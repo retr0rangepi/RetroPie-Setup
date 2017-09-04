@@ -14,7 +14,7 @@ rp_module_desc="Apple 2 emulator LinApple"
 rp_module_help="ROM Extensions: .dsk\n\nCopy your Apple 2 games to $romdir/apple2"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/dabonetn/linapple-pie/master/LICENSE"
 rp_module_section="opt"
-rp_module_flags="dispmanx !mali"
+rp_module_flags=""
 
 function depends_linapple() {
     getDepends libzip-dev libsdl1.2-dev libsdl-image1.2-dev libcurl4-openssl-dev
@@ -57,6 +57,6 @@ function configure_linapple() {
         done
     fi
 
-    addEmulator 1 "$md_id" "apple2" "pushd $romdir/apple2; $md_inst/linapple -1 %ROM%; popd"
+    addEmulator 1 "$md_id" "apple2" "pushd $romdir/apple2; LD_LIBRARY_PATH=/usr/lib startx $md_inst/linapple -1 %ROM%; popd"
     addSystem "apple2"
 }

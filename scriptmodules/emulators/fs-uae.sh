@@ -12,30 +12,7 @@
 rp_module_id="fs-uae"
 rp_module_desc="Amiga emulator - FS-UAE integrates the most accurate Amiga emulation code available from WinUAE"
 rp_module_help="ROM Extension: .adf  .adz .dms .ipf .zip\n\nCopy your Amiga games to $romdir/amiga\n\nCopy a required BIOS file (e.g. kick13.rom) to $biosdir"
-rp_module_licence="GPL2 https://raw.githubusercontent.com/FrodeSolheim/fs-uae/master/COPYING"
 rp_module_section="exp"
-rp_module_flags="!arm"
-
-function depends_fs-uae() {
-    case "$__os_id" in
-        Ubuntu)
-            if [[ "$md_mode" == "install" ]]; then
-                apt-add-repository -y ppa:fengestad/stable
-            else
-                apt-add-repository -r -y ppa:fengestad/stable
-            fi
-            aptUpdate
-            ;;
-        Debian)
-            if [[ "$md_mode" == "install" ]]; then
-                echo "deb http://download.opensuse.org/repositories/home:/FrodeSolheim:/stable/Debian_8.0/ /" > /etc/apt/sources.list.d/fsuae-stable.list
-            else
-                rm -f /etc/apt/sources.list.d/fsuae-stable.list
-            fi
-            aptUpdate
-            ;;
-    esac
-}
 
 function install_bin_fs-uae() {
     aptInstall fs-uae fs-uae-launcher fs-uae-arcade
@@ -67,9 +44,10 @@ function configure_fs-uae() {
     iniSet "fsaa" "0"
     iniSet "scanlines" "0"
     iniSet "floppy_drive_speed" "100"
+    iniSet "accuracy" "0"
     copyDefaultConfig "$config" "$md_conf_root/amiga/fs-uae/Default.fs-uae"
     rm "$config"
-
-    addEmulator 1 "$md_id" "amiga" "bash $md_inst/bin/fs-uae.sh %ROM%"
-    addSystem "amiga"
+    
+    local exts=$(getPlatformConfig amiga_exts)
+    addSystem 1 "$md_id" "amiga" "LD_LIBRARY_PATH=/usr/lib startx /usr/bin/fs-uae-launcher"
 }

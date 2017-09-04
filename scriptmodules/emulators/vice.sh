@@ -30,7 +30,7 @@ function build_vice() {
     local params=(--enable-sdlui2 --without-arts --without-oss --enable-ethernet)
     ! isPlatform "x11" && params+=(--disable-catweasel --without-pulse)
     ./autogen.sh
-    ./configure --prefix="$md_inst" "${params[@]}"
+    LDFLAGS="-L/usr/local/lib" ./configure --prefix="$md_inst" "${params[@]}"
     make
     md_ret_require="$md_build/src/x64"
 }

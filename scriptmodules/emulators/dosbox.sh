@@ -14,34 +14,26 @@ rp_module_desc="DOS emulator"
 rp_module_help="ROM Extensions: .bat .com .exe .sh\n\nCopy your DOS games to $romdir/pc"
 rp_module_licence="GPL2 https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/COPYING"
 rp_module_section="opt"
-rp_module_flags="dispmanx !mali"
+rp_module_flags=""
 
 function depends_dosbox() {
-    getDepends libsdl1.2-dev libsdl-net1.2-dev libsdl-sound1.2-dev libasound2-dev libpng12-dev automake autoconf zlib1g-dev
+    getDepends libsdl2-dev libasound2-dev libpng12-dev automake autoconf zlib1g-dev libfluidsynth-dev
 }
 
 function sources_dosbox() {
-    downloadAndExtract "$__archive_url/dosbox-r3876.tar.gz" "$md_build" 1
+    gitPullOrClone "$md_build" https://github.com/aqualung99/dosbox-0.74-ES
 }
 
 function build_dosbox() {
-    local params=()
-    ! isPlatform "x11" && params+=(--disable-opengl)
     ./autogen.sh
+    #Switching from regular PNG library to our v17
+    sed -i -e 's/lpng/lpng17/g' configure.in
     ./configure --prefix="$md_inst" "${params[@]}"
-    if isPlatform "arm"; then
-        # enable dynamic recompilation for armv4
-        sed -i 's|/\* #undef C_DYNREC \*/|#define C_DYNREC 1|' config.h
-        if isPlatform "armv6"; then
-            sed -i 's/C_TARGETCPU.*/C_TARGETCPU ARMV4LE/g' config.h
-        else
-            sed -i 's/C_TARGETCPU.*/C_TARGETCPU ARMV7LE/g' config.h
-            sed -i 's|/\* #undef C_UNALIGNED_MEMORY \*/|#define C_UNALIGNED_MEMORY 1|' config.h
-        fi
-    fi
+    rpSwap on 1024
     make clean
-    make
+    make -j2
     md_ret_require="$md_build/src/dosbox"
+    rpSwap off
 }
 
 function install_dosbox() {
@@ -75,7 +67,10 @@ _EOF_
         iniSet "usescancodes" "false"
         iniSet "core" "dynamic"
         iniSet "cycles" "max"
-        iniSet "scaler" "none"
+        iniSet "fullscreen" "true"
+        iniSet "fullresolution" "1280x720"
+        iniSet "windowresolution" "original"
+        iniSet "output" "opengles"
     fi
 
     moveConfigDir "$home/.dosbox" "$md_conf_root/pc"

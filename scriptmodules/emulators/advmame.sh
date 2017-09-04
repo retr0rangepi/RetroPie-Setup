@@ -14,7 +14,7 @@ rp_module_desc="AdvanceMAME v3.5"
 rp_module_help="ROM Extension: .zip\n\nCopy your AdvanceMAME roms to either $romdir/mame-advmame or\n$romdir/arcade"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/amadvance/advancemame/master/COPYING"
 rp_module_section="opt"
-rp_module_flags="!mali"
+rp_module_flags=""
 
 function _update_hook_advmame() {
     # if the non split advmame is installed, make directories for 0.94 / 1.4 so they will be updated
@@ -27,19 +27,19 @@ function _update_hook_advmame() {
 
 function depends_advmame() {
     local depends=(libsdl1.2-dev)
-    isPlatform "x11" && depends+=(libsdl2-dev)
+    isPlatform "mali" && depends+=(libsdl2-dev)
     isPlatform "rpi" && depends+=(libraspberrypi-dev)
     getDepends "${depends[@]}"
 }
 
 function sources_advmame() {
-    downloadAndExtract "$__archive_url/advancemame-3.5.tar.gz" "$md_build" 1
+    downloadAndExtract "https://github.com/amadvance/advancemame/releases/download/v3.5/advancemame-3.5.tar.gz" "$md_build" 1
 }
 
 function build_advmame() {
     ./configure --prefix="$md_inst"
     make clean
-    make
+    make -j2
 }
 
 function install_advmame() {
@@ -94,7 +94,7 @@ function configure_advmame() {
         iniSet "dir_snap" "$romdir/mame-advmame/snap"
         iniSet "dir_sta" "$romdir/mame-advmame/nvram"
 
-        if isPlatform "rpi"; then
+        if isPlatform "mali"; then
             iniSet "device_video" "fb"
             iniSet "device_video_cursor" "off"
             iniSet "device_keyboard" "raw"
