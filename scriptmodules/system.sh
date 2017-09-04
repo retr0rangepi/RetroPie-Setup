@@ -245,6 +245,9 @@ function get_platform() {
             ODROID-XU3)
                 __platform="odroid-xu"
                 ;;
+             sun8i)
+                __platform="H3-mali"
+                ;;
             *)
                 case $architecture in
                     i686|x86_64|amd64)
@@ -340,6 +343,14 @@ function platform_armv7-mali() {
     __default_asflags=""
     __default_makeflags="-j$(nproc)"
     __platform_flags="arm armv7 neon mali"
+}
+
+function platform_H3-mali() {
+    __default_cflags="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    __default_asflags=""
+    __default_makeflags="-j2"
+    __platform_flags="arm armv7 neon mali H3"
+    __has_binaries=0
 }
 
 function platform_imx6() {
