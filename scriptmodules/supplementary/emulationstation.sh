@@ -136,16 +136,16 @@ function depends_emulationstation() {
 function sources_emulationstation() {
     local repo="$1"
     local branch="$2"
-    [[ -z "$repo" ]] && repo="https://github.com/RetroPie/EmulationStation"
+    [[ -z "$repo" ]] && repo="https://github.com/retr0rangepi/EmulationStation"
     [[ -z "$branch" ]] && branch="master"
     gitPullOrClone "$md_build" "$repo" "$branch"
 }
 
 function build_emulationstation() {
     rpSwap on 1000
-    cmake . -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/
+    cmake . -DGLSystem="OpenGL ES" -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/
     make clean
-    make
+    make -j2
     rpSwap off
     md_ret_require="$md_build/emulationstation"
 }
