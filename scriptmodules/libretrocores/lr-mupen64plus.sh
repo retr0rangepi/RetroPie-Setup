@@ -31,7 +31,6 @@ function _update_hook_lr-mupen64plus() {
 
 function depends_lr-mupen64plus() {
     local depends=(flex bison libpng12-dev)
-    isPlatform "x11" && depends+=(libglew-dev libglu1-mesa-dev)
     isPlatform "x86" && depends+=(nasm)
     getDepends "${depends[@]}"
 }
@@ -41,14 +40,14 @@ function sources_lr-mupen64plus() {
 }
 
 function build_lr-mupen64plus() {
-    rpSwap on 750
+    rpSwap on 1024
     make clean
     if isPlatform "rpi"; then
         make platform="$__platform"
     elif isPlatform "mali"; then
-        make platform="odroid"
+        LDFLAGS="-I/usr/local/include/libpng17/ -L/usr/local/lib/linpng17 -lpng17" make platform="odroid"
     else
-        make
+        LDFLAGS="-I/usr/local/include/libpng17/ -L/usr/local/lib/linpng17 -lpng17" make
     fi
     rpSwap off
     md_ret_require="$md_build/mupen64plus_libretro.so"

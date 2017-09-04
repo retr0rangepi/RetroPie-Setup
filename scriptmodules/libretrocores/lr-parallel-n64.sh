@@ -22,11 +22,7 @@ function sources_lr-parallel-n64() {
 function build_lr-parallel-n64() {
     rpSwap on 750
     make clean
-    if isPlatform "rpi" || isPlatform "odroid-c1"; then
-        make platform="$__platform"
-    else
-        make
-    fi
+    make -j2 platform=odroid-c1
     rpSwap off
     md_ret_require="$md_build/parallel_n64_libretro.so"
 }
