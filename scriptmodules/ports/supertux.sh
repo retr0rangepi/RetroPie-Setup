@@ -13,7 +13,7 @@ rp_module_id="supertux"
 rp_module_desc="SuperTux 2d scrolling platform"
 rp_module_licence="GPL3 https://raw.githubusercontent.com/SuperTux/supertux/master/LICENSE.txt"
 rp_module_section="opt"
-rp_module_flags="!mali"
+rp_module_flags= ""
 
 function _update_hook_supertux() {
     # to show as installed in retropie-setup 4.x
@@ -29,5 +29,5 @@ function remove_supertux() {
 }
 
 function configure_supertux() {
-    addPort "$md_id" "supertux" "SuperTux" "supertux"
+    addPort "$md_id" "supertux" "SuperTux" "LD_LIBRARY_PATH=/home/pi/GL:/usr/lib startx supertux"
 }
