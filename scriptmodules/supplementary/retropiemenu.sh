@@ -48,7 +48,6 @@ function configure_retropiemenu()
         'configedit'
         'esthemes'
         'filemanager'
-        'raspiconfig'
         'retroarch'
         'retronetplay'
         'rpsetup'
@@ -64,7 +63,6 @@ function configure_retropiemenu()
         'Configuration Editor'
         'ES Themes'
         'File Manager'
-        'Raspi-Config'
         'Retroarch'
         'RetroArch Net Play'
         'RetroPie Setup'
@@ -80,7 +78,6 @@ function configure_retropiemenu()
         'Change common RetroArch options, and manually edit RetroArch configs, global configs, and non-RetroArch configs.'
         'Install, uninstall, or update EmulationStation themes. Most themes can be previewed at https://github.com/retropie/ RetroPie-Setup/wiki/themes.'
         'Basic ascii file manager for linux allowing you to browse, copy, delete, and move files.'
-        'Change user password, boot options, internationalization, camera, add your pi to Rastrack, overclock, overscan, memory split, SSH and more.'
         'Launches the RetroArch GUI so you can change RetroArch options. Note: Changes will not be saved unless you have enabled the "Save Configuration On Exit" option.'
         'Set up RetroArch Netplay options, choose host or client, port, host IP, delay frames, and your nickname.'
         'Install RetroPie from binary or source, install experimental packages, additional drivers, edit samba shares, custom scraper, as well as other RetroPie-related configurations.'
@@ -89,6 +86,9 @@ function configure_retropiemenu()
         'Enable or disable the splashscreen on RetroPie boot. Choose a splashscreen, download new splashscreens, and return splashscreen to default.'
         'Connect to or disconnect from a wifi network and configure wifi settings.'
     )
+
+#add ropi files
+    touch /home/pi/RetroPie/retropiemenu/wifi.rp
 
     setESSystem "RetroPie" "retropie" "$rpdir" ".rp .sh" "sudo $scriptdir/retropie_packages.sh retropiemenu launch %ROM% </dev/tty >/dev/tty" "" "retropie"
 
@@ -141,12 +141,13 @@ function launch_retropiemenu() {
         rpsetup.rp)
             rp_callModule setup gui
             ;;
-        raspiconfig.rp)
-            raspi-config
-            ;;
         filemanager.rp)
             mc
             ;;
+	wifi.rp)
+            sudo nmtui
+            ;;
+
         showip.rp)
             local ip="$(ip route get 8.8.8.8 2>/dev/null | head -1 | cut -d' ' -f8)"
             printMsgs "dialog" "Your IP is: $ip\n\nOutput of 'ip addr show':\n\n$(ip addr show)"
