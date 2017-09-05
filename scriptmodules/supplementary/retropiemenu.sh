@@ -42,7 +42,50 @@ function configure_retropiemenu()
     isPlatform "rpi" && rm -f "$rpdir/dispmanx.rp"
 
     # add the gameslist / icons
-    local files=(
+  if isPlatform "H3-mali"; then
+     local files=(
+        'bluetooth'
+        'configedit'
+        'esthemes'
+        'filemanager'
+        'retroarch'
+        'retronetplay'
+	'ropiwifi'
+        'rpsetup'
+        'runcommand'
+        'log'
+        'showip'
+    )
+
+    local names=(
+        'Bluetooth'
+        'Configuration Editor'
+        'ES Themes'
+        'File Manager'
+        'Retroarch'
+        'RetroArch Net Play'
+	'RetrOrangePi WiFi'
+        'RetroPie Setup'
+        'Run Command Configuration'
+        'Run Command Log'
+        'Show IP'
+    )
+
+    local descs=(
+        'Register and connect to bluetooth devices. Unregister and remove devices, and display registered and connected devices.'
+        'Change common RetroArch options, and manually edit RetroArch configs, global configs, and non-RetroArch configs.'
+        'Install, uninstall, or update EmulationStation themes. Most themes can be previewed at https://github.com/retropie/ RetroPie-Setup/wiki/themes.'
+        'Basic ascii file manager for linux allowing you to browse, copy, delete, and move files.'
+        'Launches the RetroArch GUI so you can change RetroArch options. Note: Changes will not be saved unless you have enabled the "Save Configuration On Exit" option.'
+        'Set up RetroArch Netplay options, choose host or client, port, host IP, delay frames, and your nickname.'
+	'Connect to or disconnect from a wifi network and configure wifi settings.'        
+	'Install RetroPie from binary or source, install experimental packages, additional drivers, edit samba shares, custom scraper, as well as other RetroPie-related configurations.'
+        'Change what appears on the runcommand screen. Enable or disable the menu, enable or disable box art, and change CPU configuration.'
+        'Displays runcommand.log output, useful for checking errors with your roms.'
+        'Displays your current IP address, as well as other information provided by the command, "ip addr show."'
+    )
+    else
+     local files=(
         'audiosettings'
         'bluetooth'
         'configedit'
@@ -53,6 +96,7 @@ function configure_retropiemenu()
         'retronetplay'
         'rpsetup'
         'runcommand'
+        'log'
         'showip'
         'splashscreen'
         'wifi'
@@ -69,6 +113,7 @@ function configure_retropiemenu()
         'RetroArch Net Play'
         'RetroPie Setup'
         'Run Command Configuration'
+        'Run Command Log'
         'Show IP'
         'Splash Screens'
         'WiFi'
@@ -82,17 +127,22 @@ function configure_retropiemenu()
         'Basic ascii file manager for linux allowing you to browse, copy, delete, and move files.'
         'Change user password, boot options, internationalization, camera, add your pi to Rastrack, overclock, overscan, memory split, SSH and more.'
         'Launches the RetroArch GUI so you can change RetroArch options. Note: Changes will not be saved unless you have enabled the "Save Configuration On Exit" option.'
-        'Set up RetroArch Netplay options, choose host or client, port, host IP, delay frames, and your nickname.'
-        'Install RetroPie from binary or source, install experimental packages, additional drivers, edit samba shares, custom scraper, as well as other RetroPie-related configurations.'
+        'Set up RetroArch Netplay options, choose host or client, port, host IP, delay frames, and your nickname.'        
+	'Install RetroPie from binary or source, install experimental packages, additional drivers, edit samba shares, custom scraper, as well as other RetroPie-related configurations.'
         'Change what appears on the runcommand screen. Enable or disable the menu, enable or disable box art, and change CPU configuration.'
+        'Displays runcommand.log output, useful for checking errors with your roms.'
         'Displays your current IP address, as well as other information provided by the command, "ip addr show."'
         'Enable or disable the splashscreen on RetroPie boot. Choose a splashscreen, download new splashscreens, and return splashscreen to default.'
         'Connect to or disconnect from a wifi network and configure wifi settings.'
     )
+fi
+    local file
+    for file in "${files[@]}"; do
+        touch "$rpdir/$file.rp"
+    done
 
     setESSystem "RetroPie" "retropie" "$rpdir" ".rp .sh" "sudo $scriptdir/retropie_packages.sh retropiemenu launch %ROM% </dev/tty >/dev/tty" "" "retropie"
 
-    local file
     local name
     local desc
     local image
@@ -110,8 +160,6 @@ function configure_retropiemenu()
         name="${names[i]}"
         desc="${descs[i]}"
         image="$home/RetroPie/retropiemenu/icons/${files[i]}.png"
-
-        touch "$rpdir/$file.rp"
 
         local function
         for function in $(compgen -A function _add_rom_); do
@@ -147,6 +195,12 @@ function launch_retropiemenu() {
         filemanager.rp)
             mc
             ;;
+        log.rp)
+            printMsgs "dialog" "Your runcommand.log is:\n\n$(cat /dev/shm/runcommand.log)"
+            ;;
+	ropiwifi.rp)
+	    nmtui
+	    ;;
         showip.rp)
             local ip="$(ip route get 8.8.8.8 2>/dev/null | head -1 | cut -d' ' -f8)"
             printMsgs "dialog" "Your IP is: $ip\n\nOutput of 'ip addr show':\n\n$(ip addr show)"
@@ -161,7 +215,7 @@ function launch_retropiemenu() {
             ;;
         *.sh)
             cd "$home/RetroPie/retropiemenu"
-            sudo -u "$user" bash "$command"
+            bash "$command"
             ;;
     esac
     clear
