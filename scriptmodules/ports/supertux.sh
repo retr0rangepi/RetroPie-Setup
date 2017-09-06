@@ -28,5 +28,5 @@ function remove_supertux() {
 }
 
 function configure_supertux() {
-    addPort "$md_id" "supertux" "SuperTux" "LD_LIBRARY_PATH=/home/pi/GL:/usr/lib startx supertux"
+    addPort "$md_id" "supertux" "SuperTux" "LD_LIBRARY_PATH=/usr/lib startx supertux"
 }

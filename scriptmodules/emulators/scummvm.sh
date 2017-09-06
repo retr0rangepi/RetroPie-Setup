@@ -58,6 +58,6 @@ _EOF_
     chown $user:$user "$romdir/scummvm/+Start_$name.sh"
     chmod u+x "$romdir/scummvm/+Start_$name.sh"
 
-    addEmulator 1 "$md_id" "scummvm" "LD_LIBRARY_PATH=/home/pi/GL:/usr/lib startx $romdir/scummvm/+Start_$name.sh %BASENAME%"
+    addEmulator 1 "$md_id" "scummvm" "LD_LIBRARY_PATH=/usr/lib startx $romdir/scummvm/+Start_$name.sh %BASENAME%"
     addSystem "scummvm"
 }
