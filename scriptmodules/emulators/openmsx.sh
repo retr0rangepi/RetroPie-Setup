@@ -30,7 +30,7 @@ function build_openmsx() {
     rpSwap on 512
     ./configure
     make clean
-    make
+    make -j2
     rpSwap off
 }
 
@@ -43,6 +43,6 @@ function install_openmsx() {
 function configure_openmsx() {
     mkRomDir "msx"
 
-    addEmulator 0 "$md_id" "msx" "LD_LIBRARY_PATH=/usr/lib $md_inst/bin/openmsx %ROM%"
+    addEmulator 0 "$md_id" "msx" "LD_LIBRARY_PATH=/usr/lib startx $md_inst/bin/openmsx %ROM%"
     addSystem "msx"
 }
