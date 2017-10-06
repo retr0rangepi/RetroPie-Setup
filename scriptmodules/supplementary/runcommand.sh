@@ -60,9 +60,9 @@ function governor_runcommand() {
             ((i++))
         done
     fi
-    choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
-    if [[ -n "$choices" ]]; then
-        governor="${governors[$choices]}"
+    local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+    if [[ -n "$choice" ]]; then
+        governor="${governors[$choice]}"
         iniSet "governor" "$governor"
         chown $user:$user "$configdir/all/runcommand.cfg"
     fi
@@ -112,7 +112,7 @@ function gui_runcommand() {
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         [[ -z "$choice" ]] && break
         default="$choice"
-        case $choice in
+        case "$choice" in
             1)
                 iniSet "disable_menu" "$((disable_menu ^ 1))"
                 ;;

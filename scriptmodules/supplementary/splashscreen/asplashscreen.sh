@@ -1,16 +1,5 @@
 #!/bin/sh
 
-### BEGIN INIT INFO
-# Provides:          asplashscreen
-# Required-Start:    mountdevsubfs
-# Required-Stop:
-# Default-Start:     S
-# X-Start-Before:    checkroot
-# Default-Stop:
-# Short-Description: Show custom splashscreen
-# Description:       Show custom splashscreen
-### END INIT INFO
-
 ROOTDIR=""
 DATADIR=""
 RANDOMIZE="disabled"
@@ -43,7 +32,7 @@ do_start () {
         while ! pgrep "dbus" >/dev/null; do
             sleep 1
         done
-        omxplayer -o both -b --layer 10000 "$line"
+        mpv -vo sdl -fs "$line"
     elif $(echo "$line" | grep -q "$REGEX_IMAGE"); then
         if [ "$RANDOMIZE" = "disabled" ]; then
             local count=$(wc -l <"$config")

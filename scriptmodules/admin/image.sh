@@ -114,8 +114,6 @@ modules=(
     'bluetooth depends'
     'raspbiantools enable_modules'
     'autostart enable'
-    'usbromservice'
-    'usbromservice enable'
     'samba depends'
     'samba install_shares'
     'splashscreen default'
@@ -180,7 +178,7 @@ function create_image() {
     kpartx -s -a "$image"
 
     mkfs.vfat -F 16 -n boot /dev/mapper/loop0p1
-    mkfs.ext4 -O ^metadata_csum -L retropie /dev/mapper/loop0p2
+    mkfs.ext4 -O ^metadata_csum,^huge_file -L retropie /dev/mapper/loop0p2
 
     parted "$image" print
 
@@ -197,6 +195,12 @@ function create_image() {
     # copy files
     printMsgs "console" "Rsyncing chroot to $image ..."
     rsync -aAHX --numeric-ids  chroot/ mnt/
+
+    # we need to fix up the UUIDS for /boot/cmdline.txt and /etc/fstab
+    local old_id="$(sed "s/.*PARTUUID=\([^-]*\).*/\1/" mnt/boot/cmdline.txt)"
+    local new_id="$(blkid -s PARTUUID -o value /dev/mapper/loop0p2 | cut -c -8)"
+    sed -i "s/$old_id/$new_id/" mnt/boot/cmdline.txt
+    sed -i "s/$old_id/$new_id/g" mnt/etc/fstab
 
     # unmount
     umount -l mnt/boot mnt

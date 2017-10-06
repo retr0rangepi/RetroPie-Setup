@@ -71,6 +71,10 @@ function get_os_version() {
     __os_codename="${os[3]}"
     case "$__os_id" in
         Raspbian|Debian)
+            if compareVersions "$__os_release" ge 9 && isPlatform "rpi"; then
+                error="Sorry - Raspbian/Debian Stretch (and newer) is not yet supported on the RPI"
+            fi
+
             if compareVersions "$__os_release" lt 8; then
                 __has_binaries=0
             fi
@@ -91,6 +95,9 @@ function get_os_version() {
 
     # add 32bit/64bit to platform flags
     __platform_flags+=" $(getconf LONG_BIT)bit"
+
+    # configure Raspberry Pi graphics stack
+    isPlatform "rpi" && get_rpi_video
 }
 
 function get_default_gcc() {
@@ -131,12 +138,12 @@ function set_default_gcc() {
 }
 
 function get_retropie_depends() {
-    # add rasberrypi repository if it's missing (needed for libraspberrypi-dev etc) - not used on osmc
+    # add raspberrypi.org repository if it's missing (needed for libraspberrypi-dev etc) - not used on osmc
     local config="/etc/apt/sources.list.d/raspi.list"
     if [[ "$__os_id" == "Raspbian" && ! -f "$config" ]]; then
         # add key
         wget -q http://archive.raspberrypi.org/debian/raspberrypi.gpg.key -O- | apt-key add - >/dev/null
-        echo "deb http://archive.raspberrypi.org/debian/ $__os_codename main" >>$config
+        echo "deb http://archive.raspberrypi.org/debian/ $__os_codename main ui" >>$config
     fi
 
     local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet)
@@ -146,6 +153,24 @@ function get_retropie_depends() {
     if ! getDepends "${depends[@]}"; then
         fatalError "Unable to install packages required by $0 - ${md_ret_errors[@]}"
     fi
+}
+
+function get_rpi_video() {
+    local pkgconfig="/opt/vc/lib/pkgconfig"
+
+    # detect driver via inserted module / platform driver setup
+    if [[ -d "/sys/module/vc4" ]]; then
+        __platform_flags+=" mesa kms"
+        [[ "$(ls -A /sys/bus/platform/drivers/vc4_firmware_kms/*.firmwarekms 2>/dev/null)" ]] && __platform_flags+=" dispmanx"
+    else
+        __platform_flags+=" videocore dispmanx"
+    fi
+
+    # use our supplied fallback pkgconfig if necessary
+    [[ ! -d "$pkgconfig" ]] && pkgconfig="$scriptdir/pkgconfig"
+
+    # set pkgconfig path for vendor libraries
+    export PKG_CONFIG_PATH="$pkgconfig"
 }
 
 function get_platform() {
