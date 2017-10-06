@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_stella() {
-    getDepends libsdl2-dev libpng12-dev zlib1g-dev xz-utils
+    getDepends libpng12-dev zlib1g-dev xz-utils
 }
 
 function sources_stella() {
@@ -27,7 +27,7 @@ function sources_stella() {
 function build_stella() {
     ./configure --prefix="$md_inst"
     make clean
-    make
+    make -j2
     md_ret_require="$md_build/stella"
 }
 
@@ -40,6 +40,6 @@ function configure_stella() {
 
     moveConfigDir "$home/.stella" "$md_conf_root/atari2600/stella"
 
-    addEmulator 1 "$md_id" "atari2600" "$md_inst/bin/stella -maxres 320x240 -fullscreen 1 -tia.fsfill 1 %ROM%"
+    addEmulator 1 "$md_id" "atari2600" "LD_LIBRARY_PATH=/usr/lib startx $md_inst/bin/stella -maxres 320x240 -fullscreen 1 -tia.fsfill 1 %ROM%"
     addSystem "atari2600"
 }

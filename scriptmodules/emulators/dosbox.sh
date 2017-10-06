@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_dosbox() {
-    getDepends libsdl2-dev libasound2-dev libpng12-dev automake autoconf zlib1g-dev libfluidsynth-dev
+    getDepends libasound2-dev libpng12-dev automake autoconf zlib1g-dev libfluidsynth-dev
 }
 
 function sources_dosbox() {
@@ -25,7 +25,6 @@ function sources_dosbox() {
 }
 
 function build_dosbox() {
-    ./autogen.sh
     #Switching from regular PNG library to our v17
     sed -i -e 's/lpng/lpng17/g' configure.in
     ./configure --prefix="$md_inst" "${params[@]}"

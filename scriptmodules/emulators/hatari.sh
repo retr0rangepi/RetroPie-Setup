@@ -64,7 +64,7 @@ function build_hatari() {
         -DCAPSIMAGE_INCLUDE_DIR="$md_build/src/include" \
         -DCAPSIMAGE_LIBRARY="$md_build/lib/libcapsimage.so.5.1" \
         -DENABLE_SDL2:BOOL=1 \
-        -DSDL2_LIBRARY=/usr/lib/arm-linux-gnueabihf/libSDL2.so
+        -DSDL2_LIBRARY=/usr/local/lib/libSDL2.so
     make clean
     make -j2
     md_ret_require="$md_build/src/hatari"
