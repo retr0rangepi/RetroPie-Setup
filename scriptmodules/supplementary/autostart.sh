@@ -12,6 +12,7 @@
 rp_module_id="autostart"
 rp_module_desc="Auto-start Emulation Station / Kodi on boot"
 rp_module_section="config"
+rp_module_flags="!H3"
 
 function _update_hook_autostart() {
     if [[ -f /etc/profile.d/10-emulationstation.sh ]]; then
