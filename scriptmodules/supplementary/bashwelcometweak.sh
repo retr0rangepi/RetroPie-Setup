@@ -12,6 +12,7 @@
 rp_module_id="bashwelcometweak"
 rp_module_desc="Bash Welcome Tweak (shows additional system info on login)"
 rp_module_section="config"
+rp_module_flags="!H3"
 
 function install_bashwelcometweak() {
     remove_bashwelcometweak
