@@ -33,6 +33,7 @@ do_start () {
             sleep 1
         done
         mpv -vo sdl -fs "$line"
+	sleep 30
     elif $(echo "$line" | grep -q "$REGEX_IMAGE"); then
         if [ "$RANDOMIZE" = "disabled" ]; then
             local count=$(wc -l <"$config")

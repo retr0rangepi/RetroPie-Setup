@@ -233,7 +233,8 @@ function preview_splashscreen() {
                 3)
                     file=$(choose_splashscreen "$path" "video")
                     [[ -z "$file" ]] && break
-                    omxplayer -b --layer 10000 "$file"
+                    mpv -fs -vo sdl "$file"
+                    sleep 30
                     ;;
             esac
         done
