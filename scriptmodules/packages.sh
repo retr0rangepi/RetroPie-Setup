@@ -228,6 +228,14 @@ function rp_callModule() {
             elif fnExists "install_bin_${md_id}"; then
                 "install_bin_${md_id}" "$@"
             fi
+            # if the module has the newbrcmlibs it means it is linked against the
+            # renamed videocore libbrcm* libraries. We record this so we can
+            # switch library names for SDL in runcommand for software using the
+            # older names (the new SDL 2.0.6 requires applications to also use
+            # the new libraries by default)
+            if isPlatform "rpi" && hasFlag "$md_flags" "newbrcmlibs"; then
+                touch "$md_inst/RP-NEWBRCMLIBS"
+            fi
             ;;
         install_bin)
             if fnExists "install_bin_${md_id}"; then
@@ -259,7 +267,7 @@ function rp_callModule() {
                 fi
             done
         else
-            # check for existance and copy any files/directories returned
+            # check for existence and copy any files/directories returned
             if [[ -n "$md_ret_files" ]]; then
                 for file in "${md_ret_files[@]}"; do
                     if [[ ! -e "$md_build/$file" ]]; then

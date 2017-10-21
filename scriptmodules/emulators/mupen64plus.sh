@@ -15,6 +15,13 @@ rp_module_help="ROM Extensions: .z64 .n64 .v64\n\nCopy your N64 roms to $romdir/
 rp_module_licence="GPL2 https://raw.githubusercontent.com/mupen64plus/mupen64plus-core/master/LICENSES"
 rp_module_section="main"
 
+function depends_mupen64plus() {
+    local depends=(cmake libsamplerate0-dev libspeexdsp-dev libsdl2-dev libpng12-dev)
+    isPlatform "x11" && depends+=(libglew-dev libglu1-mesa-dev libboost-filesystem-dev)
+    isPlatform "x86" && depends+=(nasm)
+    getDepends "${depends[@]}"
+}
+
 function sources_mupen64plus() {
     #Let's add Odroid repository for best compatibility with RetrOrangePi
     rm -rf /etc/apt/sources.list.d/meveric-jessie-main.list

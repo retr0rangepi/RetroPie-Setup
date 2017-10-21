@@ -9,7 +9,7 @@
 # at https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/LICENSE.md
 #
 
-__version="4.3.1"
+__version="4.3.3"
 
 [[ "$__debug" -eq 1 ]] && set -x
 
@@ -64,11 +64,9 @@ ensureFBMode 320 240
 
 rp_ret=0
 if [[ $# -gt 0 ]]; then
-    joy2keyStart
     setupDirectories
     rp_callModule "$@"
     rp_ret=$?
-    joy2keyStop
 else
     rp_printUsageinfo
 fi

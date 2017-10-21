@@ -345,8 +345,8 @@ function gitPullOrClone() {
         popd > /dev/null
     else
         local git="git clone --recursive"
-        if [[ "$__persistent_repos" -ne 1 ]]; then
-            [[ "$repo" =~ github ]] && git+=" --depth 1"
+        if [[ "$__persistent_repos" -ne 1 && "$repo" == *github* ]]; then
+            git+=" --depth 1"
         fi
         [[ "$branch" != "master" ]] && git+=" --branch $branch"
         echo "$git \"$repo\" \"$dir\""
@@ -464,7 +464,7 @@ function moveConfigFile() {
 ## @brief Compares two files using diff.
 ## @retval 0 if the files were the same
 ## @retval 1 if they were not
-## @retval >1 an error occured
+## @retval >1 an error occurred
 function diffFiles() {
     diff -q "$1" "$2" >/dev/null
     return $?
@@ -1001,6 +1001,10 @@ _EOF_
 ## @details Arguments are curses capability names or hex values starting with '0x'
 ## see: http://pubs.opengroup.org/onlinepubs/7908799/xcurses/terminfo.html
 function joy2keyStart() {
+    # don't start on SSH sessions
+    # (check for bracket in output - ip/name in brackets over a SSH connection)
+    [[ "$(who -m)" == *\(* ]] && return
+
     local params=("$@")
     if [[ "${#params[@]}" -eq 0 ]]; then
         params=(kcub1 kcuf1 kcuu1 kcud1 0x0a 0x20)
@@ -1010,7 +1014,7 @@ function joy2keyStart() {
     [[ -c "$__joy2key_dev" ]] || __joy2key_dev="/dev/input/jsX"
 
     # if no joystick device, or joy2key is already running exit
-    [[ -z "$__joy2key_dev" || -n "$SSH_TTY" ]] || pgrep -f joy2key.py >/dev/null && return 1
+    [[ -z "$__joy2key_dev" ]] || pgrep -f joy2key.py >/dev/null && return 1
 
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1
     if "$scriptdir/scriptmodules/supplementary/runcommand/joy2key.py" "$__joy2key_dev" "${params[@]}" & 2>/dev/null; then

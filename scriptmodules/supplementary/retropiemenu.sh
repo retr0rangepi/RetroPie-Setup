@@ -134,6 +134,7 @@ function launch_retropiemenu() {
     local command="$1"
     local basename="${command##*/}"
     local no_ext=${basename%.rp}
+    joy2keyStart
     case $basename in
         retroarch.rp)
             cp "$configdir/all/retroarch.cfg" "$configdir/all/retroarch.cfg.bak"
@@ -171,5 +172,6 @@ function launch_retropiemenu() {
             sudo -u "$user" bash "$command"
             ;;
     esac
+    joy2keyStop
     clear
 }

@@ -109,6 +109,8 @@ function updatescript_setup()
 function post_update_setup() {
     local return_func=("$@")
 
+    joy2keyStart
+
     echo "$__version" >"$rootdir/VERSION"
 
     clear
@@ -486,6 +488,7 @@ function reboot_setup()
 # retropie-setup main menu
 function gui_setup() {
     depends_setup
+    joy2keyStart
     local default
     while true; do
         local commit=$(git -C "$scriptdir" log -1 --pretty=format:"%cr (%h)")
@@ -571,5 +574,6 @@ function gui_setup() {
                 ;;
         esac
     done
+    joy2keyStop
     clear
 }
