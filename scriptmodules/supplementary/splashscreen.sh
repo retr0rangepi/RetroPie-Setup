@@ -234,7 +234,6 @@ function preview_splashscreen() {
                     file=$(choose_splashscreen "$path" "video")
                     [[ -z "$file" ]] && break
                     mpv -fs -vo sdl "$file"
-                    sleep 30
                     ;;
             esac
         done

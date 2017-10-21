@@ -33,7 +33,6 @@ do_start () {
             sleep 1
         done
         mpv -vo sdl -fs "$line"
-	sleep 30
     elif $(echo "$line" | grep -q "$REGEX_IMAGE"); then
         if [ "$RANDOMIZE" = "disabled" ]; then
             local count=$(wc -l <"$config")
@@ -45,8 +44,12 @@ do_start () {
         local delay=$((20/count))
         if [ "$RANDOMIZE" = "disabled" ]; then
             fbi -T 2 -once -t $delay -noverbose -a -l "$config" >/dev/null 2>&1
+	    mplayer /home/pi/RetroPie/splashscreens/bootsnd.ogg
+	    python /home/pi/RetroPie/music/bgmusic.py
         else
             fbi -T 2 -once -t $delay -noverbose -a "$line" >/dev/null 2>&1
+	    mplayer /home/pi/RetroPie/splashscreens/bootsnd.ogg
+            python /home/pi/RetroPie/music/bgmusic.py
         fi
     fi
     exit 0
