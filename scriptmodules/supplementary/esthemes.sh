@@ -115,6 +115,8 @@ function gui_esthemes() {
         'RetroHursty69 stirling'
         'lostless playstation'
         'mrharias superdisplay'
+	'retr0rangepi cosmos-ropi'
+	'retr0rangepi hyperion'
     )
     while true; do
         local theme
