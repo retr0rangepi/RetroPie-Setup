@@ -54,7 +54,6 @@ function configure_retropiemenu()
         'runcommand'
         'showip'
         'splashscreen'
-        'wifi'
 	'log'
     )
 
@@ -70,7 +69,6 @@ function configure_retropiemenu()
         'Run Command Configuration'
         'Show IP'
         'Splash Screens'
-        'WiFi'
 	'Run Command Log'
     )
 
@@ -85,7 +83,7 @@ function configure_retropiemenu()
         'Install RetroPie from binary or source, install experimental packages, additional drivers, edit samba shares, custom scraper, as well as other RetroPie-related configurations.'
         'Change what appears on the runcommand screen. Enable or disable the menu, enable or disable box art, and change CPU configuration.'
         'Displays your current IP address, as well as other information provided by the command, "ip addr show."'
-        'Enable or disable the splashscreen on RetroPie boot. Choose a splashscreen, download new splashscreens, and return splashscreen to default.'
+        'Enable or disable the splashscreen on RetrOrangePi boot. Choose a splashscreen, download new splashscreens, and return splashscreen to default.'
         'Connect to or disconnect from a wifi network and configure wifi settings.'
 	'Displays runcommand.log output, useful for checking errors with your roms.'
     )
@@ -103,7 +101,7 @@ function configure_retropiemenu()
     local i
     for i in "${!files[@]}"; do
         case "${files[i]}" in
-            audiosettings|raspiconfig|splashscreen)
+            audiosettings|raspiconfig)
                 ! isPlatform "rpi" && continue
                 ;;
             wifi)
