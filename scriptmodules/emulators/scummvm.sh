@@ -42,6 +42,7 @@ function configure_scummvm() {
 
     # Create startup script
     rm -f "$romdir/scummvm/+Launch GUI.sh"
+    rm -f "$romdir/scummvm/+Start $name.sh" 
     local name="ScummVM"
     [[ "$md_id" == "scummvm-sdl1" ]] && name="ScummVM-SDL1"
     cat > "$romdir/scummvm/+Start_$name.sh" << _EOF_
@@ -57,7 +58,8 @@ popd >/dev/null
 _EOF_
     chown $user:$user "$romdir/scummvm/+Start_$name.sh"
     chmod u+x "$romdir/scummvm/+Start_$name.sh"
-
+    cp -p "$md_data/.scummvmrc" "/home/pi/"
     addEmulator 1 "$md_id" "scummvm" "LD_LIBRARY_PATH=/usr/lib startx $romdir/scummvm/+Start_$name.sh %BASENAME%"
+    addEmulator 0 "$md_id-launcher" "scummvm" "LD_LIBRARY_PATH=/usr/lib startx %ROM%"
     addSystem "scummvm"
 }
