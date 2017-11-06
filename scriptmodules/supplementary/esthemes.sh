@@ -25,11 +25,11 @@ function install_theme_esthemes() {
     local theme="$1"
     local repo="$2"
     if [[ -z "$repo" ]]; then
-        repo="RetroPie"
+        repo="retr0rangepi"
     fi
     if [[ -z "$theme" ]]; then
-        theme="carbon"
-        repo="RetroPie"
+        theme="cosmos-ropi"
+        repo="retr0rangepi"
     fi
     mkdir -p "/etc/emulationstation/themes"
     gitPullOrClone "/etc/emulationstation/themes/$theme" "https://github.com/$repo/es-theme-$theme.git"
@@ -118,6 +118,10 @@ function gui_esthemes() {
         'mrharias superdisplay'
 	'retr0rangepi cosmos-ropi'
 	'retr0rangepi hyperion'
+        'coinjunkie synthwave'
+        'RetroHursty69 boxalloyred'
+        'RetroHursty69 boxalloyblue'
+        'Saracade scv720'
     )
     while true; do
         local theme
