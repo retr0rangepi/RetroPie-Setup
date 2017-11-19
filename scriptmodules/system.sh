@@ -21,14 +21,15 @@ function setup_env() {
     __memory_total=$(free -m -t | awk '/^Total:/{print $2}')
 
     get_platform
-
     get_os_version
-    get_default_gcc
     get_retropie_depends
 
-    # set default gcc version
-    if [[ -n "$__default_gcc_version" ]]; then
-        set_default_gcc "$__default_gcc_version"
+    __gcc_version=$(gcc -dumpversion)
+
+    # workaround for GCC ABI incompatibility with threaded armv7+ C++ apps built
+    # on Raspbian's armv6 userland https://github.com/raspberrypi/firmware/issues/491
+    if [[ "$__os_id" == "Raspbian" ]] && compareVersions $__gcc_version lt 5.0.0; then
+        __default_cxxflags+=" -U__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
     fi
 
     # set location of binary downloads
@@ -84,6 +85,18 @@ function get_os_version() {
                 __platform_flags+=" osmc"
             fi
 
+            # and for xbian
+            if grep -q "NAME=XBian" /etc/os-release; then
+                __platform_flags+=" xbian"
+            fi
+
+            # we provide binaries for RPI on Raspbian < 9 only
+            if isPlatform "rpi" && compareVersions "$__os_release" lt 9; then
+                __has_binaries=1
+            fi
+
+            # get major version (8 instead of 8.0 etc)
+            __os_debian_ver="${__os_release%%.*}"
             ;;
         Ubuntu|LinuxMint)
             __has_binaries=0
@@ -146,10 +159,11 @@ function get_retropie_depends() {
         echo "deb http://archive.raspberrypi.org/debian/ $__os_codename main ui" >>$config
     fi
 
-    local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet)
+    local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet python-pyudev)
     if [[ -n "$__default_gcc_version" ]]; then
         depends+=(gcc-$__default_gcc_version g++-$__default_gcc_version)
     fi
+
     if ! getDepends "${depends[@]}"; then
         fatalError "Unable to install packages required by $0 - ${md_ret_errors[@]}"
     fi
