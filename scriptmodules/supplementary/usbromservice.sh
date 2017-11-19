@@ -78,11 +78,15 @@ function configure_usbromservice() {
             iniSet "FILESYSTEMS" "$ini_value $fs"
         fi
     done
+
     iniGet "MOUNTOPTIONS"
+    iniSet "MOUNTOPTIONS" "sync,exec"
+
+    iniGet "FS_MOUNTOPTIONS"
     local uid=$(id -u $user)
     local gid=$(id -g $user)
-    if [[ ! "$ini_value" =~ uid|gid ]]; then
-        iniSet "MOUNTOPTIONS" "$ini_value,uid=$uid,gid=$gid"
+    if [[ ! "$ini_value" =~ uid|gid ]]; then 
+        iniSet "FS_MOUNTOPTIONS" "$ini_value -fstype=vfat,umask=022,uid=$uid,gid=$gid"
     fi
 }
 
