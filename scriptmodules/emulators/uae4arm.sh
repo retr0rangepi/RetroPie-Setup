@@ -99,8 +99,8 @@ _EOF_
         chown $user:$user "$romdir/amiga/$script"
     fi
 
-    addEmulator 1 "$md_id" "amiga" "$md_inst/$md_id.sh auto %ROM%"
-    addEmulator 1 "$md_id-a500" "amiga" "$md_inst/$md_id.sh rp-a500.uae %ROM%"
-    addEmulator 1 "$md_id-a1200" "amiga" "$md_inst/$md_id.sh rp-a1200.uae %ROM%"
+    addEmulator 1 "$md_id" "amiga" "LD_LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:/usr/lib startx $md_inst/$md_id.sh auto %ROM%"
+    addEmulator 1 "$md_id-a500" "amiga" "LD_LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:/usr/lib startx $md_inst/$md_id.sh rp-a500.uae %ROM%"
+    addEmulator 1 "$md_id-a1200" "amiga" "LD_LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:/usr/lib startx $md_inst/$md_id.sh rp-a1200.uae %ROM%"
     addSystem "amiga"
 }

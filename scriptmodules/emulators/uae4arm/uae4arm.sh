@@ -52,6 +52,7 @@ else
         config="conf/$config"
     fi
 
+    /usr/bin/qjoypad "amiga"
     "$emulator" -config="$config" "${images[@]}" -G
     archiveCleanup
 fi
