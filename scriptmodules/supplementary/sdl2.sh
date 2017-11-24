@@ -16,11 +16,11 @@ rp_module_section=""
 rp_module_flags=""
 
 function get_ver_sdl2() {
-    echo "2.0.6"
+    echo "2.0.7"
 }
 
 function get_pkg_ver_sdl2() {
-    local ver="$(get_ver_sdl2)+1"
+    local ver="$(get_ver_sdl2)+2"
     isPlatform "rpi" && ver+="rpi"
     isPlatform "mali" && ver+="mali"
     echo "$ver"
