@@ -124,6 +124,7 @@ function gui_esthemes() {
         'RetroHursty69 greenilicious'
         'RetroHursty69 retroroid'
         'RetroHursty69 merryxmas'
+        'RetroHursty69 cardcrazy'
         'Saracade scv720'
     )
     while true; do
