@@ -24,6 +24,7 @@ function depends_mupen64plus() {
 }
 
 function sources_mupen64plus() {
+<<<<<<< HEAD
     #Let's add Odroid repository for best compatibility with RetrOrangePi
     rm -rf /etc/apt/sources.list.d/meveric-jessie-main.list
     cd /etc/apt/sources.list.d/
