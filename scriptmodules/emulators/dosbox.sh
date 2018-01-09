@@ -119,7 +119,7 @@ _EOF_
             iniSet "midiconfig" "128:0"
         fi
     fi
-
+fi
     moveConfigDir "$home/.$md_id" "$md_conf_root/pc"
 
     addEmulator "$def" "$md_id" "pc" "bash $romdir/pc/${launcher_name// /\\ } %ROM%"
