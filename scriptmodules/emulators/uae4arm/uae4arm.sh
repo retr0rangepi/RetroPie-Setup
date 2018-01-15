@@ -5,6 +5,9 @@ config="$1"
 rom="$2"
 rom_bn="${rom%.*}"
 
+# enabling QJOYPAD to bind keyboard/mouse to gamepad
+/usr/bin/qjoypad "amiga" &
+
 pushd "${0%/*}" >/dev/null
 if [[ -z "$rom" ]]; then
     "$emulator"
@@ -52,7 +55,6 @@ else
         config="conf/$config"
     fi
 
-    /usr/bin/qjoypad "amiga"
     "$emulator" -config="$config" "${images[@]}" -G
     archiveCleanup
 fi

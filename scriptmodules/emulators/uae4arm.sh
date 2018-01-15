@@ -17,11 +17,13 @@ rp_module_section="opt"
 rp_module_flags="!x86 !kms"
 
 function depends_uae4arm() {
-    getDepends libsdl1.2-dev libsdl-gfx1.2-dev libsdl-ttf2.0-dev libguichan-dev libmpg123-dev libxml2-dev libflac-dev
+    getDepends libsdl1.2-dev libsdl-gfx1.2-dev libsdl-ttf2.0-dev libguichan-dev libmpg123-dev libxml2-dev libflac-dev libmpeg2-4-dev
 }
 
 function sources_uae4arm() {
     gitPullOrClone "$md_build" https://github.com/Chips-fr/uae4arm-rpi/
+    # RetrOrangePi fullscreen hack
+    sed -i -e 's/800,480,16/1280,720,16/g' src/od-gles/gles_gfx.cpp
 }
 
 function build_uae4arm() {
@@ -29,7 +31,8 @@ function build_uae4arm() {
     if isPlatform "rpi1"; then
         CXXFLAGS="" make PLATFORM=rpi1
     else
-        CXXFLAGS="" make PLATFORM=rpi2
+        # adding RetrOrangePi Mali/GLES support
+        CXXFLAGS="" make -j2 PLATFORM=gles
     fi
     md_ret_require="$md_build/uae4arm"
 }
@@ -43,7 +46,8 @@ function install_uae4arm() {
 
 function configure_uae4arm() {
     mkRomDir "amiga"
-
+    # moving previous emulator configs
+    mv "$md_conf_root/amiga/emulators.cfg" /home/pi/temp
     mkUserDir "$md_conf_root/amiga"
     mkUserDir "$md_conf_root/amiga/$md_id"
 
@@ -83,6 +87,9 @@ function configure_uae4arm() {
     copyDefaultConfig "$conf" "$md_conf_root/amiga/$md_id/conf/rp-a1200.uae"
     rm "$conf"
 
+    # copy basic QJOYPAD layout (mappings to mouse buttons,F1,F2,F12,ESC so switching to main menu and quitting will be easier).
+    cp -p $md_data/amiga.lyt /home/pi/.qjoypad3/
+
     # copy launch script (used for uae4arm and amiberry)
     sed "s/EMULATOR/$md_id/" "$scriptdir/scriptmodules/$md_type/uae4arm/uae4arm.sh" >"$md_inst/$md_id.sh"
     chmod a+x "$md_inst/$md_id.sh"
@@ -93,14 +100,14 @@ function configure_uae4arm() {
     if [[ "$md_mode" == "install" ]]; then
         cat > "$romdir/amiga/$script" << _EOF_
 #!/bin/bash
-"$md_inst/$md_id.sh"
+cd /opt/retropie/emulators/uae4arm; LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh
 _EOF_
         chmod a+x "$romdir/amiga/$script"
         chown $user:$user "$romdir/amiga/$script"
     fi
 
-    addEmulator 1 "$md_id" "amiga" "LD_LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:/usr/lib startx $md_inst/$md_id.sh auto %ROM%"
-    addEmulator 1 "$md_id-a500" "amiga" "LD_LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:/usr/lib startx $md_inst/$md_id.sh rp-a500.uae %ROM%"
-    addEmulator 1 "$md_id-a1200" "amiga" "LD_LIBRARY_PATH=/usr/lib/arm-linux-gnueabihf:/usr/lib startx $md_inst/$md_id.sh rp-a1200.uae %ROM%"
+    addEmulator 1 "$md_id" "amiga" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh auto %ROM%"
+    addEmulator 1 "$md_id-a500" "amiga" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh rp-a500.uae %ROM%"
+    addEmulator 1 "$md_id-a1200" "amiga" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh rp-a1200.uae %ROM%"
     addSystem "amiga"
 }
