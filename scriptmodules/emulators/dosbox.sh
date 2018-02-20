@@ -27,11 +27,11 @@ function sources_dosbox() {
 }
 
 function build_dosbox() {
-    #Switching from regular PNG library to our v17
-    sed -i -e 's/lpng/lpng17/g' configure.in
-    ./configure --prefix="$md_inst" "${params[@]}"
+    ./autogen.sh
+    ./configure --prefix="$md_inst"
     rpSwap on 1024
-    make clean
+    sed -i -e 's@/usr/local/include/SDL2@/usr/include/SDL2@g' src/gui/Makefile
+    #make clean
     make -j2
     md_ret_require="$md_build/src/dosbox"
     rpSwap off
@@ -122,6 +122,6 @@ _EOF_
 fi
     moveConfigDir "$home/.$md_id" "$md_conf_root/pc"
 
-    addEmulator "$def" "$md_id" "pc" "bash $romdir/pc/${launcher_name// /\\ } %ROM%"
+    addEmulator "$def" "$md_id" "pc" "$romdir/pc/${launcher_name// /\\ } %ROM%"
     addSystem "pc"
 }
