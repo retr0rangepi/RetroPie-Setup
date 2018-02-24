@@ -49,6 +49,12 @@ function configure_linapple() {
 
     moveConfigDir "$home/.linapple" "$md_conf_root/apple2"
 
+    # copy basic QJOYPAD layout - enable gamepad support
+    cp -p $md_data/apple2.lyt /home/pi/.qjoypad3/
+
+    # copy run script with needed parameters + Qjoypad support
+    cp -p $md_data/apple2.sh $md_conf_root/apple2/
+
     if [[ "$md_mode" == "install" ]]; then
         # copy default config/disk if user doesn't have them installed
         local file
@@ -57,6 +63,6 @@ function configure_linapple() {
         done
     fi
 
-    addEmulator 1 "$md_id" "apple2" "pushd $romdir/apple2; LD_LIBRARY_PATH=/usr/lib startx $md_inst/linapple -1 %ROM%; popd"
+    addEmulator 1 "$md_id" "apple2" "pushd $romdir/apple2;LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx /opt/retropie/configs/apple2/apple2.sh %ROM%;popd"
     addSystem "apple2"
 }

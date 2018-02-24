@@ -27,7 +27,7 @@ function sources_openmsx() {
 }
 
 function build_openmsx() {
-    rpSwap on 512
+    rpSwap on  1536
     ./configure
     make clean
     make -j2
@@ -42,7 +42,12 @@ function install_openmsx() {
 
 function configure_openmsx() {
     mkRomDir "msx"
+    # copy basic QJOYPAD layout - enable gamepad support
+    cp -p $md_data/openmsx.lyt /home/pi/.qjoypad3/
 
-    addEmulator 0 "$md_id" "msx" "LD_LIBRARY_PATH=/usr/lib startx $md_inst/bin/openmsx %ROM%"
+    # copy run script with needed parameters + Qjoypad support
+    cp -p $md_data/openmsx.sh $md_conf_root/msx/
+    addEmulator 1 "$md_id-x11" "msx" "startx $md_conf_root/msx/openmsx.sh %ROM%"
+    addEmulator 0 "$md_id" "msx" "$md_inst/bin/openmsx %ROM%"
     addSystem "msx"
 }

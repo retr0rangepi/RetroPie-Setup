@@ -14,7 +14,7 @@ rp_module_desc="Intellivision emulator"
 rp_module_help="ROM Extensions: .int .bin\n\nCopy your Intellivision roms to $romdir/intellivision\n\nCopy the required BIOS files exec.bin and grom.bin to $biosdir"
 rp_module_licence="GPL2 http://spatula-city.org/%7Eim14u2c/intv/"
 rp_module_section="opt"
-rp_module_flags="dispmanx !mali !kms"
+rp_module_flags="!kms"
 
 function depends_jzintv() {
     getDepends libsdl1.2-dev
@@ -50,6 +50,12 @@ function configure_jzintv() {
         setDispmanx "$md_id" 1
     fi
 
-    addEmulator 1 "$md_id" "intellivision" "$md_inst/bin/jzintv -p $biosdir -q %ROM%"
+    # copy basic QJOYPAD layout - enable gamepad support
+    cp -p $md_data/intellivision.lyt /home/pi/.qjoypad3/
+
+    # copy run script with needed parameters + Qjoypad support
+    cp -p $md_data/intellivision.sh $md_conf_root/intellivision/
+
+    addEmulator 1 "$md_id" "intellivision" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx /opt/retropie/configs/intellivision/intellivision.sh %ROM%"
     addSystem "intellivision"
 }

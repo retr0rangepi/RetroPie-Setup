@@ -25,10 +25,12 @@ function sources_stella() {
 }
 
 function build_stella() {
+    rpSwap on 1500
     ./configure --prefix="$md_inst"
     make clean
     make -j2
     md_ret_require="$md_build/stella"
+    rpSwap off
 }
 
 function install_stella() {
@@ -41,6 +43,6 @@ function configure_stella() {
     mkUserDir "$home/.config"
     moveConfigDir "$home/.config/stella" "$md_conf_root/atari2600/stella"
 
-    addEmulator 1 "$md_id" "atari2600" "LD_LIBRARY_PATH=/usr/lib startx $md_inst/bin/stella -maxres 320x240 -fullscreen 1 -tia.fsfill 1 %ROM%"
+    addEmulator 1 "$md_id" "atari2600" "$md_inst/bin/stella -maxres 320x240 -fullscreen 1 -tia.fsfill 1 %ROM%"
     addSystem "atari2600"
 }

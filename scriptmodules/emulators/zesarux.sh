@@ -14,7 +14,7 @@ rp_module_desc="ZX Spectrum emulator ZEsarUX"
 rp_module_help="ROM Extensions: .sna .szx .z80 .tap .tzx .gz .udi .mgt .img .trd .scl .dsk .zip\n\nCopy your ZX Spectrum games to $romdir/zxspectrum"
 rp_module_licence="GPL3 https://sourceforge.net/p/zesarux/code/ci/master/tree/LICENSE"
 rp_module_section="opt"
-rp_module_flags="dispmanx !mali !kms"
+rp_module_flags="!kms"
 
 function depends_zesarux() {
     local depends=(libssl-dev libpthread-stubs0-dev libsdl1.2-dev libasound2-dev)
@@ -68,10 +68,11 @@ _EOF_
 ;Run zesarux with --help or --experthelp to see all the options
 --disableborder
 --disablefooter
---vo sdl
+--vo fbdev
 --ao $ao
 --hidemousepointer
---fullscreen
+--zoomx 3
+--zoomy 3
 
 --smartloadpath $romdir/zxspectrum
 
@@ -85,8 +86,6 @@ _EOF_
 
     copyDefaultConfig "$config" "$md_conf_root/zxspectrum/.zesaruxrc"
     rm "$config"
-
-    setDispmanx "$md_id" 1
 
     addEmulator 1 "$md_id" "zxspectrum" "bash $romdir/zxspectrum/+Start\ ZEsarUX.sh %ROM%"
     addEmulator 1 "$md_id" "samcoupe" "bash $romdir/zxspectrum/+Start\ ZEsarUX.sh --machine sam %ROM%"
