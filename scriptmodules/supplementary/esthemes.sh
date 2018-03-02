@@ -114,6 +114,7 @@ function gui_esthemes() {
         'mrharias superdisplay'
 	'retr0rangepi cosmos-ropi'
 	'retr0rangepi hyperion'
+        'retr0rangepi gamehistoria'
         'coinjunkie synthwave'
         'RetroHursty69 magazinemadness'
         'RetroHursty69 stirling'
@@ -128,7 +129,7 @@ function gui_esthemes() {
         'RetroHursty69 snazzy'
         'RetroHursty69 tributeGoT'
         'RetroHursty69 tributeSTrek'
-        'RetroHursty69 tributeSWars'        
+        'RetroHursty69 tributeSWars'
         'Saracade scv720'
         'chicueloarcade Chicuelo'
     )
