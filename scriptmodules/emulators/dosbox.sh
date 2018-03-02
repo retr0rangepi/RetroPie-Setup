@@ -30,8 +30,8 @@ function build_dosbox() {
     ./autogen.sh
     ./configure --prefix="$md_inst"
     rpSwap on 1024
-    sed -i -e 's@/usr/local/include/SDL2@/usr/include/SDL2@g' src/gui/Makefile
-    #make clean
+    sed -i -e 's|/usr/local/include/SDL2|/usr/include/SDL2|g' src/gui/Makefile
+    make clean
     make -j2
     md_ret_require="$md_build/src/dosbox"
     rpSwap off
@@ -39,7 +39,7 @@ function build_dosbox() {
 
 function install_dosbox() {
     make install
-    md_ret_require="$md_inst/bin/dosbox"
+    md_ret_require="/opt/retropie/emulators/dosbox/bin/dosbox"
 }
 
 function configure_dosbox() {
@@ -106,14 +106,12 @@ _EOF_
     local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
     if [[ -f "$config_path" ]]; then
         iniConfig "=" "" "$config_path"
-        iniSet "usescancodes" "false"
         iniSet "core" "dynamic"
         iniSet "cycles" "max"
         iniSet "fullscreen" "true"
         iniSet "fullresolution" "1280x720"
         iniSet "windowresolution" "original"
         iniSet "output" "opengles"
-        iniSet "scaler" "none"
         if isPlatform "rpi" || [[ -n "$(aconnect -o | grep -e TiMidity -e FluidSynth)" ]]; then
             iniSet "mididevice" "alsa"
             iniSet "midiconfig" "128:0"
