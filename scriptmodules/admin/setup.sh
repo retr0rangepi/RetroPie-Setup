@@ -392,44 +392,6 @@ function update_packages_setup() {
     done
 }
 
-function update_packages_gui_setup() {
-    local update="$1"
-    if [[ "$update" != "update" ]]; then
-        dialog --defaultno --yesno "Are you sure you want to update installed packages?" 22 76 2>&1 >/dev/tty || return 1
-        updatescript_setup
-        # restart at post_update and then call "update_packages_gui_setup update" afterwards
-        joy2keyStop
-        exec "$scriptdir/retropie_packages.sh" setup post_update update_packages_gui_setup update
-    fi
-
-    local update_os=0
-    dialog --yesno "Would you like to update the underlying OS packages (eg kernel etc) ?" 22 76 2>&1 >/dev/tty && update_os=1
-
-    clear
-
-    local logfilename
-    __ERRMSGS=()
-    __INFMSGS=()
-    rps_logInit
-    {
-        rps_logStart
-        [[ "$update_os" -eq 1 ]] && apt_upgrade_raspbiantools
-        update_packages_setup
-        rps_logEnd
-    } &> >(tee >(gzip --stdout >"$logfilename"))
-
-    rps_printInfo "$logfilename"
-    printMsgs "dialog" "Installed packages have been updated."
-    gui_setup
-}
-
-function basic_install_setup() {
-    local idx
-    for idx in $(rp_getSectionIds core) $(rp_getSectionIds main); do
-        rp_installModule "$idx"
-    done
-}
-
 function packages_gui_setup() {
     local section
     local default
@@ -458,27 +420,6 @@ function packages_gui_setup() {
     done
 }
 
-function uninstall_setup()
-{
-    dialog --defaultno --yesno "Are you sure you want to uninstall RetroPie?" 22 76 2>&1 >/dev/tty || return 0
-    dialog --defaultno --yesno "Are you REALLY sure you want to uninstall RetroPie?\n\n$rootdir will be removed - this includes configuration files for all RetroPie components." 22 76 2>&1 >/dev/tty || return 0
-    clear
-    printHeading "Uninstalling RetroPie"
-    for idx in "${__mod_idx[@]}"; do
-        rp_isInstalled "$idx" && rp_callModule $idx remove
-    done
-    rm -rfv "$rootdir"
-    dialog --defaultno --yesno "Do you want to remove all the files from $datadir - this includes all your installed ROMs, BIOS files and custom splashscreens." 22 76 2>&1 >/dev/tty && rm -rfv "$datadir"
-    if dialog --defaultno --yesno "Do you want to remove all the system packages that RetroPie depends on? \n\nWARNING: this will remove packages like SDL even if they were installed before you installed RetroPie - it will also remove any package configurations - such as those in /etc/samba for Samba.\n\nIf unsure choose No (selected by default)." 22 76 2>&1 >/dev/tty; then
-        clear
-        # remove all dependencies
-        for idx in "${__mod_idx[@]}"; do
-            rp_isInstalled "$idx" && rp_callModule "$idx" depends remove
-        done
-    fi
-    printMsgs "dialog" "RetroPie has been uninstalled."
-}
-
 function reboot_setup()
 {
     clear
@@ -495,10 +436,6 @@ function gui_setup() {
 
         cmd=(dialog --backtitle "$__backtitle" --title "RetroPie-Setup Script" --cancel-label "Exit" --item-help --help-button --default-item "$default" --menu "Version: $__version\nLast Commit: $commit" 22 76 16)
         options=(
-            I "Basic install" "I This will install all packages from Core and Main which gives a basic RetroPie install. Further packages can then be installed later from the Optional and Experimental sections. If binaries are available they will be used, alternatively packages will be built from source - which will take longer."
-
-            U "Update" "U Updates RetroPie-Setup and all currently installed packages. Will also allow to update OS packages. If binaries are available they will be used, otherwise packages will be built from source."
-
             P "Manage packages"
             "P Install/Remove and Configure the various components of RetroPie, including emulators, ports, and controller drivers."
 
@@ -507,9 +444,6 @@ function gui_setup() {
 
             S "Update RetroPie-Setup script"
             "S Update this RetroPie-Setup script. This will update this main management script only, but will not update any software packages. To update packages use the 'Update' option from the main menu, which will also update the RetroPie-Setup script."
-
-            X "Uninstall RetroPie"
-            "X Uninstall RetroPie completely."
 
             R "Perform reboot"
             "R Reboot your machine."
