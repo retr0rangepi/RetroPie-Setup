@@ -193,14 +193,6 @@ function set_default_gcc() {
 }
 
 function get_retropie_depends() {
-    # add raspberrypi.org repository if it's missing (needed for libraspberrypi-dev etc) - not used on osmc
-    local config="/etc/apt/sources.list.d/raspi.list"
-    if [[ "$__os_id" == "Raspbian" && ! -f "$config" ]]; then
-        # add key
-        wget -q http://archive.raspberrypi.org/debian/raspberrypi.gpg.key -O- | apt-key add - >/dev/null
-        echo "deb http://archive.raspberrypi.org/debian/ $__os_codename main ui" >>$config
-    fi
-
     local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet python-pyudev)
     if [[ -n "$__default_gcc_version" ]]; then
         depends+=(gcc-$__default_gcc_version g++-$__default_gcc_version)
@@ -208,6 +200,11 @@ function get_retropie_depends() {
 
     if ! getDepends "${depends[@]}"; then
         fatalError "Unable to install packages required by $0 - ${md_ret_errors[@]}"
+    fi
+
+    # make sure we don't have xserver-xorg-legacy installed as it breaks launching x11 apps from ES
+    if ! isPlatform "x11" && hasPackage "xserver-xorg-legacy"; then
+        aptRemove xserver-xorg-legacy
     fi
 }
 
