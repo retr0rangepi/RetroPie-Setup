@@ -18,12 +18,14 @@ rp_module_flags="!kms"
 
 function depends_mupen64plus() {
     local depends=(cmake libsamplerate0-dev libspeexdsp-dev libsdl2-dev libpng12-dev fonts-freefont-ttf)
+    isPlatform "rpi" && depends+=(libraspberrypi-dev)
     isPlatform "x11" && depends+=(libglew-dev libglu1-mesa-dev libboost-filesystem-dev)
     isPlatform "x86" && depends+=(nasm)
     getDepends "${depends[@]}"
 }
 
 function sources_mupen64plus() {
+<<<<<<< HEAD
     #Let's add Odroid repository for best compatibility with RetrOrangePi
     rm -rf /etc/apt/sources.list.d/meveric-jessie-main.list
     cd /etc/apt/sources.list.d/

@@ -132,6 +132,7 @@ function gui_esthemes() {
         'RetroHursty69 tributeSWars'
         'Saracade scv720'
         'chicueloarcade Chicuelo'
+        'SuperMagicom nostalgic'
     )
     while true; do
         local theme
