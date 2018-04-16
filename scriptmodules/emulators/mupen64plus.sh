@@ -17,7 +17,7 @@ rp_module_section="main"
 rp_module_flags="!kms"
 
 function depends_mupen64plus() {
-    local depends=(cmake libsamplerate0-dev libspeexdsp-dev libsdl2-dev libpng12-dev fonts-freefont-ttf)
+    local depends=(cmake libsamplerate0-dev libspeexdsp-dev libsdl2-dev libpng12-dev fonts-freefont-ttf libboost-filesystem-dev)
     isPlatform "rpi" && depends+=(libraspberrypi-dev)
     isPlatform "x11" && depends+=(libglew-dev libglu1-mesa-dev libboost-filesystem-dev)
     isPlatform "x86" && depends+=(nasm)
@@ -68,7 +68,7 @@ function build_mupen64plus() {
             isPlatform "x11" && params+=("OSD=1" "PIE=1")
             isPlatform "x86" && params+=("SSE=SSE2")
             [[ "$dir" == "mupen64plus-ui-console" ]] && params+=("COREDIR=$md_inst/lib/" "PLUGINDIR=$md_inst/lib/mupen64plus/")
-            make -C "$dir/projects/unix" "${params[@]}" clean
+            #make -C "$dir/projects/unix" "${params[@]}" clean
             # MAKEFLAGS replace removes any distcc from path, as it segfaults with cross compiler and lto
             MAKEFLAGS="${MAKEFLAGS/\/usr\/lib\/distcc:/}" make -C "$dir/projects/unix" all "${params[@]}" OPTFLAGS="$CFLAGS -O3 -flto"
         fi
