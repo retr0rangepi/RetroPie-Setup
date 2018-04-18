@@ -136,6 +136,7 @@ function gui_esthemes() {
         'RetroHursty69 primo_light'
         'RetroHursty69 back2basics'
         'RetroHursty69 retrogamenews'
+        'RetroHursty69 bluray'
         'Saracade scv720'
         'chicueloarcade Chicuelo'
         'SuperMagicom nostalgic'
