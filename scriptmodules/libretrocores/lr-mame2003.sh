@@ -24,7 +24,7 @@ function sources_lr-mame2003() {
 }
 
 function build_lr-mame2003() {
-    rpSwap on 750
+    rpSwap on 1200
     make clean
     local params=()
     isPlatform "arm" && params+=("ARM=1")
@@ -37,9 +37,9 @@ function install_lr-mame2003() {
     md_ret_files=(
         "$(_get_name_lr-mame2003)_libretro.so"
         'README.md'
-        'changed.txt'
-        'whatsnew.txt'
-        'whatsold.txt'
+        #'changed.txt'
+        #'whatsnew.txt'
+        #'whatsold.txt'
         'metadata'
     )
 }

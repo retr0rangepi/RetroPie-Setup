@@ -20,9 +20,11 @@ function sources_lr-fuse() {
 }
 
 function build_lr-fuse() {
+    rpSwap on 1200
     make -f Makefile.libretro clean
     make -f Makefile.libretro
     md_ret_require="$md_build/fuse_libretro.so"
+    rpSwap off
 }
 
 function install_lr-fuse() {
