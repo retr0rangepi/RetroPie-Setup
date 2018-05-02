@@ -64,7 +64,6 @@ function gui_esthemes() {
         'AmadhiX eudora'
         'AmadhiX eudora-bigshot'
         'AmadhiX eudora-concise'
-        'ChoccyHobNob eudora-updated'
         'InsecureSpike retroplay-clean-canela'
         'InsecureSpike retroplay-clean-detail-canela'
         'Omnija simpler-turtlepi'
@@ -137,9 +136,16 @@ function gui_esthemes() {
         'RetroHursty69 back2basics'
         'RetroHursty69 retrogamenews'
         'RetroHursty69 bluray'
+        'RetroHursty69 soda'
+        'RetroHursty69 lightswitch'
+        'RetroHursty69 darkswitch'
         'Saracade scv720'
         'chicueloarcade Chicuelo'
         'SuperMagicom nostalgic'
+        'lipebello retrorama'
+        'lipebello strangerstuff'
+        'lipebello spaceoddity'
+        'lipebello swineapple'
     )
     while true; do
         local theme
