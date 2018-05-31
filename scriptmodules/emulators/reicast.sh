@@ -35,7 +35,7 @@ function build_reicast() {
     cd shell/linux
     if isPlatform "mali"; then
         make platform=odroid clean
-        make -j4 platform=odroid
+        make -j2 platform=odroid
     else
         make clean
         make

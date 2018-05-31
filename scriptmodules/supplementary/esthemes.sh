@@ -139,6 +139,12 @@ function gui_esthemes() {
         'RetroHursty69 soda'
         'RetroHursty69 lightswitch'
         'RetroHursty69 darkswitch'
+        'RetroHursty69 whiteslide'
+        'RetroHursty69 graffiti'
+        'RetroHursty69 whitewood'
+        'RetroHursty69 sublime'
+        'RetroHursty69 infinity'
+        'RetroHursty69 neogeo_only'
         'Saracade scv720'
         'chicueloarcade Chicuelo'
         'SuperMagicom nostalgic'
@@ -201,7 +207,7 @@ function gui_esthemes() {
                             fi
                             ;;
                         2)
-                            gitPullOrClone "$gallerydir" "http://github.com/wetriner/es-theme-gallery"
+                            gitPullOrClone "$gallerydir" "https://github.com/wetriner/es-theme-gallery"
                             ;;
                         3)
                             if [[ -d "$gallerydir" ]]; then
