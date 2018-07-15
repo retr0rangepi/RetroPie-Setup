@@ -82,7 +82,7 @@ function disable_plymouth_splashscreen() {
 }
 
 function default_splashscreen() {
-    echo "$md_inst/retropie-default.png" >/etc/splashscreen.list
+    echo "$datadir/splashscreens/splash.jpg" >/etc/splashscreen.list
 }
 
 function enable_splashscreen() {
@@ -237,7 +237,7 @@ function preview_splashscreen() {
                 3)
                     file=$(choose_splashscreen "$path" "video")
                     [[ -z "$file" ]] && break
-                    mpv -fs -vo sdl "$file"
+                    LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/local/lib mpv -fs -vo sdl "$file"
                     ;;
             esac
         done
