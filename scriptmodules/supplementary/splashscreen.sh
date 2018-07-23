@@ -237,7 +237,7 @@ function preview_splashscreen() {
                 3)
                     file=$(choose_splashscreen "$path" "video")
                     [[ -z "$file" ]] && break
-                    mpv -fs -vo sdl "$file"
+                    LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/local/lib mpv -fs -vo sdl "$file"
                     ;;
             esac
         done

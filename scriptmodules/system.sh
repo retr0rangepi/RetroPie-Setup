@@ -108,11 +108,15 @@ function get_os_version() {
                     error="You need Linux Mint 17 or newer"
                 elif compareVersions "$__os_release" lt 18; then
                     __os_ubuntu_ver="14.04"
-                else
+                    __os_debian_ver="8"
+                elif compareVersions "$__os_release" lt 19; then
                     __os_ubuntu_ver="16.04"
+                    __os_debian_ver="8"
+                else
+                    __os_ubuntu_ver="18.04"
+                    __os_debian_ver="9"
                 fi
             fi
-            __os_debian_ver="8"
             ;;
         Ubuntu)
             if compareVersions "$__os_release" lt 14.04; then
@@ -349,7 +353,7 @@ function platform_odroid-xu() {
 }
 
 function platform_tinker() {
-    __default_cflags="-O2 -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    __default_cflags="-O2 -marm -march=armv7-a -mtune=cortex-a17 -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
     # required for mali headers to define GL functions
     __default_cflags+=" -DGL_GLEXT_PROTOTYPES"
     __default_asflags=""

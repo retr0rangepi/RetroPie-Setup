@@ -29,7 +29,7 @@ function sources_lr-parallel-n64() {
 }
 
 function build_lr-parallel-n64() {
-    rpSwap on 750
+    rpSwap on 1000
     make clean
     make -j2 platform=odroid-c1
     rpSwap off
@@ -48,9 +48,9 @@ function configure_lr-parallel-n64() {
     ensureSystemretroconfig "n64"
 
     # Set core options
-    setRetroArchCoreOption "mupen64-gfxplugin" "rice"
-    setRetroArchCoreOption "mupen64-gfxplugin-accuracy" "low"
-    setRetroArchCoreOption "mupen64-screensize" "640x480"
+    setRetroArchCoreOption "parallel-n64-gfxplugin" "auto"
+    setRetroArchCoreOption "parallel-n64-gfxplugin-accuracy" "low"
+    setRetroArchCoreOption "parallel-n64-screensize" "640x480"
 
     # Copy config files
     cat > $home/RetroPie/BIOS/gles2n64rom.conf << _EOF_
