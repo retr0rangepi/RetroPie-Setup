@@ -267,6 +267,9 @@ function get_platform() {
             "Rockchip (Device Tree)")
                 __platform="tinker"
                 ;;
+            Vero4K)
+                __platform="vero4k"
+                ;;
             *)
                 case $architecture in
                     i686|x86_64|amd64)
@@ -400,3 +403,11 @@ function platform_imx6() {
     __platform_flags="arm armv7 neon"
     __has_binaries=0
 }
+
+function platform_vero4k() {
+    __default_cflags="-I/opt/vero3/include -L/opt/vero3/lib -O2 -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    __default_asflags=""
+    __default_makeflags="-j4"
+    __platform_flags="arm armv8 neon vero4k gles"
+}
+

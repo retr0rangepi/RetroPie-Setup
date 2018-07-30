@@ -28,9 +28,11 @@ function sources_advmame() {
 }
 
 function build_advmame() {
+    ./autogen.sh
     ./configure CFLAGS="$CFLAGS -fno-stack-protector" --prefix="$md_inst"
     make clean
     make -j2
+    md_ret_require="$md_build/advmame"
 }
 
 function install_advmame() {
