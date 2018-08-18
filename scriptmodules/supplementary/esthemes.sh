@@ -80,8 +80,7 @@ function gui_esthemes() {
         'lilbud flat'
         'lilbud flat-dark'
         'lilbud minimal'
-        'lilbud switch-light'
-        'lilbud switch-dark'
+        'lilbud switch'
         'FlyingTomahawk futura-V'
         'FlyingTomahawk futura-dark-V'
         'G-rila fundamental'
@@ -155,6 +154,7 @@ function gui_esthemes() {
         'lipebello strangerstuff'
         'lipebello spaceoddity'
         'lipebello swineapple'
+        'waweedman pii-wii'
     )
     while true; do
         local theme

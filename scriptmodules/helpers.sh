@@ -204,6 +204,10 @@ function getDepends() {
     for required in $@; do
 
         # workaround for different package names on osmc / xbian
+        if [[ "$required" == "libraspberrypi-bin" ]]; then
+            isPlatform "osmc" && required="rbp-userland-osmc"
+            isPlatform "xbian" && required="xbian-package-firmware"
+        fi
         if [[ "$required" == "libraspberrypi-dev" ]]; then
             isPlatform "osmc" && required="rbp-userland-dev-osmc"
             isPlatform "xbian" && required="xbian-package-firmware"
@@ -981,6 +985,7 @@ function downloadAndExtract() {
 ## were not set to use the dispmanx SDL1 backend would just show in a small
 ## area of the screen.
 function ensureFBMode() {
+    [[ ! -f /etc/fb.modes ]] && return
     local res_x="$1"
     local res_y="$2"
     local res="${res_x}x${res_y}"
