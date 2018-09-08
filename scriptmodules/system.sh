@@ -197,10 +197,7 @@ function set_default_gcc() {
 }
 
 function get_retropie_depends() {
-    local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet python-pyudev)
-    if [[ -n "$__default_gcc_version" ]]; then
-        depends+=(gcc-$__default_gcc_version g++-$__default_gcc_version)
-    fi
+    local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet python-pyudev ca-certificates)
 
     if ! getDepends "${depends[@]}"; then
         fatalError "Unable to install packages required by $0 - ${md_ret_errors[@]}"
@@ -342,7 +339,7 @@ function platform_odroid-c2() {
         __platform_flags="arm armv8 neon mali gles"
     else
         __default_cflags="-O2 -march=native"
-        __platform_flags="aarch64 mali"
+        __platform_flags="aarch64 mali gles"
     fi
 }
 
