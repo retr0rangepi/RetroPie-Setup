@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags="dispmanx !mali"
 
 function depends_fuse() {
-    getDepends libsdl1.2-dev libpng12-dev zlib1g-dev libbz2-dev libaudiofile-dev bison flex
+    getDepends libsdl1.2-dev libpng-dev zlib1g-dev libbz2-dev libaudiofile-dev bison flex
 }
 
 function sources_fuse() {
@@ -25,17 +25,7 @@ function sources_fuse() {
     mkdir libspectrum
     downloadAndExtract "$__archive_url/libspectrum-1.4.1.tar.gz" "$md_build/libspectrum" 1
     if ! isPlatform "x11"; then
-        applyPatch cursor.diff <<\_EOF_
---- a/ui/sdl/sdldisplay.c	2015-02-18 22:39:05.631516602 +0000
-+++ b/ui/sdl/sdldisplay.c	2015-02-18 22:39:08.407506296 +0000
-@@ -411,7 +411,7 @@
-     SDL_ShowCursor( SDL_DISABLE );
-     SDL_WarpMouse( 128, 128 );
-   } else {
--    SDL_ShowCursor( SDL_ENABLE );
-+    SDL_ShowCursor( SDL_DISABLE );
-   }
-_EOF_
+        applyPatch "$md_data/01_disable_cursor.diff"
     fi
 }
 

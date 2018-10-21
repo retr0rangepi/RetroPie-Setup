@@ -72,6 +72,11 @@ function get_os_version() {
     __os_codename="${os[3]}"
     case "$__os_id" in
         Raspbian|Debian)
+            # Debian unstable is not officially supported though
+            if [[ "$__os_release" == "unstable" ]]; then
+                __os_release=10
+            fi
+
             if compareVersions "$__os_release" lt 8; then
                 __has_binaries=0
             fi
@@ -95,10 +100,22 @@ function get_os_version() {
             __os_debian_ver="${__os_release%%.*}"
             ;;
         Devuan)
+            if isPlatform "rpi"; then
+                error="We do not support Devuan on the Raspberry Pi. We recommend you use Raspbian to run RetroPie."
+            fi
             # devuan lsb-release version numbers don't match jessie
             case "$__os_codename" in
                 jessie)
                     __os_debian_ver="8"
+                    ;;
+                ascii)
+                    __os_debian_ver="9"
+                    ;;
+                beowolf)
+                    __os_debian_ver="10"
+                    ;;
+                ceres)
+                    __os_debian_ver="11"
                     ;;
             esac
             ;;
@@ -145,7 +162,12 @@ function get_os_version() {
             __os_debian_ver="8"
             ;;
         neon)
-             __os_ubuntu_ver="$__os_release"
+            __os_ubuntu_ver="$__os_release"
+            if compareVersions "$__os_release" lt 16.10; then
+                __os_debian_ver="8"
+            else
+                __os_debian_ver="9"
+            fi
             ;;
         *)
             fatalError "Unsupported OS\n\n$(lsb_release -idrc)"
@@ -197,10 +219,7 @@ function set_default_gcc() {
 }
 
 function get_retropie_depends() {
-    local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet python-pyudev)
-    if [[ -n "$__default_gcc_version" ]]; then
-        depends+=(gcc-$__default_gcc_version g++-$__default_gcc_version)
-    fi
+    local depends=(git dialog wget gcc g++ build-essential unzip xmlstarlet python-pyudev ca-certificates)
 
     if ! getDepends "${depends[@]}"; then
         fatalError "Unable to install packages required by $0 - ${md_ret_errors[@]}"
@@ -342,7 +361,7 @@ function platform_odroid-c2() {
         __platform_flags="arm armv8 neon mali gles"
     else
         __default_cflags="-O2 -march=native"
-        __platform_flags="aarch64 mali"
+        __platform_flags="aarch64 mali gles"
     fi
 }
 

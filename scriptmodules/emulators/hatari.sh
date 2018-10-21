@@ -16,7 +16,7 @@ rp_module_help="ROM Extensions: .st .stx .img .rom .raw .ipf .ctr\n\nCopy your H
 rp_module_section="opt"
 
 function depends_hatari() {
-    getDepends libsdl2-dev zlib1g-dev libpng12-dev cmake libreadline-dev portaudio19-dev
+    getDepends libsdl2-dev zlib1g-dev libpng-dev cmake libreadline-dev portaudio19-dev
 }
 
 function _sources_libcapsimage_hatari() {

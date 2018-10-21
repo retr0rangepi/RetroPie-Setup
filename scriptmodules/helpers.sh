@@ -213,9 +213,15 @@ function getDepends() {
             isPlatform "xbian" && required="xbian-package-firmware"
         fi
 
-        # map libpng12-dev to libpng-dev for Ubuntu 16.10+
+        # map libpng12-dev to libpng-dev for Stretch+
         if [[ "$required" == "libpng12-dev" ]] && compareVersions "$__os_debian_ver" ge 9;  then
             required="libpng-dev"
+            printMsgs "console" "RetroPie module references libpng12-dev and should be changed to libpng-dev"
+        fi
+
+        # map libpng-dev to libpng12-dev for Jessie
+        if [[ "$required" == "libpng-dev" ]] && compareVersions "$__os_debian_ver" lt 9; then
+            required="libpng12-dev"
         fi
 
         if [[ "$md_mode" == "install" ]]; then
@@ -346,6 +352,7 @@ function gitPullOrClone() {
 
     if [[ -d "$dir/.git" ]]; then
         pushd "$dir" > /dev/null
+        runCmd git checkout "$branch"
         runCmd git pull
         runCmd git submodule update --init --recursive
         popd > /dev/null
@@ -355,12 +362,14 @@ function gitPullOrClone() {
             git+=" --depth 1"
         fi
         [[ "$branch" != "master" ]] && git+=" --branch $branch"
-        echo "$git \"$repo\" \"$dir\""
+        printMsgs "console" "$git \"$repo\" \"$dir\""
         runCmd $git "$repo" "$dir"
     fi
-    if [[ "$commit" ]]; then
-        echo "Winding back $repo->$branch to commit: #$commit"
-        runCmd git -C "$dir" checkout $commit
+
+    if [[ -n "$commit" ]]; then
+        printMsgs "console" "Winding back $repo->$branch to commit: #$commit"
+        git branch -D "$commit" &>/dev/null
+        runCmd git -C "$dir" checkout -f "$commit" -b "$commit"
     fi
 }
 
@@ -908,14 +917,10 @@ function applyPatch() {
     local patch="$1"
     local patch_applied="${patch##*/}.applied"
 
-    # patch is in stdin
-    if [[ ! -t 0 ]]; then
-        cat >"$patch"
-    fi
-
     if [[ ! -f "$patch_applied" ]]; then
         if patch -f -p1 <"$patch"; then
             touch "$patch_applied"
+            printMsgs "console" "Successfully applied patch: $patch"
         else
             md_ret_errors+=("$md_id patch $patch failed to apply")
             return 1
@@ -1154,8 +1159,6 @@ function delSystem() {
 ## @brief Adds a port to the emulationstation ports menu.
 ## @details Adds an emulators.cfg entry as with addSystem but also creates a launch script in `$datadir/ports/$name.sh`.
 ##
-## Can optionally take a script via stdin to use instead of the default launch script.
-##
 ## Can also optionally take a game parameter which can be used to create multiple launch
 ## scripts for different games using the same engine - eg for quake
 ##
@@ -1189,14 +1192,10 @@ function addPort() {
 
     mkUserDir "$romdir/ports"
 
-    if [[ -t 0 ]]; then
-        cat >"$file" << _EOF_
+    cat >"$file" << _EOF_
 #!/bin/bash
 "$rootdir/supplementary/runcommand/runcommand.sh" 0 _PORT_ "$port" "$game"
 _EOF_
-    else
-        cat >"$file"
-    fi
 
     chown $user:$user "$file"
     chmod +x "$file"
