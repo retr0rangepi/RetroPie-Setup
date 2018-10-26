@@ -49,8 +49,11 @@ function build_amiberry() {
     elif isPlatform "vero4k"; then
         amiberry_bin="vero4k"
         amiberry_platform="vero4k"
+    elif isPlatform "H3-mali"; then
+        amiberry_bin="orangepi-pc"
+        amiberry_platform="orangepi-pc"
     fi
-
+    
     make clean
     CXXFLAGS="" make PLATFORM="$amiberry_platform"
     ln -sf "amiberry-$amiberry_bin" "amiberry"
@@ -67,6 +70,9 @@ function install_amiberry() {
         amiberry_bin="tinker"
     elif isPlatform "vero4k"; then
         amiberry_bin="vero4k"
+    elif isPlatform "H3-mali"; then
+        amiberry_bin="orangepi-pc"
+        
     fi
 
     md_ret_files=(
