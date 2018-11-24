@@ -167,6 +167,8 @@ function gui_esthemes() {
         'RetroHursty69 cyber'
         'RetroHursty69 supersweet'
         'RetroHursty69 donkeykonkey'
+        'RetroHursty69 snapback'
+        'RetroHursty69 heman'
         'Saracade scv720'
         'chicueloarcade Chicuelo'
         'SuperMagicom nostalgic'
@@ -178,6 +180,7 @@ function gui_esthemes() {
         'waweedman Blade-360'
         'waweedman Venom'
         'waweedman Spider-Man'
+        'blowfinger77 locomotion'
     )
     while true; do
         local theme

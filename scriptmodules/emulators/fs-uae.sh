@@ -47,7 +47,7 @@ function configure_fs-uae() {
     iniSet "accuracy" "0"
     copyDefaultConfig "$config" "$md_conf_root/amiga/fs-uae/Default.fs-uae"
     rm "$config"
-    
     local exts=$(getPlatformConfig amiga_exts)
     addSystem 1 "$md_id" "amiga" "LD_LIBRARY_PATH=/usr/lib startx /usr/bin/fs-uae-launcher"
+    addSystem "amiga"
 }
