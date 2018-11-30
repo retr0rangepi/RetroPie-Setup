@@ -13,6 +13,10 @@ rp_module_id="setup"
 rp_module_desc="GUI based setup for RetroPie"
 rp_module_section=""
 
+function _setup_gzip_log() {
+    setsid tee >(setsid gzip --stdout >"$1")
+}
+
 function rps_logInit() {
     if [[ ! -d "$__logdir" ]]; then
         if mkdir -p "$__logdir"; then
@@ -128,7 +132,7 @@ function post_update_setup() {
         printHeading "Running post update hooks"
         rp_updateHooks
         rps_logEnd
-    } &> >(tee >(gzip --stdout >"$logfilename"))
+    } &> >(_setup_gzip_log "$logfilename")
     rps_printInfo "$logfilename"
 
     printMsgs "dialog" "NOTICE: The RetroPie-Setup script and pre-made RetrOrangePi SD card images are available to download for free from http://www.retrorangepi.org\n\nThe pre-built RetrOrangePi image includes software that has non commercial licenses. Selling RetrOrangePi/RetroPie images or including them with your commercial product is not allowed.\n\nNo copyrighted games are included with RetrOrangePi/RetroPie.\n\nIf you have been sold this software, you can let us know about it by emailing retrorangepi@outlook.com."
@@ -193,7 +197,7 @@ function package_setup() {
                     rps_logStart
                     rp_installModule "$idx"
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             S)
@@ -204,7 +208,7 @@ function package_setup() {
                     rp_callModule "$idx" clean
                     rp_callModule "$idx"
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             C)
@@ -213,7 +217,7 @@ function package_setup() {
                     rps_logStart
                     rp_callModule "$idx" gui
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             X)
@@ -225,7 +229,7 @@ function package_setup() {
                     rps_logStart
                     rp_callModule "$idx" remove
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             H)
@@ -300,7 +304,7 @@ function section_gui_setup() {
                         rp_installModule "$idx"
                     done
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             S)
@@ -313,7 +317,7 @@ function section_gui_setup() {
                         rp_callModule "$idx"
                     done
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
 
@@ -328,7 +332,7 @@ function section_gui_setup() {
                         rp_isInstalled "$idx" && rp_callModule "$idx" remove
                     done
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             *)
@@ -381,7 +385,7 @@ function config_gui_setup() {
                 rp_callModule "$choice"
             fi
             rps_logEnd
-        } &> >(tee >(gzip --stdout >"$logfilename"))
+        } &> >(_setup_gzip_log "$logfilename")
         rps_printInfo "$logfilename"
     done
 }
@@ -477,7 +481,7 @@ function gui_setup() {
                     rps_logStart
                     basic_install_setup
                     rps_logEnd
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             U)
@@ -503,7 +507,7 @@ function gui_setup() {
                 rps_logInit
                 {
                     uninstall_setup
-                } &> >(tee >(gzip --stdout >"$logfilename"))
+                } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
             R)
