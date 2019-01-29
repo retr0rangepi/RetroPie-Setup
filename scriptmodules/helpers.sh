@@ -383,6 +383,12 @@ function setupDirectories() {
     mkUserDir "$configdir"
     mkUserDir "$configdir/all"
 
+    # some home folders for configs that modules rely on
+    mkUserDir "$home/.cache"
+    mkUserDir "$home/.config"
+    mkUserDir "$home/.local"
+    mkUserDir "$home/.local/share"
+
     # make sure we have inifuncs.sh in place and that it is up to date
     mkdir -p "$rootdir/lib"
     local helper_libs=(inifuncs.sh archivefuncs.sh)
@@ -1242,7 +1248,7 @@ function addEmulator() {
     fi
 
     # automatically add parameters for libretro modules
-    if [[ "$id" == lr-* && "$cmd" != "$emudir/retroarch/bin/retroarch"* ]]; then
+    if [[ "$id" == lr-* && "$cmd" =~ ^"$md_inst"[^[:space:]]*\.so ]]; then
         cmd="$emudir/retroarch/bin/retroarch -L $cmd --config $md_conf_root/$system/retroarch.cfg %ROM%"
     fi
 

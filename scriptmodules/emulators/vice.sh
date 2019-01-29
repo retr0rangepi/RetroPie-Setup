@@ -27,7 +27,7 @@ function sources_vice() {
 }
 
 function build_vice() {
-    local params=(--enable-sdlui2 --without-arts --without-oss --enable-ethernet)
+    local params=(--enable-sdlui2 --without-oss --enable-ethernet)
     ! isPlatform "x11" && params+=(--disable-catweasel --without-pulse)
     ./autogen.sh
     LDFLAGS="-L/usr/local/lib" ./configure --prefix="$md_inst" "${params[@]}"
@@ -83,8 +83,9 @@ _EOF_
 
     [[ "$md_mode" == "remove" ]] && return
 
-    # copy any existing configs from ~/.vice and symlink the config folder to $md_conf_root/c64/
+    # copy configs and symlink the old and new config folders to $md_conf_root/c64/
     moveConfigDir "$home/.vice" "$md_conf_root/c64"
+    moveConfigDir "$home/.config/vice" "$md_conf_root/c64"
 
     local config="$(mktemp)"
     echo "[C64]" > "$config"
