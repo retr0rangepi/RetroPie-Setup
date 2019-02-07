@@ -90,6 +90,7 @@ function get_config() {
         DISABLE_JOYSTICK="$ini_value"
         iniGet "disable_menu"
         DISABLE_MENU="$ini_value"
+        [[ "$DISABLE_MENU" -eq 1 ]] && DISABLE_JOYSTICK=1
         iniGet "image_delay"
         IMAGE_DELAY="$ini_value"
         [[ -z "$IMAGE_DELAY" ]] && IMAGE_DELAY=2
@@ -441,7 +442,7 @@ function main_menu() {
             [[ -n "$vid_rom" ]] && options+=(7 "Remove video mode choice for $EMULATOR + ROM")
         fi
 
-        if [[ "$EMULATOR" == lr-* ]]; then
+        if [[ "$COMMAND" =~ retroarch ]]; then
             options+=(
                 8 "Select RetroArch render res for $EMULATOR ($RENDER_RES)"
                 9 "Edit custom RetroArch config for this ROM"
@@ -459,7 +460,7 @@ function main_menu() {
 
         options+=(X "Launch")
 
-        if [[ "$EMULATOR" == lr-* ]]; then
+        if [[ "$COMMAND" =~ retroarch ]]; then
             options+=(L "Launch with verbose logging")
             options+=(Z "Launch with netplay enabled")
         fi
@@ -594,7 +595,7 @@ function choose_emulator() {
         ((i++))
     done < <(sort "$EMU_SYS_CONF")
     if [[ -z "${options[*]}" ]]; then
-        dialog --msgbox "No emulator options found for $SYSTEM - Do you have a valid $EMU_SYS_CONF ?" 20 60 >/dev/tty
+        dialog --msgbox "No emulator options found for $SYSTEM - have you installed any snes emulators yet? Do you have a valid $EMU_SYS_CONF ?" 20 60 >/dev/tty
         exit 1
     fi
     local cmd=(dialog $cancel --default-item "$default_id" --menu "Choose default emulator"  22 76 16 )
@@ -778,7 +779,7 @@ function config_dispmanx() {
 
 function retroarch_append_config() {
     # only for retroarch emulators
-    [[ "$EMULATOR" != lr-* ]] && return
+    [[ ! "$COMMAND" =~ "retroarch" ]] && return
 
     # make sure tmp folder exists for unpacking archives
     mkdir -p "/tmp/retroarch"
@@ -1010,6 +1011,36 @@ function launch_command() {
     return $ret
 }
 
+function bios_check() {
+    BIOS="$HOME/RetroPie/BIOS"
+    if [[ "$SYSTEM" =~ ^("naomi"|"atomiswave")$ ]]; then
+        for filename in airlbios awbios f355bios f355dlx hod2bios naomi; do
+            if [[ ! -f "$BIOS/dc/$filename.zip" ]]; then
+                dialog --no-cancel --pause "REQUIRED BIOS FILES\n\nCopy airlbios.zip, awbios.zip, f355bios.zip, f355dlx.zip, hod2bios.zip, and naomi.zip from the Mame BIOS pack to the internal SD card:\n\n$BIOS/dc\n\nIn addition, an update to lr-reicast from binary or source is required.\n\n" 22 76 15
+                clear
+                user_script "runcommand-onend.sh"
+                exit 1
+            fi
+        done
+        for filename in naomi_boot naomi_boot_jp naomi_boot_us; do
+            if [[ -f "$BIOS/dc/$filename.bin" ]]; then
+                rm "$BIOS/dc/$filename.bin" &> /dev/null
+            fi
+        done
+    fi
+    if [[ "$SYSTEM" == "dreamcast" ]]; then
+        for filename in dc_boot dc_flash; do
+            if [[ ! -f "$BIOS/dc/$filename.bin" ]]; then
+                dialog --no-cancel --pause "REQUIRED BIOS FILES\n\nCopy dc_boot.bin and dc_flash.bin to the internal SD card:\n\n$BIOS/dc\n\n." 22 76 15
+                clear
+                user_script "runcommand-onend.sh"
+                exit 1
+            fi
+        done
+    fi
+}
+
+
 function runcommand() {
     get_config
 
@@ -1072,7 +1103,7 @@ function runcommand() {
     # reset/restore framebuffer res (if it was changed)
     [[ -n "$FB_NEW" ]] && restore_fb
 
-    [[ "$EMULATOR" == lr-* ]] && retroarchIncludeToEnd "$CONF_ROOT/retroarch.cfg"
+    [[ "$COMMAND" =~ retroarch ]] && retroarchIncludeToEnd "$CONF_ROOT/retroarch.cfg"
 
     user_script "runcommand-onend.sh"
 
