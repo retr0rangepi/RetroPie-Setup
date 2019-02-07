@@ -1,3 +1,11 @@
+RetroPie-Cores-Allwinner-H2-H3
+==============
+
+lr-reicast - Allwinner h2/h3 support
+
+to fix the no sound bug update retroarch to v 1.7.6
+
+
 RetroPie-Setup
 ==============
 
