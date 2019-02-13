@@ -1010,6 +1010,35 @@ function launch_command() {
     return $ret
 }
 
+function bios_check() {
+    BIOS="$HOME/RetroPie/BIOS"
+    if [[ "$SYSTEM" =~ ^("naomi"|"atomiswave")$ ]]; then
+        for filename in airlbios awbios f355bios f355dlx hod2bios naomi; do
+            if [[ ! -f "$BIOS/dc/$filename.zip" ]]; then
+                dialog --no-cancel --pause "REQUIRED BIOS FILES\n\nCopy airlbios.zip, awbios.zip, f355bios.zip, f355dlx.zip, hod2bios.zip, and naomi.zip from the Mame BIOS pack to the internal SD card:\n\n$BIOS/dc\n\nIn addition, an update to lr-reicast from binary or source is required.\n\n" 22 76 15
+                clear
+                user_script "runcommand-onend.sh"
+                exit 1
+            fi
+        done
+        for filename in naomi_boot naomi_boot_jp naomi_boot_us; do
+            if [[ -f "$BIOS/dc/$filename.bin" ]]; then
+                rm "$BIOS/dc/$filename.bin" &> /dev/null
+            fi
+        done
+    fi
+    if [[ "$SYSTEM" == "dreamcast" ]]; then
+        for filename in dc_boot dc_flash; do
+            if [[ ! -f "$BIOS/dc/$filename.bin" ]]; then
+                dialog --no-cancel --pause "REQUIRED BIOS FILES\n\nCopy dc_boot.bin and dc_flash.bin to the internal SD card:\n\n$BIOS/dc\n\n." 22 76 15
+                clear
+                user_script "runcommand-onend.sh"
+                exit 1
+            fi
+        done
+    fi
+}
+
 function runcommand() {
     get_config
 
