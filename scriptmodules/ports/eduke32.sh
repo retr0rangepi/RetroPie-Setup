@@ -61,7 +61,7 @@ function configure_eduke32() {
 
     mkRomDir "ports/duke3d"
 
-    moveConfigDir "$home/.eduke32" "$md_conf_root/duke3d"
+    moveConfigDir "$home/.config/eduke32" "$md_conf_root/duke3d"
 
     # remove old launch script
     rm -f "$romdir/ports/Duke3D Shareware.sh"

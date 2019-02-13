@@ -368,9 +368,13 @@ function gitPullOrClone() {
 
     if [[ -n "$commit" ]]; then
         printMsgs "console" "Winding back $repo->$branch to commit: #$commit"
-        git branch -D "$commit" &>/dev/null
+        git -C "$dir" branch -D "$commit" &>/dev/null
         runCmd git -C "$dir" checkout -f "$commit" -b "$commit"
     fi
+
+    branch=$(runCmd git -C "$dir" rev-parse --abbrev-ref HEAD)
+    commit=$(runCmd git -C "$dir" rev-parse HEAD)
+    printMsgs "console" "HEAD is now in branch '$branch' at commit '$commit'"
 }
 
 # @fn setupDirectories()
@@ -1042,6 +1046,7 @@ function joy2keyStart() {
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1
     if "$scriptdir/scriptmodules/supplementary/runcommand/joy2key.py" "$__joy2key_dev" "${params[@]}" & 2>/dev/null; then
         __joy2key_pid=$!
+        sleep 1
         return 0
     fi
 
@@ -1319,4 +1324,50 @@ function patchVendorGraphics() {
              --replace-needed libGLESv2.so libbrcmGLESv2.so \
              --replace-needed libOpenVG.so libbrcmOpenVG.so \
              --replace-needed libWFC.so libbrcmWFC.so "$filename"
+}
+
+## @fn dkmsManager()
+## @param mode dkms operation type
+## @module_name name of dkms module
+## @module_ver version of dkms module
+## Helper function to manage DKMS modules installed by RetroPie
+function dkmsManager() {
+    local mode="$1"
+    local module_name="$2"
+    local module_ver="$3"
+    local kernel="$(uname -r)"
+    local ver
+
+    case "$mode" in
+        install)
+            if dkms status | grep -q "^$module_name"; then
+                dkmsManager remove "$module_name" "$module_ver"
+            fi
+            if [[ "$__chroot" -eq 1 ]]; then
+                kernel="$(ls -1 /lib/modules | tail -n -1)"
+            fi
+            ln -sf "$md_inst" "/usr/src/${module_name}-${module_ver}"
+            dkms install --force -m "$module_name" -v "$module_ver" -k "$kernel"
+            if dkms status | grep -q "^$module_name"; then
+                md_ret_error+=("Failed to install $md_id")
+                return 1
+            fi
+            ;;
+        remove)
+            for ver in $(dkms status "$module_name" | cut -d"," -f2); do
+                dkms remove -m "$module_name" -v "$ver" --all
+                rm -f "/usr/src/${module_name}-${ver}"
+            done
+            dkmsManager unload "$module_name" "$module_ver"
+            ;;
+        reload)
+            dkmsManager unload "$module_name" "$module_ver"
+            modprobe "$module_name"
+            ;;
+        unload)
+            if [[ -n "$(lsmod | grep ${module_name/-/_})" ]]; then
+                rmmod "$module_name"
+            fi
+            ;;
+    esac
 }
