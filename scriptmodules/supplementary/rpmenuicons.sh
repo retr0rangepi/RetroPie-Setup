@@ -23,9 +23,7 @@ function gui_rpmenu-icons() {
     while true; do
         local options=(
             1 "Install default icon set"
-            2 "Install nes style icon set"
-            3 "Install snes style icon set"
-            4 "Install modern icon set"
+            2 "Install snes style icon set"
         )
         local cmd=(dialog --default-item "$default" --backtitle "$__backtitle" --menu "Choose an option" 22 76 16)
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
@@ -40,19 +38,7 @@ function gui_rpmenu-icons() {
                 ;;
             2)
                 rm -rf "$datadir/retropiemenu/icons"
-                cp -r "$scriptdir/scriptmodules/supplementary/retropiemenu/icons_nes" "$datadir/retropiemenu/icons"
-                chown -R $user:$user "$datadir/retropiemenu/icons"
-                printMsgs "dialog" "Settings menu cart icons installed.\n\nRestart EmulationStation to apply."
-                ;;
-            3)
-                rm -rf "$datadir/retropiemenu/icons"
                 cp -r "$scriptdir/scriptmodules/supplementary/retropiemenu/icons_snes" "$datadir/retropiemenu/icons"
-                chown -R $user:$user "$datadir/retropiemenu/icons"
-                printMsgs "dialog" "Settings menu cart icons installed.\n\nRestart EmulationStation to apply."
-                ;;
-            4)
-                rm -rf "$datadir/retropiemenu/icons"
-                cp -r "$scriptdir/scriptmodules/supplementary/retropiemenu/icons_modern" "$datadir/retropiemenu/icons"
                 chown -R $user:$user "$datadir/retropiemenu/icons"
                 printMsgs "dialog" "Settings menu cart icons installed.\n\nRestart EmulationStation to apply."
                 ;;
