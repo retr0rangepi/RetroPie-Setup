@@ -21,7 +21,7 @@ function sources_lr-reicast() {
 
 function build_lr-reicast() {
     make clean
-    make platform=classic_armv7_a7 ARCH=arm
+    make platform=sun8i ARCH=arm
     md_ret_require="$md_build/reicast_libretro.so"
 }
 
