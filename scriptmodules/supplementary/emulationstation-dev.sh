@@ -36,7 +36,7 @@ function depends_emulationstation-dev() {
 }
 
 function sources_emulationstation-dev() {
-    sources_emulationstation "" "master"
+    sources_emulationstation "" "full"
 }
 
 function build_emulationstation-dev() {
