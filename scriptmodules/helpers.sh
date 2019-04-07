@@ -1384,4 +1384,3 @@ function getIPAddress() {
     # if an external route was found, report its source address
     [[ -n "$ip_route" ]] && grep -oP "src \K[^\s]+" <<< "$ip_route"
 }
->>>>>>> 307db2d5d14ac855abee1d722a19403acb438507
