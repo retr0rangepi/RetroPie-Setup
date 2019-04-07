@@ -128,6 +128,7 @@ function depends_emulationstation() {
         libvlc-dev libvlccore-dev vlc
     )
 
+    compareVersions "$__os_debian_ver" gt 8 && depends+=(rapidjson-dev)
     isPlatform "x11" && depends+=(gnome-terminal)
     getDepends "${depends[@]}"
 }

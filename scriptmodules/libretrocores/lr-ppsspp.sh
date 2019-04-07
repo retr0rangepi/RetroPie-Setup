@@ -17,18 +17,11 @@ rp_module_section="opt"
 rp_module_flags="!aarch64"
 
 function depends_lr-ppsspp() {
-    local depends=()
-    isPlatform "rpi" && depends+=(libraspberrypi-dev)
-    getDepends "${depends[@]}"
+    depends_ppsspp
 }
 
 function sources_lr-ppsspp() {
-    local branch="libretro"
-    isPlatform "rpi" && branch="libretro_rpi_fix"
-    gitPullOrClone "$md_build" https://github.com/RetroPie/ppsspp.git "$branch"
-
-    # remove the lines that trigger the ffmpeg build script functions - we will just use the variables from it
-    sed -i "/^build_ARMv6$/,$ d" ffmpeg/linux_arm.sh
+    sources_ppsspp
 }
 
 function build_lr-ppsspp() {
@@ -52,9 +45,8 @@ function build_lr-ppsspp() {
 
 function install_lr-ppsspp() {
     md_ret_files=(
-        'libretro/ppsspp_libretro.so'
-        'assets'
-        'flash0'
+        'lr-ppsspp/lib/ppsspp_libretro.so'
+        'lr-ppsspp/assets'
     )
 }
 
@@ -65,7 +57,6 @@ function configure_lr-ppsspp() {
     if [[ "$md_mode" == "install" ]]; then
         mkUserDir "$biosdir/PPSSPP"
         cp -Rv "$md_inst/assets/"* "$biosdir/PPSSPP/"
-        cp -Rv "$md_inst/flash0" "$biosdir/PPSSPP/"
         chown -R $user:$user "$biosdir/PPSSPP"
     fi
 

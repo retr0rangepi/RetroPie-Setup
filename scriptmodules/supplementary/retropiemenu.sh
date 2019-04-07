@@ -155,9 +155,9 @@ function launch_retropiemenu() {
 	log.rp)
             printMsgs "dialog" "Your runcommand.log is:\n\n$(cat /dev/shm/runcommand.log)"
             ;;
-	showip.rp)
-            local ip="$(ip route get 8.8.8.8 2>/dev/null | head -1 | cut -d' ' -f8)"
-            printMsgs "dialog" "Your IP is: $ip\n\nOutput of 'ip addr show':\n\n$(ip addr show)"
+        showip.rp)
+            local ip="$(getIPAddress)"
+            printMsgs "dialog" "Your IP is: ${ip:-(unknown)}\n\nOutput of 'ip addr show':\n\n$(ip addr show)"
             ;;
         *.rp)
             rp_callModule $no_ext depends

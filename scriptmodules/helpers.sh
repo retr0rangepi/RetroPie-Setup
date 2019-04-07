@@ -28,6 +28,7 @@ function printMsgs() {
         [[ "$type" == "console" ]] && echo -e "$msg"
         [[ "$type" == "heading" ]] && echo -e "\n= = = = = = = = = = = = = = = = = = = = =\n$msg\n= = = = = = = = = = = = = = = = = = = = =\n"
     done
+    return 0
 }
 
 ## @fn printHeading()
@@ -43,6 +44,7 @@ function printHeading() {
 function fatalError() {
     printHeading "Error"
     echo -e "$1"
+    joy2keyStop
     exit 1
 }
 
@@ -927,16 +929,15 @@ function applyPatch() {
 ## @fn downloadAndExtract()
 ## @param url url of archive
 ## @param dest destination folder for the archive
-## @param opts number of leading components from file to strip off or unzip params
+## @param optional additional parameters to pass to the decompression tool.
 ## @brief Download and extract an archive
-## @details Download and extract an archive, optionally stripping off a number
-## of directories - equivalent to the tar `--strip-components parameter`. For
-## zip files, the strip parameter can contain additional options to send to unzip
+## @details Download and extract an archive.
 ## @retval 0 on success
 function downloadAndExtract() {
     local url="$1"
     local dest="$2"
-    local opts="$3"
+    shift 2
+    local opts=("$@")
 
     local ext="${url##*.}"
     local cmd=(tar -xv)
@@ -958,15 +959,14 @@ function downloadAndExtract() {
             local tmp="$(mktemp -d)"
             local file="${url##*/}"
             runCmd wget -q -O"$tmp/$file" "$url"
-            runCmd unzip $opts -o "$tmp/$file" -d "$dest"
+            runCmd unzip "${opts[@]}" -o "$tmp/$file" -d "$dest"
             rm -rf "$tmp"
             ret=$?
     esac
 
     if [[ "$is_tar" -eq 1 ]]; then
         mkdir -p "$dest"
-        cmd+=(-C "$dest")
-        [[ -n "$opts" ]] && cmd+=(--strip-components "$opts")
+        cmd+=(-C "$dest" "${opts[@]}")
 
         runCmd "${cmd[@]}" < <(wget -q -O- "$url")
         ret=$?
@@ -1029,8 +1029,8 @@ function joy2keyStart() {
     [[ -z "$__joy2key_dev" ]] || pgrep -f joy2key.py >/dev/null && return 1
 
     # if joy2key.py is installed run it with cursor keys for axis/dpad, and enter + space for buttons 0 and 1
-    if "$scriptdir/scriptmodules/supplementary/runcommand/joy2key.py" "$__joy2key_dev" "${params[@]}" & 2>/dev/null; then
-        __joy2key_pid=$!
+    if "$scriptdir/scriptmodules/supplementary/runcommand/joy2key.py" "$__joy2key_dev" "${params[@]}" 2>/dev/null; then
+        __joy2key_pid=$(pgrep -f joy2key.py)
         return 0
     fi
 
@@ -1041,7 +1041,8 @@ function joy2keyStart() {
 ## @brief Stop previously started joy2key.py process.
 function joy2keyStop() {
     if [[ -n $__joy2key_pid ]]; then
-        kill -INT $__joy2key_pid 2>/dev/null
+        kill $__joy2key_pid 2>/dev/null
+        __joy2key_pid=""
         sleep 1
     fi
 }
@@ -1315,3 +1316,72 @@ function patchVendorGraphics() {
              --replace-needed libOpenVG.so libbrcmOpenVG.so \
              --replace-needed libWFC.so libbrcmWFC.so "$filename"
 }
+
+## @fn dkmsManager()
+## @param mode dkms operation type
+## @module_name name of dkms module
+## @module_ver version of dkms module
+## Helper function to manage DKMS modules installed by RetroPie
+function dkmsManager() {
+    local mode="$1"
+    local module_name="$2"
+    local module_ver="$3"
+    local kernel="$(uname -r)"
+    local ver
+
+    case "$mode" in
+        install)
+            if dkms status | grep -q "^$module_name"; then
+                dkmsManager remove "$module_name" "$module_ver"
+            fi
+            if [[ "$__chroot" -eq 1 ]]; then
+                kernel="$(ls -1 /lib/modules | tail -n -1)"
+            fi
+            ln -sf "$md_inst" "/usr/src/${module_name}-${module_ver}"
+            dkms install --force -m "$module_name" -v "$module_ver" -k "$kernel"
+            if dkms status | grep -q "^$module_name"; then
+                md_ret_error+=("Failed to install $md_id")
+                return 1
+            fi
+            ;;
+        remove)
+            for ver in $(dkms status "$module_name" | cut -d"," -f2 | cut -d":" -f1); do
+                dkms remove -m "$module_name" -v "$ver" --all
+                rm -f "/usr/src/${module_name}-${ver}"
+            done
+            dkmsManager unload "$module_name" "$module_ver"
+            ;;
+        reload)
+            dkmsManager unload "$module_name" "$module_ver"
+            modprobe "$module_name"
+            ;;
+        unload)
+            if [[ -n "$(lsmod | grep ${module_name/-/_})" ]]; then
+                rmmod "$module_name"
+            fi
+            ;;
+    esac
+}
+
+## @fn getIPAddress()
+## @param dev optional specific network device to use for address lookup
+## @brief Obtains the current externally routable source IP address of the machine
+## @details This function first tries to obtain an external IPv4 route and
+## otherwise tries an IPv6 route if the IPv4 route can not be determined.
+## If no external route can be determined, nothing will be returned.
+## This function uses Google's DNS servers as the external lookup address.
+function getIPAddress() {
+    local dev="$1"
+    local ip_route
+
+    # first try to obtain an external IPv4 route
+    ip_route=$(ip -4 route get 8.8.8.8 ${dev:+dev $dev} 2>/dev/null)
+    if [[ -z "$ip_route" ]]; then
+        # if there is no IPv4 route, try to obtain an IPv6 route instead
+        ip_route=$(ip -6 route get 2001:4860:4860::8888 ${dev:+dev $dev} 2>/dev/null)
+    fi
+
+    # if an external route was found, report its source address
+    [[ -n "$ip_route" ]] && grep -oP "src \K[^\s]+" <<< "$ip_route"
+}
+>>>>>>> 307db2d5d14ac855abee1d722a19403acb438507

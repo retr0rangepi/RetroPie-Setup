@@ -20,11 +20,11 @@ function depends_quake3() {
 }
 
 function sources_quake3() {
-    gitPullOrClone "$md_build" https://github.com/RetroPie/quake3.git
+    gitPullOrClone "$md_build" https://github.com/raspberrypi/quake3.git
 }
 
 function build_quake3() {
-    ./build.sh
+    ./build_rpi_raspbian.sh
 }
 
 function install_quake3() {
@@ -36,7 +36,7 @@ function install_quake3() {
 
 function game_data_quake3() {
     if [[ ! -f "$romdir/ports/quake3/pak0.pk3" ]]; then
-        downloadAndExtract "$__archive_url/Q3DemoPaks.zip" "$romdir/ports/quake3" "-j"
+        downloadAndExtract "$__archive_url/Q3DemoPaks.zip" "$romdir/ports/quake3" -j
     fi
     # always chown as moveConfigDir in the configure_ script would move the root owned demo files
     chown -R $user:$user "$romdir/ports/quake3"
