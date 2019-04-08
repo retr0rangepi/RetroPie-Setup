@@ -215,9 +215,9 @@ function getDepends() {
             isPlatform "xbian" && required="xbian-package-firmware"
         fi
 
-        # map libpng12-dev to libpng-dev for Ubuntu 16.10+
+        # map libpng12-dev to libpng12-dev for Ubuntu 16.10+
         if [[ "$required" == "libpng12-dev" ]] && compareVersions "$__os_debian_ver" ge 9;  then
-            required="libpng-dev"
+            required="libpng12-dev"
         fi
 
         if [[ "$md_mode" == "install" ]]; then

@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_atari800() {
-    local depends=(libsdl1.2-dev autoconf zlib1g-dev libpng-dev)
+    local depends=(libsdl1.2-dev autoconf zlib1g-dev libpng12-dev)
     isPlatform "rpi" && depends+=(libraspberrypi-dev)
     getDepends "${depends[@]}"
 }
