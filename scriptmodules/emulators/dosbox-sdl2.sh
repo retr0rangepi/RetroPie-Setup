@@ -28,15 +28,77 @@ function sources_dosbox-sdl2() {
 }
 
 function build_dosbox-sdl2() {
-    build_dosbox
+    ./autogen.sh
+    ./configure --prefix="$md_inst"
+    rpSwap on 1024
+    sed -i -e 's|/usr/local/include/SDL2|/usr/include/SDL2|g' src/gui/Makefile
+    #make clean
+    make -j2
+    md_ret_require="$md_build/src/dosbox"
+    rpSwap off
 }
 
 function install_dosbox-sdl2() {
-    install_dosbox
+    make install
+    md_ret_require="/opt/retropie/emulators/dosbox-sdl2/bin/dosbox"
 }
 
 function configure_dosbox-sdl2() {
-    configure_dosbox
+    if [[ "$md_id" == "dosbox-sdl2" ]]; then
+        local def="0"
+        local launcher_name="+Start DOSBox-SDL2.sh"
+        local needs_synth="0"
+    else
+        local def="1"
+        local launcher_name="+Start DOSBox.sh"
+        # needs software synth for midi; limit to Pi for now
+        if isPlatform "rpi"; then
+            local needs_synth="1"
+        fi
+    fi
+
+    mkRomDir "pc"
+    rm -f "$romdir/pc/$launcher_name"
+    if [[ "$md_mode" == "install" ]]; then
+        cat > "$romdir/pc/$launcher_name" << _EOF_
+#!/bin/bash
+[[ ! -n "\$(aconnect -o | grep -e TiMidity -e FluidSynth)" ]] && needs_synth="$needs_synth"
+function midi_synth() {
+    [[ "\$needs_synth" != "1" ]] && return
+    case "\$1" in
+        "start")
+            timidity -Os -iAD &
+            until [[ -n "\$(aconnect -o | grep TiMidity)" ]]; do
+                sleep 1
+            done
+            ;;
+        "stop")
+            killall timidity
+            ;;
+        *)
+            ;;
+    esac
+}
+params=("\$@")
+if [[ -z "\${params[0]}" ]]; then
+    params=(-c "@MOUNT C $romdir/pc" -c "@C:")
+elif [[ "\${params[0]}" == *.sh ]]; then
+    midi_synth start
+    bash "\${params[@]}"
+    midi_synth stop
+    exit
+elif [[ "\${params[0]}" == *.conf ]]; then
+    params=(-userconf -conf "\${params[@]}")
+else
+    params+=(-exit)
+fi
+midi_synth start
+"$md_inst/bin/dosbox" "\${params[@]}"
+midi_synth stop
+_EOF_
+    chmod +x "$romdir/pc/+Start DOSBox-SDL2.sh"
+    chown $user:$user "$romdir/pc/+Start DOSBox-SDL2.sh"
+
     if [[ "$md_mode" == "install" ]]; then
         local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
         if [[ -f "$config_path" ]]; then
@@ -50,4 +112,9 @@ function configure_dosbox-sdl2() {
             iniDel "usescancodes"
         fi
     fi
+fi
+    moveConfigDir "$home/.$md_id" "$md_conf_root/pc"
+
+    addEmulator "$def" "$md_id" "pc" "$romdir/pc/${launcher_name// /\\ } %ROM%"
+    addSystem "pc"
 }
