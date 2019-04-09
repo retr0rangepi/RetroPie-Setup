@@ -32,7 +32,7 @@ function build_dosbox-sdl2() {
     ./configure --prefix="$md_inst"
     rpSwap on 1024
     sed -i -e 's|/usr/local/include/SDL2|/usr/include/SDL2|g' src/gui/Makefile
-    #make clean
+    make clean
     make -j2
     md_ret_require="$md_build/src/dosbox"
     rpSwap off
