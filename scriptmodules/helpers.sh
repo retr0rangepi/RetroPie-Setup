@@ -198,10 +198,14 @@ function getDepends() {
 
     # check whether to use our own sdl2 - can be disabled to resolve issues with
     # mixing custom 64bit sdl2 and os distributed i386 version on multiarch
-    local own_sdl2=0
+    local own_sdl2=1
+    # default to off for x11 targets due to issues with dependencies with recent
+    # Ubuntu (19.04). eg libavdevice58 requiring exactly 2.0.9 sdl2.
+    isPlatform "x11" && own_sdl2=0
     iniConfig " = " '"' "$configdir/all/retropie.cfg"
     iniGet "own_sdl2"
-    [[ "$ini_value" == "0" ]] && own_sdl2=0
+    [[ "$ini_value" == 1 ]] && own_sdl2=1
+    [[ "$ini_value" == 0 ]] && own_sdl2=0
 
     for required in $@; do
 
@@ -1019,7 +1023,7 @@ function joy2keyStart() {
 
     local params=("$@")
     if [[ "${#params[@]}" -eq 0 ]]; then
-        params=(kcub1 kcuf1 kcuu1 kcud1 0x0a 0x20)
+        params=(kcub1 kcuf1 kcuu1 kcud1 0x0a 0x20 0x1b)
     fi
 
     # get the first joystick device (if not already set)
