@@ -287,8 +287,8 @@ function get_platform() {
             Vero4K)
                 __platform="vero4k"
                 ;;
-            "Allwinner sun8i Family")
-                __platform="armv7-mali"
+            "Allwinner sun7i (A20) Family")
+                __platform="A20-mali"
                 ;;
             *)
                 case $architecture in
@@ -413,7 +413,15 @@ function platform_H3-mali() {
     __default_asflags=""
     __default_makeflags="-j2"
     __has_binaries=0
-    __platform_flags="arm armv7 neon mali gles"
+    __platform_flags="arm armv7 neon kms gles"
+}
+
+function platform_A20-mali() {
+    __default_cflags="-O2 -march=armv7-a -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -ffast-math -Ofast"
+    __default_asflags=""
+    __default_makeflags="-j2"
+    __has_binaries=0
+    __platform_flags="arm armv7 neon kms gles"
 }
 
 function platform_imx6() {
