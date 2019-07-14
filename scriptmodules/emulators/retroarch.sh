@@ -40,7 +40,6 @@ function depends_retroarch() {
 function sources_retroarch() {
     gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.7.7
     applyPatch "$md_data/01_hotkey_hack.diff"
-    #applyPatch "$md_data/02_disable_search.diff"
     applyPatch "$md_data/03_disable_udev_sort.diff"
 }
 
@@ -61,7 +60,7 @@ function build_retroarch() {
     isPlatform "x11" && params+=(--enable-vulkan)
     isPlatform "vero4k" && params+=(--enable-mali_fbdev --with-opengles_libs='-L/opt/vero3/lib')
     ./configure --prefix="$md_inst" "${params[@]}"
-    #make clean
+    make clean
     make -j2
     md_ret_require="$md_build/retroarch"
 }
