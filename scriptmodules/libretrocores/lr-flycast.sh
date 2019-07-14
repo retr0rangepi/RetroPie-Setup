@@ -22,7 +22,8 @@ function _update_hook_lr-flycast() {
 }
 
 function sources_lr-flycast() {
-    gitPullOrClone "$md_build" https://github.com/libretro/flycast.git
+    gitPullOrClone "$md_build" https://github.com/libretro/flycast.git 
+#master 268d0bb8121ad02eed490dcc6d19c1ce33242cb1
     # don't override our C/CXXFLAGS
     sed -i "/^C.*FLAGS.*:=/d" Makefile
 }
@@ -33,7 +34,7 @@ function build_lr-flycast() {
         # MAKEFLAGS replace removes any distcc from path, as it segfaults with cross compiler and lto
         MAKEFLAGS="${MAKEFLAGS/\/usr\/lib\/distcc:/}" make platform=rpi
     else
-        make
+        make platform=classic_armv7_a7 -j2
     fi
     md_ret_require="$md_build/flycast_libretro.so"
 }

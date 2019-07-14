@@ -25,10 +25,10 @@ function sources_lr-ppsspp() {
 }
 
 function build_lr-ppsspp() {
-    #build_ffmpeg_ppsspp "$md_build/ffmpeg"
+    build_ffmpeg_ppsspp "$md_build/ffmpeg"
     cd "$md_build"
 
-    make -C libretro clean
+    #make -C libretro clean
     local params=()
     if isPlatform "rpi"; then
         if isPlatform "rpi1"; then
@@ -36,7 +36,7 @@ function build_lr-ppsspp() {
         else
             params+=("platform=rpi2")
         fi
-    elif isPlatform "mali"; then
+    elif isPlatform "kms"; then
         params+=("platform=armvglesneon")
     fi
     make -C libretro "${params[@]}"
@@ -45,7 +45,7 @@ function build_lr-ppsspp() {
 
 function install_lr-ppsspp() {
     md_ret_files=(
-        'lr-ppsspp/lib/ppsspp_libretro.so'
+        'lr-ppsspp/libretro/ppsspp_libretro.so'
         'lr-ppsspp/assets'
     )
 }

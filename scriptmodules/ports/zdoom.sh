@@ -25,7 +25,7 @@ function depends_zdoom() {
 }
 
 function sources_zdoom() {
-    gitPullOrClone "$md_build" https://github.com/RetroPie/zdoom.git retropie
+    gitPullOrClone "$md_build" https://github.com/rheit/zdoom.git
 }
 
 function build_zdoom() {
@@ -34,7 +34,7 @@ function build_zdoom() {
     cd release
     local params=(-DCMAKE_INSTALL_PREFIX="$md_inst" -DCMAKE_BUILD_TYPE=Release)
     cmake "${params[@]}" ..
-    make
+    make -j4
     md_ret_require="$md_build/release/zdoom"
 }
 

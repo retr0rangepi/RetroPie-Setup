@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_scummvm() {
-    local depends=(libmpeg2-4-dev libogg-dev libvorbis-dev libflac-dev libmad0-dev libpng12-dev libtheora-dev libfaad-dev libfluidsynth-dev libfreetype6-dev zlib1g-dev libjpeg-dev)
+    local depends=(libmpeg2-4-dev libogg-dev libvorbis-dev libflac-dev libmad0-dev libpng-dev libtheora-dev libfaad-dev libfluidsynth-dev libfreetype6-dev zlib1g-dev libjpeg-dev)
     if isPlatform "vero4k"; then
         depends+=(vero3-userland-dev-osmc)
     fi
@@ -45,7 +45,7 @@ function build_scummvm() {
         ./configure "${params[@]}"
     fi
     make clean
-    make
+    make -j4
     strip "$md_build/scummvm"
     md_ret_require="$md_build/scummvm"
 }

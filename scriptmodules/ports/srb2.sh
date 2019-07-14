@@ -20,7 +20,9 @@ function depends_srb2() {
 
 function sources_srb2() {
     gitPullOrClone "$md_build" https://github.com/STJr/SRB2.git
-    downloadAndExtract "$__archive_url/srb2-assets.tar.gz" "$md_build"
+    downloadAndExtract "$__archive_url/srb2-assets.tar.gz" "$md_build/"
+    mkdir "$md_build/srb2/assets/installer/"
+    ln -sf "$md_build/srb2/assets/*" "$md_build/srb2/assets/installer/"
 }
 
 function build_srb2() {

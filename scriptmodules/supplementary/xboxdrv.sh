@@ -31,7 +31,7 @@ function sources_xboxdrv() {
 }
 
 function build_xboxdrv() {
-    scons
+    scons -j4
 }
 
 function install_xboxdrv() {

@@ -18,20 +18,20 @@ rp_module_flags=""
 
 function depends_advmame() {
     local depends=(libsdl1.2-dev)
-    isPlatform "mali" && depends+=(libsdl2-dev)
+    isPlatform "kms" && depends+=(libsdl2-dev)
     isPlatform "rpi" && depends+=(libraspberrypi-dev)
     getDepends "${depends[@]}"
 }
 
 function sources_advmame() {
-    downloadAndExtract "https://github.com/amadvance/advancemame/releases/download/v3.9/advancemame-3.9.tar.gz" "$md_build" 1
+    gitPullOrClone "$md_build" https://github.com/amadvance/advancemame v3.9
 }
 
 function build_advmame() {
     ./autogen.sh
     ./configure CFLAGS="$CFLAGS -fno-stack-protector" --prefix="$md_inst"
     make clean
-    make -j2
+    make -j4
     md_ret_require="$md_build/advmame"
 }
 
