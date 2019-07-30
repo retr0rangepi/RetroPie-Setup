@@ -14,12 +14,13 @@ rp_module_desc="ResidualVM - A 3D Game Interpreter"
 rp_module_help="Copy your ResidualVM games to $romdir/residualvm"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/residualvm/residualvm/master/COPYING"
 rp_module_section="exp"
-rp_module_flags="dispmanx !mali !kms"
+#rp_module_flags="dispmanx !mali !kms"
 
 function depends_residualvm() {
     local depends=(
-        libsdl2-dev libmpeg2-4-dev libogg-dev libvorbis-dev libflac-dev libmad0-dev
-        libpng12-dev libtheora-dev libfaad-dev libfluidsynth-dev libfreetype6-dev
+        ##
+	libmpeg2-4-dev libogg-dev libvorbis-dev libflac-dev libmad0-dev
+        libpng-dev libtheora-dev libfaad-dev libfluidsynth-dev libfreetype6-dev
         zlib1g-dev libjpeg-dev
     )
     isPlatform "x11" && depends+=(libglew-dev)

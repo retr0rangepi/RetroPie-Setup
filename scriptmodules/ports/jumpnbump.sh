@@ -17,7 +17,7 @@ rp_module_section="exp"
 rp_module_flags=""
 
 function depends_jumpnbump() {
-    getDepends libsdl2-dev libsdl2-net-dev libsdl2-mixer-dev libbz2-dev zlib1g-dev
+    getDepends  libsdl2-net-dev libsdl2-mixer-dev libbz2-dev zlib1g-dev
 }
 
 function sources_jumpnbump() {

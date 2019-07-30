@@ -17,7 +17,7 @@ rp_module_section="exp"
 rp_module_flags=""
 
 function depends_minivmac() {
-    getDepends libsdl2-dev
+    getDepends 
 }
 
 function sources_minivmac() {

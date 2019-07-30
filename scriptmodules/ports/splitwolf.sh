@@ -16,7 +16,7 @@ rp_module_licence="NONCOM https://bitbucket.org/linuxwolf6/splitwolf/src/master/
 rp_module_section="exp"
 
 function depends_splitwolf() {
-    getDepends libsdl2-dev libsdl2-mixer-dev
+    getDepends  libsdl2-mixer-dev
 }
 
 function sources_splitwolf() {

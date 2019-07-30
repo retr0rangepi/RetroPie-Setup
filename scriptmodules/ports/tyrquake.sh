@@ -15,7 +15,7 @@ rp_module_licence="GPL2 https://raw.githubusercontent.com/RetroPie/tyrquake/mast
 rp_module_section="opt"
 
 function depends_tyrquake() {
-    getDepends libsdl2-dev
+    getDepends 
 }
 
 function sources_tyrquake() {

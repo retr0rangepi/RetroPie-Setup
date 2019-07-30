@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags="!x86 !x11 !mali !kms"
 
 function depends_coolcv() {
-    getDepends libsdl2-dev
+    getDepends 
 }
 
 function install_bin_coolcv() {

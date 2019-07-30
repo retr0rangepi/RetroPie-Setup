@@ -16,8 +16,8 @@ rp_module_section="opt"
 
 function depends_eduke32() {
     local depends=(
-        subversion flac libflac-dev libvorbis-dev libpng12-dev libvpx-dev freepats
-        libsdl2-dev libsdl2-mixer-dev
+        subversion flac libflac-dev libvorbis-dev libpng-dev libvpx-dev freepats
+        libsdl2-mixer-dev
     )
 
     isPlatform "x86" && depends+=(nasm)

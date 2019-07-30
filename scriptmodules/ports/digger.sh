@@ -15,7 +15,7 @@ rp_module_licence="GPL https://raw.githubusercontent.com/sobomax/digger/master/R
 rp_module_section="exp"
 
 function depends_digger() {
-    getDepends cmake libsdl2-dev zlib1g-dev
+    getDepends cmake  zlib1g-dev
 }
 
 function sources_digger() {

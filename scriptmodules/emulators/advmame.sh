@@ -18,7 +18,7 @@ rp_module_flags=""
 
 function depends_advmame() {
     local depends=(libsdl1.2-dev)
-    isPlatform "kms" && depends+=(libsdl2-dev)
+    isPlatform "kms" && depends+=()
     isPlatform "rpi" && depends+=(libraspberrypi-dev)
     getDepends "${depends[@]}"
 }

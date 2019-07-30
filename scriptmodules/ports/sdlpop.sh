@@ -15,7 +15,7 @@ rp_module_licence="GPL3 https://raw.githubusercontent.com/NagyD/SDLPoP/master/do
 rp_module_section="opt"
 
 function depends_sdlpop() {
-    getDepends libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev
+    getDepends libsdl2-mixer-dev libsdl2-image-dev
 }
 
 function sources_sdlpop() {

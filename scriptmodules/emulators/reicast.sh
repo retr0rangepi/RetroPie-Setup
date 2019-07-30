@@ -14,26 +14,27 @@ rp_module_desc="Dreamcast emulator Reicast"
 rp_module_help="ROM Extensions: .cdi .gdi\n\nCopy your Dreamcast roms to $romdir/dreamcast\n\nCopy the required BIOS files dc_boot.bin and dc_flash.bin to $biosdir/dc"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/reicast/reicast-emulator/master/LICENSE"
 rp_module_section="opt"
-rp_module_flags="!armv6"
+rp_module_flags="!armv6 !mali"
 
 function depends_reicast() {
-    local depends=(libsdl2-dev python-dev python-pip alsa-oss python-setuptools libevdev-dev libasound2-dev libudev-dev)
+    local depends=(python-dev python-pip alsa-oss python-setuptools libevdev-dev libasound2-dev libudev-dev)
     isPlatform "vero4k" && depends+=(vero3-userland-dev-osmc)
     getDepends "${depends[@]}"
     pip install evdev
 }
 
 function sources_reicast() {
-        gitPullOrClone "$md_build" https://github.com/reicast/reicast-emulator.git
-    #sed -i "s/CXXFLAGS += -fno-rtti -fpermissive -fno-operator-names/CXXFLAGS += -fno-rtti -fpermissive -fno-operator-names -D_GLIBCXX_USE_CXX11_ABI=0/g" shell/linux/Makefile
-    cp -v "$md_data/Makefile" "$md_build/shell/linux/"
+    gitPullOrClone "$md_build" https://github.com/reicast/reicast-emulator.git
 }
 
 function build_reicast() {
-    cd shell/linux
-    if isPlatform "mali"; then
-        make platform=odroid clean
-        make -j2 platform=odroid
+    cd reicast/linux
+    if isPlatform "rpi"; then
+        make platform=rpi2 clean
+        make platform=rpi2
+    elif isPlatform "tinker"; then
+        make USE_GLES=1 USE_SDL=1 clean
+        make USE_GLES=1 USE_SDL=1
     else
         make clean
         make
@@ -42,9 +43,11 @@ function build_reicast() {
 }
 
 function install_reicast() {
-    cd shell/linux
-    if isPlatform "mali"; then
-        make -j2 platform=odroid PREFIX="$md_inst" install
+    cd reicast/linux
+    if isPlatform "rpi"; then
+        make platform=rpi2 PREFIX="$md_inst" install
+    elif isPlatform "tinker"; then
+        make USE_GLES=1 USE_SDL=1 PREFIX="$md_inst" install
     else
         make PREFIX="$md_inst" install
     fi

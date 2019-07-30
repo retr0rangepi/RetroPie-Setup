@@ -14,32 +14,49 @@ rp_module_desc="DOS emulator"
 rp_module_help="ROM Extensions: .bat .com .exe .sh .conf\n\nCopy your DOS games to $romdir/pc"
 rp_module_licence="GPL2 https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/COPYING"
 rp_module_section="opt"
-rp_module_flags=""
+rp_module_flags="dispmanx !mali"
 
 function depends_dosbox() {
-    local depends=(libsdl1.2-dev libsdl-net1.2-dev libsdl-sound1.2-dev libasound2-dev libpng12-dev automake autoconf zlib1g-dev subversion "$@")
+    local depends=(libsdl1.2-dev libsdl-net1.2-dev libsdl-sound1.2-dev libasound2-dev libpng-dev automake autoconf zlib1g-dev subversion "$@")
     isPlatform "rpi" && depends+=(timidity freepats)
     getDepends "${depends[@]}"
 }
 
 function sources_dosbox() {
-    gitPullOrClone "$md_build" https://github.com/aqualung99/dosbox-0.74-ES
+    local revision="$1"
+    [[ -z "$revision" ]] && revision="4252"
+
+    svn checkout https://svn.code.sf.net/p/dosbox/code-0/dosbox/trunk "$md_build" -r "$revision"
+    applyPatch "$md_data/01-fully-bindable-joystick.diff"
 }
 
 function build_dosbox() {
+    local params=()
+
+    ! isPlatform "x11" && params+=(--disable-opengl)
+    # add or override params from calling function
+    params+=("$@")
+
     ./autogen.sh
-    ./configure --prefix="$md_inst"
-    rpSwap on 1024
-    sed -i -e 's|/usr/local/include/SDL2|/usr/include/SDL2|g' src/gui/Makefile
+    ./configure --prefix="$md_inst" "${params[@]}"
+    if isPlatform "arm"; then
+        # enable dynamic recompilation for armv4
+        sed -i 's|/\* #undef C_DYNREC \*/|#define C_DYNREC 1|' config.h
+        if isPlatform "armv6"; then
+            sed -i 's/C_TARGETCPU.*/C_TARGETCPU ARMV4LE/g' config.h
+        else
+            sed -i 's/C_TARGETCPU.*/C_TARGETCPU ARMV7LE/g' config.h
+            sed -i 's|/\* #undef C_UNALIGNED_MEMORY \*/|#define C_UNALIGNED_MEMORY 1|' config.h
+        fi
+    fi
     make clean
-    make -j2
+    make -j4
     md_ret_require="$md_build/src/dosbox"
-    rpSwap off
 }
 
 function install_dosbox() {
     make install
-    md_ret_require="/opt/retropie/emulators/dosbox/bin/dosbox"
+    md_ret_require="$md_inst/bin/dosbox"
 }
 
 function configure_dosbox() {
@@ -100,26 +117,30 @@ midi_synth start
 "$md_inst/bin/dosbox" "\${params[@]}"
 midi_synth stop
 _EOF_
-    chmod +x "$romdir/pc/+Start DOSBox.sh"
-    chown $user:$user "$romdir/pc/+Start DOSBox.sh"
+        chmod +x "$romdir/pc/$launcher_name"
+        chown $user:$user "$romdir/pc/$launcher_name"
 
-    local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
-    if [[ -f "$config_path" ]]; then
-        iniConfig "=" "" "$config_path"
-        iniSet "core" "dynamic"
-        iniSet "cycles" "max"
-        iniSet "fullscreen" "true"
-        iniSet "fullresolution" "1280x720"
-        iniSet "windowresolution" "original"
-        iniSet "output" "opengles"
-        if isPlatform "rpi" || [[ -n "$(aconnect -o | grep -e TiMidity -e FluidSynth)" ]]; then
-            iniSet "mididevice" "alsa"
-            iniSet "midiconfig" "128:0"
+        local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
+        if [[ -f "$config_path" ]]; then
+            iniConfig " = " "" "$config_path"
+            iniSet "usescancodes" "false"
+            iniSet "core" "dynamic"
+            iniSet "cycles" "max"
+            iniSet "scaler" "none"
+            if isPlatform "rpi" || [[ -n "$(aconnect -o | grep -e TiMidity -e FluidSynth)" ]]; then
+                iniSet "mididevice" "alsa"
+                iniSet "midiconfig" "128:0"
+            fi
+            if isPlatform "mesa"; then
+                iniSet "fullscreen" "true"
+                iniSet "fullresolution" "desktop"
+                iniSet "output" "overlay"
+            fi
         fi
     fi
-fi
+
     moveConfigDir "$home/.$md_id" "$md_conf_root/pc"
 
-    addEmulator "$def" "$md_id" "pc" "$romdir/pc/${launcher_name// /\\ } %ROM%"
+    addEmulator "$def" "$md_id" "pc" "bash $romdir/pc/${launcher_name// /\\ } %ROM%"
     addSystem "pc"
 }

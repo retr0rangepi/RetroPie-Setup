@@ -15,7 +15,7 @@ rp_module_licence="GPL2 https://raw.githubusercontent.com/STJr/SRB2/master/LICEN
 rp_module_section="exp"
 
 function depends_srb2() {
-    getDepends cmake libsdl2-dev libsdl2-mixer-dev
+    getDepends cmake  libsdl2-mixer-dev
 }
 
 function sources_srb2() {

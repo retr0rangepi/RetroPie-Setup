@@ -17,7 +17,7 @@ rp_module_flags=""
 
 function depends_zdoom() {
     local depends=(
-        libev-dev libsdl2-dev libmpg123-dev libsndfile1-dev zlib1g-dev libbz2-dev
+        libev-dev  libmpg123-dev libsndfile1-dev zlib1g-dev libbz2-dev
         timidity freepats cmake libopenal-dev libjpeg-dev
     )
 

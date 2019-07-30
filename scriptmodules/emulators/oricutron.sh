@@ -16,7 +16,7 @@ rp_module_licence="GPL2 https://raw.githubusercontent.com/pete-gordon/oricutron/
 rp_module_section="exp"
 
 function depends_oricutron() {
-    local depends=(cmake libsdl2-dev)
+    local depends=(cmake )
     isPlatform "x11" && depends+=(libgtk-3-dev)
     getDepends "${depends[@]}"
 }

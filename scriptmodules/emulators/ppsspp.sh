@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_ppsspp() {
-    local depends=(cmake libsdl2-dev libzip-dev)
+    local depends=(cmake  libzip-dev)
     getDepends "${depends[@]}"
 }
 

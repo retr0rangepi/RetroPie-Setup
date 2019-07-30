@@ -944,7 +944,7 @@ function downloadAndExtract() {
     local opts=("$@")
 
     local ext="${url##*.}"
-    local cmd=(tar -xv)
+    local cmd=(tar -zxv)
     local is_tar=1
 
     local ret
