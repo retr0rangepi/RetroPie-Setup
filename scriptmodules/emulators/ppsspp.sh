@@ -17,7 +17,10 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_ppsspp() {
-    local depends=(cmake  libzip-dev)
+    local depends=(cmake libsnappy-dev libzip-dev zlib1g-dev)
+    isPlatform "videocore" && depends+=(libraspberrypi-dev)
+    isPlatform "mesa" && depends+=(libgles2-mesa-dev)
+    isPlatform "vero4k" && depends+=(vero3-userland-dev-osmc)
     getDepends "${depends[@]}"
 }
 
@@ -109,7 +112,31 @@ function build_ppsspp() {
     # build ppsspp
     cd "$md_build/$md_id"
     rm -rf CMakeCache.txt CMakeFiles
-    local params=(-DCMAKE_TOOLCHAIN_FILE="$md_data/ropi.armv7.cmake")
+    local params=()
+    if isPlatform "videocore"; then
+        if isPlatform "armv6"; then
+            params+=(-DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/raspberry.armv6.cmake)
+        else
+            params+=(-DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/raspberry.armv7.cmake)
+        fi
+    elif isPlatform "mesa"; then
+        params+=(-DUSING_GLES2=ON -DUSING_EGL=OFF)
+    elif isPlatform "mali"; then
+        params+=(-DUSING_GLES2=ON -DUSING_FBDEV=ON)
+    elif isPlatform "kms"; then
+        params+=(-DCMAKE_TOOLCHAIN_FILE="$md_data/ropi.armv7.cmake")
+    elif isPlatform "tinker"; then
+        params+=(-DCMAKE_TOOLCHAIN_FILE="$md_data/tinker.armv7.cmake")
+    elif isPlatform "vero4k"; then
+        params+=(-DCMAKE_TOOLCHAIN_FILE="cmake/Toolchains/vero4k.armv8.cmake")
+    fi
+    if isPlatform "arm" && ! isPlatform "x11"; then
+        params+=(-DARM_NO_VULKAN=ON)
+    fi
+    if [ "$md_id" == "lr-ppsspp" ]; then
+        params+=(-DLIBRETRO=On)
+        ppsspp_binary="lib/ppsspp_libretro.so"
+    fi
     "$cmake" "${params[@]}" .
     make clean
     make -j2

@@ -10,14 +10,21 @@
 #
 
 rp_module_id="dxx-rebirth"
-rp_module_desc="DXX-Rebirth (Descent & Descent 2) build from source"
+rp_module_desc="DXX-Rebirth (Descent & Descent 2) source port"
 rp_module_licence="NONCOM https://raw.githubusercontent.com/dxx-rebirth/dxx-rebirth/master/COPYING.txt"
 rp_module_section="opt"
-rp_module_flags="!mali !kms"
+rp_module_flags="!mali"
 
 function depends_dxx-rebirth() {
-    local depends=(libphysfs1 libphysfs-dev libsdl1.2-dev libsdl-mixer1.2-dev scons)
-    isPlatform "rpi" && depends+=(libraspberrypi-dev)
+    local depends=(libpng-dev libphysfs-dev libsdl1.2-dev libsdl-mixer1.2-dev scons)
+    if isPlatform "videocore"; then
+        depends+=(libraspberrypi-dev)
+    elif isPlatform "gles" && ! isPlatform "mesa"; then
+        depends+=(libgles2-mesa-dev)
+    else
+        depends+=(libgl1-mesa-dev libglu1-mesa-dev libsdl2-dev libsdl2-mixer-dev)
+    fi
+
     getDepends "${depends[@]}"
 }
 
@@ -27,7 +34,18 @@ function sources_dxx-rebirth() {
 
 function build_dxx-rebirth() {
     local params=()
-    isPlatform "rpi" && params+=(raspberrypi=1)
+    isPlatform "arm" && params+=("words_need_alignment=1")
+    if isPlatform "videocore"; then
+        params+=("raspberrypi=1")
+    elif isPlatform "mesa"; then
+        # GLES is limited to ES 1 and blocks SDL2; GL works at fullspeed on Pi 3.
+        params+=("raspberrypi=mesa" "opengl=1" "opengles=0" "sdl2=1")
+    elif isPlatform "gles";  then
+        params+=("opengl=0" "opengles=1")
+    else
+        params+=("opengl=1" "opengles=0" "sdl2=1")
+    fi
+
     scons -c
     scons "${params[@]}"
     md_ret_require=(
@@ -39,10 +57,8 @@ function build_dxx-rebirth() {
 function install_dxx-rebirth() {
     # Rename generic files
     mv -f "$md_build/d1x-rebirth/INSTALL.txt" "$md_build/d1x-rebirth/D1X-INSTALL.txt"
-    mv -f "$md_build/d1x-rebirth/README.txt" "$md_build/d1x-rebirth/D1X-README.txt"
     mv -f "$md_build/d1x-rebirth/RELEASE-NOTES.txt" "$md_build/d1x-rebirth/D1X-RELEASE-NOTES.txt"
     mv -f "$md_build/d2x-rebirth/INSTALL.txt" "$md_build/d2x-rebirth/D2X-INSTALL.txt"
-    mv -f "$md_build/d2x-rebirth/README.txt" "$md_build/d2x-rebirth/D2X-README.txt"
     mv -f "$md_build/d2x-rebirth/RELEASE-NOTES.txt" "$md_build/d2x-rebirth/D2X-RELEASE-NOTES.txt"
 
     md_ret_files=(
@@ -52,12 +68,10 @@ function install_dxx-rebirth() {
         'd1x-rebirth/d1x-rebirth'
         'd1x-rebirth/d1x.ini'
         'd1x-rebirth/D1X-INSTALL.txt'
-        'd1x-rebirth/D1X-README.txt'
         'd1x-rebirth/D1X-RELEASE-NOTES.txt'
         'd2x-rebirth/d2x-rebirth'
         'd2x-rebirth/d2x.ini'
         'd2x-rebirth/D2X-INSTALL.txt'
-        'd2x-rebirth/D2X-README.txt'
         'd2x-rebirth/D2X-RELEASE-NOTES.txt'
     )
 }

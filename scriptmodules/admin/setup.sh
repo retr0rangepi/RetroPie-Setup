@@ -35,7 +35,7 @@ function rps_logInit() {
 function rps_logStart() {
     echo -e "Log started at: $(date -d @$time_start)\n"
     echo "RetroPie-Setup version: $__version ($(git -C "$scriptdir" log -1 --pretty=format:%h))"
-    echo "System: $(uname -a)"
+    echo "System: $__os_desc - $(uname -a)"
 }
 
 function rps_logEnd() {
@@ -71,7 +71,11 @@ function depends_setup() {
     if isPlatform "rpi" && isPlatform "mesa" && ! isPlatform "rpi4"; then
         printMsgs "dialog" "WARNING: You have the experimental desktop GL driver enabled. This is NOT supported by RetroPie, and Emulation Station as well as emulators may fail to launch.\n\nPlease disable the experimental desktop GL driver from the raspi-config 'Advanced Options' menu."
     fi
-    
+
+    if [[ "$__os_debian_ver" -eq 8 ]]; then
+        printMsgs "dialog" "Raspbian/Debian Jessie and versions of Ubuntu below 16.04 are no longer supported.\n\nPlease install RetroPie 4.4 or newer from a fresh image which is based on Raspbian Stretch (or if running Ubuntu, upgrade your OS)."
+    fi
+
     # make sure user has the correct group permissions
     if ! isPlatform "x11"; then
         local group
@@ -437,7 +441,7 @@ function gui_setup() {
     while true; do
         local commit=$(git -C "$scriptdir" log -1 --pretty=format:"%cr (%h)")
 
-        cmd=(dialog --backtitle "$__backtitle" --title "RetroPie-Setup Script" --cancel-label "Exit" --item-help --help-button --default-item "$default" --menu "Version: $__version\nLast Commit: $commit" 22 76 16)
+        cmd=(dialog --backtitle "$__backtitle" --title "RetroPie-Setup Script" --cancel-label "Exit" --item-help --help-button --default-item "$default" --menu "Version: $__version (running on $__os_desc)\nLast Commit: $commit" 22 76 16)
         options=(
             P "Manage packages"
             "P Install/Remove and Configure the various components of RetroPie, including emulators, ports, and controller drivers."

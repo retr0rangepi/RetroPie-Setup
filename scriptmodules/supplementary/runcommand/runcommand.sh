@@ -900,12 +900,6 @@ function get_sys_command() {
         COMMAND="${COMMAND:4}"
         CONSOLE_OUT=1
     fi
-
-    # workaround for launching xserver on correct/user owned tty
-    # see https://github.com/RetroPie/RetroPie-Setup/issues/1805
-    if [[ -n "$TTY" && "$COMMAND" =~ ^(startx|xinit) ]]; then
-        COMMAND+=" -- vt$TTY -keeptty"
-    fi
 }
 
 function show_launch() {
@@ -1080,6 +1074,10 @@ function runcommand() {
 
     mode_switch "$MODE_REQ_ID"
 
+    # replace X/Y resolution (needed for KMS applications)
+    COMMAND="${COMMAND//\%XRES\%/${MODE_CUR[0]}}"
+    COMMAND="${COMMAND//\%YRES\%/${MODE_CUR[1]}}"
+
     [[ -n "$FB_NEW" ]] && switch_fb_res $FB_NEW
 
     config_dispmanx "$SAVE_EMU"
@@ -1088,6 +1086,12 @@ function runcommand() {
     [[ -n "$GOVERNOR" ]] && set_governor "$GOVERNOR"
 
     retroarch_append_config
+
+    # workaround for launching xserver on correct/user owned tty
+    # see https://github.com/RetroPie/RetroPie-Setup/issues/1805
+    if [[ -n "$TTY" && "$COMMAND" =~ ^(startx|xinit) ]]; then
+        COMMAND+=" -- vt$TTY -keeptty"
+    fi
 
     local ret
     launch_command

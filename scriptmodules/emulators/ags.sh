@@ -14,7 +14,7 @@ rp_module_desc="Adventure Game Studio - Adventure game engine"
 rp_module_help="ROM Extension: .exe\n\nCopy your Adventure Game Studio roms to $romdir/ags"
 rp_module_licence="OTHER https://raw.githubusercontent.com/adventuregamestudio/ags/master/License.txt"
 rp_module_section="opt"
-rp_module_flags="!kms"
+rp_module_flags="!mali"
 
 function depends_ags() {
     getDepends xorg pkg-config libaldmb1-dev libfreetype6-dev libtheora-dev libvorbis-dev libogg-dev liballegro4-dev
@@ -34,6 +34,13 @@ function install_ags() {
 }
 
 function configure_ags() {
+    local binary="$md_inst/bin/ags"
+    local params=("--fullscreen %ROM%")
+    if ! isPlatform "x11"; then
+        binary="xinit $binary"
+        params+=("--gfxdriver software")
+    fi
+
     mkRomDir "ags"
 
     # install Eawpatches GUS patch set (see: http://liballeg.org/digmid.html)

@@ -259,7 +259,7 @@ function getDepends() {
         # workaround to force installation of our fixed libsdl1.2 and custom compiled libsdl2
         local temp=()
         for required in ${packages[@]}; do
-            if isPlatform "rpi" && [[ "$required" == "libsdl1.2-dev" ]]; then
+            if isPlatform "videocore" && [[ "$required" == "libsdl1.2-dev" ]]; then
                 if [[ "$__has_binaries" -eq 1 ]]; then
                     rp_callModule sdl1 install_bin
                 else
@@ -360,8 +360,8 @@ function gitPullOrClone() {
         if [[ "$__persistent_repos" -ne 1 && "$repo" == *github* && -z "$commit" ]]; then
             git+=" --depth 1"
         fi
-        [[ "$branch" != "master" ]] && git+=" --branch $branch"
-        echo "$git \"$repo\" \"$dir\""
+        git+=" --branch $branch"
+        printMsgs "console" "$git \"$repo\" \"$dir\""
         runCmd $git "$repo" "$dir"
     fi
     if [[ "$commit" ]]; then
@@ -577,7 +577,7 @@ function addUdevInputRules() {
 ## @details Set a dispmanx flag for a module as to whether it should use the
 ## sdl1 dispmanx backend by default or not (0 for framebuffer, 1 for dispmanx).
 function setDispmanx() {
-    isPlatform "rpi" || return
+    isPlatform "dispmanx" || return
     local mod_id="$1"
     local status="$2"
     iniConfig "=" "\"" "$configdir/all/dispmanx.cfg"

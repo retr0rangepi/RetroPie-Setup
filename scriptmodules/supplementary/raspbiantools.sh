@@ -15,6 +15,9 @@ rp_module_section="config"
 rp_module_flags="!x11 !mali"
 
 function apt_upgrade_raspbiantools() {
+    # install a newer kernel/firmware for stretch to resolve sony bt issues
+    stretch_fix_raspbiantools
+
     aptUpdate
     apt-get -y dist-upgrade
 }
@@ -37,6 +40,34 @@ function package_cleanup_raspbiantools() {
 function disable_blanker_raspbiantools() {
     sed -i 's/BLANK_TIME=\d*/BLANK_TIME=0/g' /etc/kbd/config
     sed -i 's/POWERDOWN_TIME=\d*/POWERDOWN_TIME=0/g' /etc/kbd/config
+}
+
+function stretch_fix_raspbiantools() {
+    local ver="1.20190401-1"
+    # install an older kernel/firmware for stretch to resolve sony bt, composite and overscan issues
+    if isPlatform "rpi" && [[ "$__os_debian_ver" -eq 9 ]] && hasPackage raspberrypi-kernel "$ver" ne; then
+        install_firmware_raspbiantools "$ver" hold
+    fi
+}
+
+function install_firmware_raspbiantools() {
+    local ver="$1"
+    local state="$2"
+    [[ -z "$ver" ]] && return 1
+    local url="http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware"
+    mkdir -p "$md_build"
+    pushd "$md_build" >/dev/null
+    local pkg
+    local deb
+    for pkg in raspberrypi-bootloader libraspberrypi0 libraspberrypi-doc libraspberrypi-dev libraspberrypi-bin raspberrypi-kernel-headers raspberrypi-kernel; do
+        deb="${pkg}_${ver}_armhf.deb"
+        wget -O"$deb" "$url/$deb"
+        dpkg -i "$deb"
+        [[ -n "$state" ]] && apt-mark "$state" "$pkg"
+        rm "$deb"
+    done
+    popd >/dev/null
+    rm -rf "$md_build"
 }
 
 function enable_modules_raspbiantools() {

@@ -14,10 +14,11 @@ rp_module_desc="DOS emulator (enhanced DOSBox fork)"
 rp_module_help="ROM Extensions: .bat .com .exe .sh .conf\n\nCopy your DOS games to $romdir/pc"
 rp_module_licence="GPL2 https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/COPYING"
 rp_module_section="exp"
-#rp_module_flags="!kms"
+rp_module_flags="!mali"
 
 function depends_dosbox-sdl2() {
-    depends_dosbox libsdl2-net-dev libfluidsynth-dev fluid-soundfont-gm
+    local depends=(libsdl2-net-dev libfluidsynth-dev fluid-soundfont-gm)
+    depends_dosbox "${depends[@]}"
 }
 
 function sources_dosbox-sdl2() {
@@ -102,7 +103,7 @@ _EOF_
     if [[ "$md_mode" == "install" ]]; then
         local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
         if [[ -f "$config_path" ]]; then
-            iniConfig "=" "" "$config_path"
+            iniConfig " = " "" "$config_path"
             iniSet "fluid.driver" "alsa"
             iniSet "fluid.soundfont" "/usr/share/sounds/sf2/FluidR3_GM.sf2"
             iniSet "fullresolution" "desktop"
