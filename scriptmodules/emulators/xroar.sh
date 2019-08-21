@@ -17,7 +17,7 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_xroar() {
-    getDepends libsdl1.2-dev automake texinfo
+    getDepends automake
 }
 
 function sources_xroar() {
@@ -27,7 +27,7 @@ function sources_xroar() {
 function build_xroar() {
     local params=(--without-gtk2 --without-gtkgl)
     if ! isPlatform "x11"; then
-        params+=(--without-pulse)
+        params+=(--without-pulse --disable-kbd-translate --without-x)
     fi
     ./autogen.sh
     ./configure --prefix="$md_inst" "${params[@]}"
@@ -55,10 +55,10 @@ function configure_xroar() {
     cp -p $md_data/{coco.sh,cocous.sh} $md_conf_root/coco/
 
     local params=(-fs)
-    ! isPlatform "x11" && params+=(-vo sdlgl -ao sdl --ccr simple)
-    addEmulator 1 "$md_id-dragon32" "dragon32" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_conf_root/dragon32/dragon32.sh %ROM%"
-    addEmulator 1 "$md_id-cocous" "coco" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_conf_root/coco/cocous.sh %ROM%"
-    addEmulator 0 "$md_id-coco" "coco" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_conf_root/coco/coco.sh %ROM%"
+    ! isPlatform "x11" && params+=(-vo sdl -ccr simple)
+    addEmulator 1 "$md_id-dragon32" "dragon32" "$md_inst/bin/xroar ${params[*]} -machine dragon32 -run %ROM%"
+    addEmulator 1 "$md_id-cocous" "coco" "$md_inst/bin/xroar ${params[*]} -machine cocous -run %ROM%"
+    addEmulator 0 "$md_id-coco" "coco" "$md_inst/bin/xroar ${params[*]} -machine coco -run %ROM%"
     addSystem "dragon32"
     addSystem "coco"
 }
