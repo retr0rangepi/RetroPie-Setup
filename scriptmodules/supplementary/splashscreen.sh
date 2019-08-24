@@ -31,7 +31,7 @@ function _video_exts_splashscreen() {
 }
 
 function depends_splashscreen() {
-    getDepends fbi insserv vorbis-tools
+    getDepends fbi 
 }
 
 function install_bin_splashscreen() {

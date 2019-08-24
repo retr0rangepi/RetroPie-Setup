@@ -44,10 +44,10 @@ do_start () {
         local delay=$((20/count))
         if [ "$RANDOMIZE" = "disabled" ]; then
             fbi -T 2 -once -t $delay -noverbose -a -l "$config" >/dev/null 2>&1
-	    ogg123 /home/pi/RetroPie/splashscreens/bootsnd.ogg &
+	    cvlc -q /home/pi/RetroPie/splashscreens/bootsnd.ogg &
         else
             fbi -T 2 -once -t $delay -noverbose -a "$line" >/dev/null 2>&1
-	    ogg123 /home/pi/RetroPie/splashscreens/bootsnd.ogg &
+	    cvlc -q /home/pi/RetroPie/splashscreens/bootsnd.ogg &
         fi
     fi
     exit 0
