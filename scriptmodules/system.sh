@@ -257,7 +257,7 @@ function get_rpi_video() {
 function get_platform() {
     local architecture="$(uname --machine)"
     if [[ -z "$__platform" ]]; then
-        case "$(sed -n '/^Hardware/s/^.*: \(.*\)/\1/p' < /proc/cpuinfo)" in
+        case "$(sed -n "/^Hardware/{ s/^.*: \(.*\)/\1/p;q }" < /proc/cpuinfo)" in
             BCM2708)
                 __platform="rpi1"
                 ;;
@@ -296,6 +296,9 @@ function get_platform() {
                 ;;
             "Allwinner sun7i (A20) Family")
                 __platform="A20-mali"
+                ;;
+            sun50iw1p1)
+                __platform="H5-A64-mali"
                 ;;
             *)
                 case $architecture in
@@ -416,6 +419,14 @@ function platform_armv7-mali() {
 }
 
 function platform_H3-mali() {
+    __default_cflags="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    __default_asflags=""
+    __default_makeflags="-j4"
+    __has_binaries=0
+    __platform_flags="arm armv7 neon kms gles"
+}
+
+function platform_H5-A64-mali() {
     __default_cflags="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
     __default_asflags=""
     __default_makeflags="-j4"
