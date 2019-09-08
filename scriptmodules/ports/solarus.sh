@@ -50,6 +50,9 @@ function build_solarus() {
     cd build
     cmake "${params[@]}" ..
     make
+    md_ret_require=(
+        "$md_build/build/solarus-run"
+    )
 }
 
 function install_solarus() {
