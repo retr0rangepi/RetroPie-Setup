@@ -199,19 +199,22 @@ function configure_mupen64plus() {
         # Bilinear filtering mode (0=N64 3point, 1=standard)
         iniSet "bilinearMode" "1"
         # Size of texture cache in megabytes. Good value is VRAM*3/4
-        iniSet "CacheSize" "50"
-        # Disable FB emulation until visual issues are sorted out
+        local gpu_mem
+        if isPlatform "armv6"; then
+            gpu_mem=64
+        else
+            gpu_mem=128
+        fi
+        iniSet "CacheSize" "$gpu_mem"
         iniSet "EnableFBEmulation" "True"
         # Use native res
         iniSet "UseNativeResolutionFactor" "1"
         # Enable legacy blending
         iniSet "EnableLegacyBlending" "True"
-        # Enable FPS Counter. Fixes zelda depth issue
-        iniSet "ShowFPS " "True"
-        iniSet "fontSize" "14"
-        iniSet "fontColor" "1F1F1F"
         # Enable Threaded GL calls
         iniSet "ThreadedVideo" "True"
+        # Swap frame buffers On buffer update (most performant)
+        iniSet "BufferSwapMode" "2"
 
         # Disable gles2n64 autores feature and use dispmanx upscaling
         iniConfig "=" "" "$md_conf_root/n64/gles2n64.conf"

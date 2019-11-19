@@ -253,14 +253,6 @@ function testCompatibility() {
                 config_version=$(<"$configdir/n64/GLideN64_config_version.ini")
             fi
             iniSet "configVersion" "$config_version"
-            # Size of texture cache in megabytes. Good value is VRAM*3/4
-            iniSet "CacheSize" "50"
-            # Enable FPS Counter. Fixes zelda depth issue
-            iniSet "ShowFPS " "True"
-            iniSet "fontSize" "14"
-            iniSet "fontColor" "1F1F1F"
-            # Enable FBEmulation if necessary
-            iniSet "EnableFBEmulation" "True"
             # Set native resolution factor of 1
             iniSet "UseNativeResolutionFactor" "1"
             for game in "${GLideN64NativeResolution_blacklist[@]}"; do

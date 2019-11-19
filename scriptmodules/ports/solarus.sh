@@ -62,9 +62,9 @@ function install_solarus() {
 
 function configure_solarus() {
     addEmulator 1 "$md_id" "solarus" "$md_inst/solarus.sh %ROM%"
-    addSystem "solarus" "Solarus Engine" ".solarus .zip"
-    moveConfigDir "$home/.solarus" "$md_conf_root/solarus"
-    [[ "$mode" == "remove" ]] && return
+    addSystem "solarus"
+    moveConfigDir "$home/.solarus" "$configdir/solarus"
+    [[ "$md_mode" == "remove" ]] && return
 
     # ensure rom dir exists
     mkRomDir "solarus"
