@@ -18,6 +18,7 @@ rp_module_flags="!x86"
 
 function install_bin_drastic() {
     downloadAndExtract "http://www.retrorangepi.org/drastic.tar.gz" "$md_inst" --strip-components 1
+}
 
 function configure_drastic() {
     mkRomDir "nds"
