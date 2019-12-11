@@ -42,16 +42,17 @@ function depends_amiberry() {
 }
 
 function sources_amiberry() {
-    # temporarily use dev branch
     gitPullOrClone "$md_build" https://github.com/midwan/amiberry
+    # use our default optimisation level
+    sed -i "s/-Ofast//" "$md_build/Makefile"
 }
 
 function build_amiberry() {
     local platform=$(_get_platform_amiberry)
     cd external/capsimg
-    make clean
     ./bootstrap.fs
     ./configure.fs
+    make -f Makefile.fs clean
     make -f Makefile.fs
     cd "$md_build"
     make clean
