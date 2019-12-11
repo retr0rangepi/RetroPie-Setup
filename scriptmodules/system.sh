@@ -393,11 +393,11 @@ function platform_H3-mali() {
 }
 
 function platform_H5-A64-mali() {
-    __default_cflags="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -ftree-vectorize -funsafe-math-optimizations"
+    __default_cflags="-O2 -march=native -ftree-vectorize -funsafe-math-optimizations"
     __default_asflags=""
     __default_makeflags="-j4"
     __has_binaries=0
-    __platform_flags="arm armv7 neon kms gles"
+    __platform_flags="aarch64 armv8 kms gles"
 }
 
 function platform_A20-mali() {
@@ -405,7 +405,7 @@ function platform_A20-mali() {
     __default_asflags=""
     __default_makeflags="-j2"
     __has_binaries=0
-    __platform_flags="arm armv7 neon kms gles"
+    __platform_flags="arm armv7 kms gles"
 }
 
 function platform_imx6() {

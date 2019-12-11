@@ -31,7 +31,7 @@ function _get_platform_amiberry() {
 }
 
 function depends_amiberry() {
-    local depends=(libpng12-dev libmpeg2-4-dev zlib1g-dev)
+    local depends=(libpng-dev libmpeg2-4-dev zlib1g-dev)
     if ! isPlatform "rpi" || isPlatform "kms" || isPlatform "vero4k"; then
         depends+=( libsdl2-image-dev libsdl2-ttf-dev)
     fi
