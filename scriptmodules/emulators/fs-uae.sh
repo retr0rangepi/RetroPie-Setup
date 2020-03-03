@@ -13,6 +13,28 @@ rp_module_id="fs-uae"
 rp_module_desc="Amiga emulator - FS-UAE integrates the most accurate Amiga emulation code available from WinUAE"
 rp_module_help="ROM Extension: .adf  .adz .dms .ipf .zip\n\nCopy your Amiga games to $romdir/amiga\n\nCopy a required BIOS file (e.g. kick13.rom) to $biosdir"
 rp_module_section="exp"
+rp_module_flags="!all !arm x11"
+
+function depends_fs-uae() {
+    case "$__os_id" in
+        Ubuntu)
+            if [[ "$md_mode" == "install" ]]; then
+                apt-add-repository -y ppa:fengestad/stable
+            else
+                apt-add-repository -r -y ppa:fengestad/stable
+            fi
+            aptUpdate
+            ;;
+        Debian)
+            if [[ "$md_mode" == "install" ]]; then
+                echo "deb http://download.opensuse.org/repositories/home:/FrodeSolheim:/stable/Debian_9.0/ /" > /etc/apt/sources.list.d/fsuae-stable.list
+            else
+                rm -f /etc/apt/sources.list.d/fsuae-stable.list
+            fi
+            aptUpdate
+            ;;
+    esac
+}
 
 function install_bin_fs-uae() {
     aptInstall fs-uae fs-uae-launcher fs-uae-arcade

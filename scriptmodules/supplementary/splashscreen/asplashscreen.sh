@@ -6,10 +6,19 @@ RANDOMIZE="disabled"
 REGEX_VIDEO=""
 REGEX_IMAGE=""
 
+is_fkms() {
+    if grep -q okay /proc/device-tree/soc/v3d@7ec00000/status 2> /dev/null || grep -q okay /proc/device-tree/soc/firmwarekms@7e600000/status 2> /dev/null ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 do_start () {
     local config="/etc/splashscreen.list"
     local line
     local re="$REGEX_VIDEO\|$REGEX_IMAGE"
+    local omxiv="/opt/retropie/supplementary/omxiv/omxiv"
     case "$RANDOMIZE" in
         disabled)
             line="$(head -1 "$config")"
@@ -40,8 +49,8 @@ do_start () {
             local count=1
         fi
         [ $count -eq 0 ] && count=1
-        [ $count -gt 20 ] && count=20
-        local delay=$((20/count))
+        [ $count -gt 12 ] && count=12
+        local delay=$((12/count))
         if [ "$RANDOMIZE" = "disabled" ]; then
             fbi -T 2 -once -t $delay -noverbose -a -l "$config" >/dev/null 2>&1
 	    cvlc -q /home/pi/RetroPie/splashscreens/bootsnd.ogg &
@@ -72,5 +81,3 @@ case "$1" in
         exit 3
         ;;
 esac
-
-:

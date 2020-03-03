@@ -40,7 +40,7 @@ function module_builder() {
         ! fnExists "install_${md_id}" && continue
 
         # skip already built archives, so we can retry failed modules
-        [[ -f "$__tmpdir/archives/$__os_codename/$__platform/${__mod_type[md_idx]}/$md_id.tar.gz" ]] && continue
+        [[ -f "$__tmpdir/archives/$__binary_path/${__mod_type[md_idx]}/$md_id.tar.gz" ]] && continue
 
         # build, install and create binary archive.
         # initial clean in case anything was in the build folder when calling
@@ -61,7 +61,7 @@ function section_builder() {
 }
 
 function upload_builder() {
-    rsync -av --progress --delay-updates "$__tmpdir/archives/" "retropie@$__binary_host:files/binaries/"
+    adminRsync "$__tmpdir/archives/" "files/binaries/"
 }
 
 function clean_archives_builder() {
@@ -102,11 +102,17 @@ function chroot_build_builder() {
         fi
 
         for platform in $platforms; do
+            if [[ "$dist" == "stretch" && "$platform" == "rpi4" ]]; then
+                printMsgs "heading" "Skipping platform $platform on $dist ..."
+                continue
+            fi
+
             rp_callModule image chroot "$md_build/$dist" \
                 sudo \
                 MAKEFLAGS="$makeflags" \
                 DISTCC_HOSTS="$distcc_hosts" \
                 __platform="$platform" \
+                __has_binaries="$__chroot_has_binaries" \
                 /home/pi/RetroPie-Setup/retropie_packages.sh builder "$@"
         done
 

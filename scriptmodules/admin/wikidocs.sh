@@ -15,7 +15,7 @@ rp_module_section=""
 
 function depends_wikidocs() {
     getDepends python3 python3-pip libyaml-dev
-    pip3 install --upgrade mkdocs mkdocs-material mdx_truly_sane_lists
+    pip3 install --upgrade mkdocs mkdocs-material mdx_truly_sane_lists git+https://github.com/cmitu/mkdocs-altlink-plugin
 }
 
 function sources_wikidocs() {
@@ -36,5 +36,5 @@ function install_wikidocs() {
 }
 
 function upload_wikidocs() {
-    rsync -av --delete "$__tmpdir/wikidocs/" "retropie@$__binary_host:docs/"
+    adminRsync "$__tmpdir/wikidocs/" "docs/" --delete
 }

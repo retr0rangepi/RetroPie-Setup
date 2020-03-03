@@ -15,7 +15,9 @@ rp_module_licence="GPL2 https://raw.githubusercontent.com/STJr/SRB2/master/LICEN
 rp_module_section="exp"
 
 function depends_srb2() {
-    getDepends cmake  libsdl2-mixer-dev
+    local depends=(cmake libsdl2-mixer-dev libgme-dev)
+    compareVersions "$__os_debian_ver" gt 9 && depends+=(libopenmpt-dev)
+    getDepends "${depends[@]}"
 }
 
 function sources_srb2() {
@@ -28,21 +30,25 @@ function sources_srb2() {
 function build_srb2() {
     mkdir build
     cd build
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$md_inst"
+
+    # Disable OpenMPT on Debian Stretch and old, its version is too old
+    local extra
+    compareVersions "$__os_debian_ver" lt 10 && extra="-DSRB2_CONFIG_HAVE_OPENMPT=Off"
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$md_inst" $extra
     make
-    md_ret_require="$md_build/build/bin/srb2"
+    md_ret_require="$md_build/build/bin/lsdlsrb2"
 }
 
 function install_srb2() {
-    # copy and dereference, so we get a srb2 binary rather than a symlink to srb2-version
-    cp -L 'build/bin/srb2' "$md_inst/srb2"
+    # copy and dereference, so we get a srb2 binary rather than a symlink to lsdlsrb2-version
+    cp -L 'build/bin/lsdlsrb2' "$md_inst/srb2"
     md_ret_files=(
-        'assets/music.dta'
-        'assets/patch.dta'
-        'assets/player.dta'
-        'assets/rings.dta'
-        'assets/zones.dta'
-        'assets/srb2.srb'
+        'assets/installer/music.dta'
+        'assets/installer/player.dta'
+        'assets/installer/zones.pk3'
+        'assets/installer/srb2.pk3'
+        'assets/README.txt'
+        'assets/LICENSE.txt'
     )
 }
 

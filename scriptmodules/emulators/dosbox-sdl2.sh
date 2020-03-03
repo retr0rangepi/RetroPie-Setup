@@ -103,7 +103,7 @@ _EOF_
     if [[ "$md_mode" == "install" ]]; then
         local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
         if [[ -f "$config_path" ]]; then
-            iniConfig " = " "" "$config_path"
+            iniConfig "=" "" "$config_path"
             iniSet "fluid.driver" "alsa"
             iniSet "fluid.soundfont" "/usr/share/sounds/sf2/FluidR3_GM.sf2"
             iniSet "fullresolution" "desktop"
@@ -111,6 +111,7 @@ _EOF_
             iniSet "mididevice" "fluidsynth"
             iniSet "output" "texture"
             iniDel "usescancodes"
+            isPlatform "kms" && iniSet "vsync" "true"
         fi
     fi
 fi

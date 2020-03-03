@@ -20,7 +20,8 @@ function _update_hook_runcommand() {
 
 function depends_runcommand() {
     local depends=()
-    isPlatform "rpi" && depends+=(fbi fbset libraspberrypi-bin)
+    isPlatform "rpi" && depends+=(libraspberrypi-bin)
+    isPlatform "rpi" || isPlatform "kms" && depends+=(fbi fbset)
     isPlatform "x11" && depends+=(feh)
     getDepends "${depends[@]}"
 }
@@ -45,6 +46,12 @@ function install_bin_runcommand() {
         dialog --create-rc "$configdir/all/runcommand-launch-dialog.cfg"
         chown $user:$user "$configdir/all/runcommand-launch-dialog.cfg"
     fi
+
+    # needed for KMS modesetting (debian buster or later only)
+    if compareVersions "$__os_debian_ver" ge 10; then
+        rp_installModule "$(rp_getIdxFromId mesa-drm)"
+    fi
+
     md_ret_require="$md_inst/runcommand.sh"
 }
 

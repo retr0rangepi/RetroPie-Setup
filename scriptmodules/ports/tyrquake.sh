@@ -15,15 +15,15 @@ rp_module_licence="GPL2 https://raw.githubusercontent.com/RetroPie/tyrquake/mast
 rp_module_section="opt"
 
 function depends_tyrquake() {
-    if isPlatform "x11" || isPlatform "mesa"; then
+    if isPlatform "gl" || isPlatform "mesa"; then
         depends+=(libgl1-mesa-dev)
     fi
-
     getDepends "${depends[@]}"
 }
 
 function sources_tyrquake() {
     gitPullOrClone "$md_build" https://github.com/RetroPie/tyrquake.git
+    isPlatform "kms" && applyPatch "$md_data/0001-force-vsync.patch"
 }
 
 function build_tyrquake() {
@@ -48,7 +48,7 @@ function add_games_tyrquake() {
     local binary="$md_inst/bin/tyr-quake"
 
     isPlatform "kms" && params+=("-width %XRES%" "-height %YRES%")
-    if isPlatform "x11" || isPlatform "mesa"; then
+    if isPlatform "gl" || isPlatform "mesa"; then
         binary="$md_inst/bin/tyr-glquake"
     fi
 

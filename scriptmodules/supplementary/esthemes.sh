@@ -230,6 +230,14 @@ function gui_esthemes() {
         'blowfinger77 locomotion'
         'justincaseurskynet Arcade1up-5x4-Horizontal'
         'KALEL1981 Super-Retroboy'
+        'xovox RetroCRT-240p'
+        'xovox RetroCRT-240p-Vertical'
+        'arcadeforge push-a'
+        'arcadeforge push-a-v'
+        'arcadeforge pixel-heaven'
+        'arcadeforge pixel-heaven-text'
+        'arcadeforge 240p_Bubblegum'
+        'arcadeforge 240p-honey'
     )
     while true; do
         local theme

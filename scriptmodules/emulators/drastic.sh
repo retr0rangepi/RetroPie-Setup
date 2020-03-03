@@ -16,6 +16,10 @@ rp_module_licence="PROP"
 rp_module_section="exp"
 rp_module_flags="!x86"
 
+function depends_drastic() {
+    getDepends libasound2-dev zlib1g-dev
+}
+
 function install_bin_drastic() {
     downloadAndExtract "http://www.retrorangepi.org/drastic.tar.gz" "$md_inst" --strip-components 1
 }

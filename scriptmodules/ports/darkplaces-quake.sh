@@ -48,7 +48,9 @@ function install_darkplaces-quake() {
 }
 
 function add_games_darkplaces-quake() {
-    _add_games_lr-tyrquake "$md_inst/darkplaces-sdl -basedir $romdir/ports/quake -game %QUAKEDIR%"
+    local params=()
+    isPlatform "kms" && params+=("+vid_vsync 1")
+    _add_games_lr-tyrquake "$md_inst/darkplaces-sdl -basedir $romdir/ports/quake -game %QUAKEDIR% ${params[*]}"
 }
 
 function configure_darkplaces-quake() {

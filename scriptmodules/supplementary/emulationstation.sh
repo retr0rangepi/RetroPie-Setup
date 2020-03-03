@@ -130,6 +130,7 @@ function depends_emulationstation() {
 
     compareVersions "$__os_debian_ver" gt 8 && depends+=(rapidjson-dev)
     isPlatform "x11" && depends+=(gnome-terminal)
+    isPlatform "rpi" && depends+=(omxplayer)
     getDepends "${depends[@]}"
 }
 
@@ -145,6 +146,7 @@ function build_emulationstation() {
     local params=(-DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/)
     # Temporary workaround until GLESv2 support is implemented
     isPlatform "rpi" && isPlatform "mesa" && params+=(-DGL=On)
+    isPlatform "rpi" && params+=(-DRPI=On)
     rpSwap on 1000
     cmake . -DGLSystem="OpenGL ES" -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/
     make clean
@@ -160,10 +162,14 @@ function install_emulationstation() {
         'emulationstation.sh'
         'GAMELISTS.md'
         'README.md'
-        'resources'
         'THEMES.md'
         'resources'
     )
+
+    # This folder is present only from 2.8.x, don't include it for older releases
+    if compareVersions "$__os_debian_ver" gt 8; then
+        md_ret_files+=('resources')
+    fi
 }
 
 function init_input_emulationstation() {
@@ -214,8 +220,8 @@ if [[ "\$(uname --machine)" != *86* ]]; then
 fi
 
 # save current tty/vt number for use with X so it can be launched on the correct tty
-tty=\$(tty)
-export TTY="\${tty:8:1}"
+TTY=\$(tty)
+export TTY="\${TTY:8:1}"
 
 clear
 tput civis
