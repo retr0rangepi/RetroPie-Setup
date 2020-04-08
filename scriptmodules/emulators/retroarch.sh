@@ -39,16 +39,14 @@ function depends_retroarch() {
 }
 
 function sources_retroarch() {
-    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.8.4
-    applyPatch "$md_data/01_hotkey_hack.diff"
+    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.8.5
     applyPatch "$md_data/02_disable_search.diff"
     applyPatch "$md_data/03_shader_path_config_enable.diff"
-    applyPatch "$md_data/04_fix_corrupted_widgets.diff"
 }
 
 function build_retroarch() {
     local params=(--disable-opengl --disable-opengl1 --disable-sdl --disable-sdl2 --disable-al --disable-jack --disable-qt \
-		--enable-oss --enable-pulse)
+		--enable-oss --enable-pulse --enable-ffmpeg)
     if ! isPlatform "x11"; then
         params+=(--disable-pulse)
         ! isPlatform "mesa" && params+=(--disable-x11)

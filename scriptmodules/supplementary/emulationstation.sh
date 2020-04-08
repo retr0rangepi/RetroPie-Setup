@@ -138,7 +138,7 @@ function sources_emulationstation() {
     local repo="$1"
     local branch="$2"
     [[ -z "$repo" ]] && repo="https://github.com/retr0rangepi/EmulationStation"
-    [[ -z "$branch" ]] && branch="full"
+    [[ -z "$branch" ]] && branch="v4.3-full"
     gitPullOrClone "$md_build" "$repo" "$branch"
 }
 
