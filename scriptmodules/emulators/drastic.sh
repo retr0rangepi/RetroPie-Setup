@@ -20,6 +20,10 @@ function depends_drastic() {
     getDepends libasound2-dev zlib1g-dev
 }
 
+function __binary_url_drastic() {
+   echo "$__archive_url/drastic-2.5.0.4.tar.gz"
+}
+
 function install_bin_drastic() {
     downloadAndExtract "http://www.retrorangepi.org/drastic.tar.gz" "$md_inst" --strip-components 1
 }

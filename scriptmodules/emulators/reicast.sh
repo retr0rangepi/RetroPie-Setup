@@ -14,7 +14,7 @@ rp_module_desc="Dreamcast emulator Reicast"
 rp_module_help="ROM Extensions: .cdi .gdi\n\nCopy your Dreamcast roms to $romdir/dreamcast\n\nCopy the required BIOS files dc_boot.bin and dc_flash.bin to $biosdir/dc"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/reicast/reicast-emulator/master/LICENSE"
 rp_module_section="opt"
-rp_module_flags="!armv6 !mali"
+rp_module_flags="!armv6"
 
 function depends_reicast() {
     local depends=(python-dev python-pip alsa-oss python-setuptools libevdev-dev libasound2-dev libudev-dev)
@@ -116,15 +116,16 @@ function configure_reicast() {
 
     chown -R $user:$user "$md_conf_root/dreamcast"
 
-    cat > "$romdir/dreamcast/+Start Reicast.sh" << _EOF_
+    if [[ "$md_mode" == "install" ]]; then
+        cat > "$romdir/dreamcast/+Start Reicast.sh" << _EOF_
 #!/bin/bash
 $md_inst/bin/reicast.sh
 _EOF_
-    chmod a+x "$romdir/dreamcast/+Start Reicast.sh"
-    chown $user:$user "$romdir/dreamcast/+Start Reicast.sh"
-
-    # remove old systemManager.cdi symlink
-    rm -f "$romdir/dreamcast/systemManager.cdi"
+        chmod a+x "$romdir/dreamcast/+Start Reicast.sh"
+        chown $user:$user "$romdir/dreamcast/+Start Reicast.sh"
+    else
+        rm "$romdir/dreamcast/+Start Reicast.sh"
+    fi
 
     if [[ "$md_mode" == "install" ]]; then
         # possible audio backends: alsa, oss, omx

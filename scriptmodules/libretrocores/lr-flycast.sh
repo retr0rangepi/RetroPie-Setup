@@ -35,7 +35,7 @@ function sources_lr-flycast() {
 }
 
 function build_lr-flycast() {
-    local params=()
+    local params=("HAVE_LTCG=0")
     make clean
     if isPlatform "rpi"; then
         # MAKEFLAGS replace removes any distcc from path, as it segfaults with cross compiler and lto
