@@ -7,16 +7,25 @@ rom_path="${rom%/*}"
 rom_name="${rom##*/}"
 rom_bn="${rom_name%.*}"
 
+#<<<<<<< HEAD
 # enabling QJOYPAD to bind keyboard/mouse to gamepad
-/usr/bin/qjoypad "amiga" &
+#/usr/bin/qjoypad "amiga" &
+#=======
+config_param="-config="
+is_amiberry=0
+if [[ "$emulator" == *amiberry* ]]; then
+    is_amiberry=1
+    config_param="--config "
+fi
+#>>>>>>> e8251fdfd3563af8a58e5cbe72e11d1d3fa779fc
 
 pushd "${0%/*}" >/dev/null
 if [[ -z "$rom" ]]; then
     "$emulator"
 elif [[ "$rom" == *.uae ]]; then
-    "$emulator" -config="$rom" -G
-elif [[ "$rom" == *.lha || "$rom" == *.cue ]]; then
-    "$emulator" -autoload="$rom" -G
+    "$emulator" ${config_param}"$rom" -G
+elif [[ "$is_amiberry" -eq 1 ]] && [[ "$rom" == *.lha || "$rom" == *.cue ]]; then
+    "$emulator" --autoload "$rom" -G
 else
     source "../../lib/archivefuncs.sh"
 
@@ -61,7 +70,7 @@ else
         config="conf/$config"
     fi
 
-    "$emulator" -config="$config" "${images[@]}" -G
+    "$emulator" ${config_param}"$config" "${images[@]}" -G
     archiveCleanup
 fi
 

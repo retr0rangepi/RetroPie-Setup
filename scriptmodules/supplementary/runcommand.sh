@@ -15,12 +15,13 @@ rp_module_section="core"
 
 function _update_hook_runcommand() {
     # make sure runcommand is always updated when updating retropie-setup
-    rp_isInstalled "$md_idx" && install_bin_runcommand
+    rp_isInstalled "$md_id" && install_bin_runcommand
 }
 
 function depends_runcommand() {
     local depends=()
-    isPlatform "rpi" && depends+=(fbi fbset libraspberrypi-bin)
+    isPlatform "rpi" && depends+=(libraspberrypi-bin)
+    isPlatform "rpi" || isPlatform "kms" && depends+=(fbi fbset)
     isPlatform "x11" && depends+=(feh)
     getDepends "${depends[@]}"
 }
@@ -30,7 +31,7 @@ function install_bin_runcommand() {
     cp "$md_data/joy2key.py" "$md_inst/"
     chmod a+x "$md_inst/runcommand.sh"
     chmod a+x "$md_inst/joy2key.py"
-    python -m compileall "$md_inst/joy2key.py"
+    python3 -m compileall "$md_inst/joy2key.py"
     if [[ ! -f "$configdir/all/runcommand.cfg" ]]; then
         mkUserDir "$configdir/all"
         iniConfig " = " '"' "$configdir/all/runcommand.cfg"
@@ -45,7 +46,17 @@ function install_bin_runcommand() {
         dialog --create-rc "$configdir/all/runcommand-launch-dialog.cfg"
         chown $user:$user "$configdir/all/runcommand-launch-dialog.cfg"
     fi
+
+    # needed for KMS modesetting (debian buster or later only)
+    if compareVersions "$__os_debian_ver" ge 10; then
+        rp_installModule "mesa-drm" "_autoupdate_"
+    fi
+
     md_ret_require="$md_inst/runcommand.sh"
+}
+
+function remove_runcommand() {
+    rp_callModule "mesa-drm" "remove"
 }
 
 function governor_runcommand() {

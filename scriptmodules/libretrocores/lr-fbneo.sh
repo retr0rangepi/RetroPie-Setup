@@ -10,10 +10,10 @@
 #
 
 rp_module_id="lr-fbneo"
-rp_module_desc="Arcade emu - FinalBurn Neo v0.2.97.44 (WIP) port for libretro"
+rp_module_desc="Arcade emu - FinalBurn Neo v1.0.0.01 (Upstream) port for libretro"
 rp_module_help="Previously called lr-fba-next and fbalpha\n\ROM Extension: .zip\n\nCopy your FBA roms to\n$romdir/fba or\n$romdir/neogeo or\n$romdir/arcade\n\nFor NeoGeo games the neogeo.zip BIOS is required and must be placed in the same directory as your FBA roms."
 rp_module_licence="NONCOM https://raw.githubusercontent.com/libretro/FBNeo/master/src/license.txt"
-rp_module_section="main"
+rp_module_section="main armv6=opt"
 
 function _update_hook_lr-fbneo() {
     # move from old location and update emulators.cfg
@@ -42,7 +42,6 @@ function install_lr-fbneo() {
         'src/burner/libretro/fbneo_libretro.so'
         'gamelist.txt'
         'whatsnew.html'
-        'preset-example.zip'
         'metadata'
         'dats'
     )
@@ -85,11 +84,15 @@ function configure_lr-fbneo() {
     addEmulator 0 "$md_id-cv" "coleco" "$md_inst/fbneo_libretro.so --subsystem cv"
     addEmulator 0 "$md_id-msx" "msx" "$md_inst/fbneo_libretro.so --subsystem msx"
     addEmulator 0 "$md_id-spec" "zxspectrum" "$md_inst/fbneo_libretro.so --subsystem spec"
+    addEmulator 0 "$md_id-fds" "fds" "$md_inst/fbneo_libretro.so --subsystem fds"
+    addEmulator 0 "$md_id-nes" "nes" "$md_inst/fbneo_libretro.so --subsystem nes"
+    addEmulator 0 "$md_id-ngp" "ngp" "$md_inst/fbneo_libretro.so --subsystem ngp"
+    addEmulator 0 "$md_id-ngpc" "ngpc" "$md_inst/fbneo_libretro.so --subsystem ngp"
 
     addSystem "arcade"
     addSystem "neogeo"
     addSystem "fba"
-    
+
     addSystem "pcengine"
     addSystem "gamegear"
     addSystem "mastersystem"
@@ -98,4 +101,8 @@ function configure_lr-fbneo() {
     addSystem "coleco"
     addSystem "msx"
     addSystem "zxspectrum"
+    addSystem "fds"
+    addSystem "nes"
+    addSystem "ngp"
+    addSystem "ngpc"
 }

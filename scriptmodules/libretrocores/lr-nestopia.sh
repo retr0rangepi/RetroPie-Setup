@@ -31,12 +31,7 @@ function build_lr-nestopia() {
 function install_lr-nestopia() {
     md_ret_files=(
         'libretro/nestopia_libretro.so'
-        'NstDatabase.xml'
-        'README.md'
-        'ChangeLog'
-        'readme.html'
         'COPYING'
-        'AUTHORS'
     )
 }
 
@@ -45,9 +40,6 @@ function configure_lr-nestopia() {
     mkRomDir "fds"
     ensureSystemretroconfig "nes"
     ensureSystemretroconfig "fds"
-
-    cp NstDatabase.xml "$biosdir/"
-    chown $user:$user "$biosdir/NstDatabase.xml"
 
     addEmulator 0 "$md_id" "nes" "$md_inst/nestopia_libretro.so"
     addEmulator 1 "$md_id" "fds" "$md_inst/nestopia_libretro.so"

@@ -11,7 +11,7 @@
 
 rp_module_id="lr-vice"
 rp_module_desc="C64 emulator - port of VICE for libretro"
-rp_module_help="ROM Extensions: .crt .d64 .g64 .prg .t64 .tap .x64 .zip .vsf\n\nCopy your Commodore 64 games to $romdir/c64"
+rp_module_help="ROM Extensions: .cmd .crt .d64 .d71 .d80 .d81 .g64 .m3u .prg .t64 .tap .x64 .zip .vsf\n\nCopy your Commodore 64 games to $romdir/c64"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/libretro/vice-libretro/master/vice/COPYING"
 rp_module_section="exp"
 rp_module_flags=""
@@ -21,8 +21,8 @@ function sources_lr-vice() {
 }
 
 function build_lr-vice() {
-    make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make clean
+    make
     md_ret_require="$md_build/vice_x64_libretro.so"
 }
 
@@ -38,9 +38,11 @@ function configure_lr-vice() {
     mkRomDir "c64"
     ensureSystemretroconfig "c64"
 
-    cp -R "$md_inst/data" "$biosdir"
-    chown -R $user:$user "$biosdir/data"
-
     addEmulator 1 "$md_id" "c64" "$md_inst/vice_x64_libretro.so"
     addSystem "c64"
+
+    [[ "$md_mode" == "remove" ]] && return
+
+    cp -R "$md_inst/data" "$biosdir"
+    chown -R $user:$user "$biosdir/data"
 }

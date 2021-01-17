@@ -18,11 +18,12 @@ rp_module_section="opt"
 function depends_cannonball() {
     local depends=(cmake libsdl2-dev libboost-dev)
     isPlatform "rpi" && depends+=(libraspberrypi-dev)
+    isPlatform "mesa" && depends+=(libgles2-mesa-dev)
     getDepends "${depends[@]}"
 }
 
 function sources_cannonball() {
-    gitPullOrClone "$md_build" https://github.com/djyt/cannonball.git
+    gitPullOrClone "$md_build" https://github.com/djyt/cannonball.git "master" "2b3839dd34c1b4263ec5006fdeeb1ae2689cd401"
     sed -i "s/-march=armv6 -mfpu=vfp -mfloat-abi=hard//" "$md_build/cmake/sdl2_rpi.cmake" "$md_build/cmake/sdl2gles_rpi.cmake"
 }
 
@@ -30,9 +31,9 @@ function build_cannonball() {
     local target
     mkdir build
     cd build
-    if isPlatform "rpi"; then
+    if isPlatform "videocore"; then
         target="sdl2gles_rpi"
-    elif isPlatform "mali"; then
+    elif isPlatform "gles"; then
         target="sdl2gles"
     else
         target="sdl2gl"

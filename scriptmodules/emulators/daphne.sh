@@ -25,8 +25,10 @@ function sources_daphne() {
 }
 
 function build_daphne() {
+    local params=()
+    isPlatform "aarch64" && params=(--build=arm)
     cd src/vldp2
-    ./configure
+    ./configure "${params[@]}"
     make -f Makefile.rp
     cd ..
     ln -sf Makefile.vars.rp Makefile.vars
@@ -46,7 +48,14 @@ function configure_daphne() {
     mkRomDir "daphne"
     mkRomDir "daphne/roms"
 
+    addEmulator 1 "$md_id" "daphne" "$md_inst/daphne.sh %ROM%"
+    addSystem "daphne"
+
+    [[ "$md_mode" == "remove" ]] && return
+
     mkUserDir "$md_conf_root/daphne"
+
+    setDispmanx "$md_id" 1
 
     if [[ ! -f "$md_conf_root/daphne/dapinput.ini" ]]; then
         cp -v "$md_data/dapinput.ini" "$md_conf_root/daphne/dapinput.ini"
@@ -71,6 +80,4 @@ _EOF_
     chown -R $user:$user "$md_inst"
     chown -R $user:$user "$md_conf_root/daphne/dapinput.ini"
 
-    addEmulator 1 "$md_id" "daphne" "$md_inst/daphne.sh %ROM%"
-    addSystem "daphne"
 }

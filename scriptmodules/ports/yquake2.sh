@@ -16,15 +16,13 @@ rp_module_section="exp"
 rp_module_flags=""
 
 function depends_yquake2() {
-    local depends=(libgl1-mesa-dev libglu1-mesa-dev libogg-dev libopenal-dev libsdl2-dev libvorbis-dev zlib1g-dev)
+    local depends=(libgl1-mesa-dev libglu1-mesa-dev libogg-dev libopenal-dev libsdl2-dev libvorbis-dev zlib1g-dev libcurl4-openssl-dev)
 
     getDepends "${depends[@]}"
 }
 
 function sources_yquake2() {
-    gitPullOrClone "$md_build" https://github.com/yquake2/yquake2.git
-    # workaround for hang on startup
-    sed -i "$md_build/src/backends/unix/system.c" -e '/setegid/d' -e '/setreuid/d'
+    gitPullOrClone "$md_build" https://github.com/yquake2/yquake2.git "QUAKE2_7_41"
 }
 
 function build_yquake2() {
@@ -85,8 +83,17 @@ function game_data_yquake2() {
 
 function configure_yquake2() {
     local params=()
-    if isPlatform "gles"; then
+
+    if isPlatform "gl3"; then
+        params+=("+set vid_renderer gl3")
+    elif isPlatform "gl" || isPlatform "mesa"; then
+        params+=("+set vid_renderer gl1")
+    else
         params+=("+set vid_renderer soft")
+    fi
+
+    if isPlatform "kms"; then
+        params+=("+set r_mode -1" "+set r_customwidth %XRES%" "+set r_customheight %YRES%" "+set r_vsync 1")
     fi
 
     mkRomDir "ports/quake2"
@@ -94,5 +101,5 @@ function configure_yquake2() {
     moveConfigDir "$home/.yq2" "$md_conf_root/quake2/yquake2"
 
     [[ "$md_mode" == "install" ]] && game_data_yquake2
-    add_games_yquake2 "$md_inst/quake2 -datadir $romdir/ports/quake2 ${params[@]} +set game %ROM%"
+    add_games_yquake2 "$md_inst/quake2 -datadir $romdir/ports/quake2 ${params[*]} +set game %ROM%"
 }

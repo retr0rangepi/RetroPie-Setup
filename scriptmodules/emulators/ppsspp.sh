@@ -17,16 +17,33 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_ppsspp() {
-    local depends=(cmake libsdl2-dev libzip-dev)
+    local depends=(cmake libsnappy-dev libzip-dev zlib1g-dev)
+    isPlatform "videocore" && depends+=(libraspberrypi-dev)
+    isPlatform "mesa" && depends+=(libgles2-mesa-dev)
+    isPlatform "vero4k" && depends+=(vero3-userland-dev-osmc)
     getDepends "${depends[@]}"
 }
 
 function sources_ppsspp() {
-    gitPullOrClone "$md_build/$md_id" https://github.com/hrydgard/ppsspp.git
-    cd "$md_id"
+    local branch="$1"
+    [[ -z "$branch" ]] && branch="master"
+    gitPullOrClone "$md_build/ppsspp" https://github.com/hrydgard/ppsspp.git "$branch"
+    cd "ppsspp"
 
     # remove the lines that trigger the ffmpeg build script functions - we will just use the variables from it
     sed -i "/^build_ARMv6$/,$ d" ffmpeg/linux_arm.sh
+
+    # remove -U__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 as we handle this ourselves if armv7 on Raspbian
+    sed -i "/^  -U__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2/d" cmake/Toolchains/raspberry.armv7.cmake
+    # set ARCH_FLAGS to our own CXXFLAGS (which includes GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 if needed)
+    sed -i "s/^set(ARCH_FLAGS.*/set(ARCH_FLAGS \"$CXXFLAGS\")/" cmake/Toolchains/raspberry.armv7.cmake
+
+    # remove file(READ "/sys/firmware/devicetree/base/compatible" PPSSPP_PI_MODEL)
+    # as it fails when building in a chroot
+    sed -i "/^file(READ .*/d" cmake/Toolchains/raspberry.armv7.cmake
+
+    # ensure Pi vendor libraries are available for linking of shared library
+    sed -n -i "p; s/^set(CMAKE_EXE_LINKER_FLAGS/set(CMAKE_SHARED_LINKER_FLAGS/p" cmake/Toolchains/raspberry.armv?.cmake
 
     if hasPackage cmake 3.6 lt; then
         cd ..
@@ -51,7 +68,7 @@ function build_ffmpeg_ppsspp() {
             arch="x86";
         fi
     elif isPlatform "aarch64"; then
-        arch="arm64"
+        arch="aarch64"
     fi
     isPlatform "vero4k" && local extra_params='--arch=arm'
 
@@ -104,17 +121,42 @@ function build_ppsspp() {
     fi
 
     # build ffmpeg
-    build_ffmpeg_ppsspp "$md_build/$md_id/ffmpeg"
+    build_ffmpeg_ppsspp "$md_build/ppsspp/ffmpeg"
 
     # build ppsspp
-    cd "$md_build/$md_id"
+    cd "$md_build/ppsspp"
     rm -rf CMakeCache.txt CMakeFiles
-    local params=(-DCMAKE_TOOLCHAIN_FILE="$md_data/ropi.armv7.cmake")
+    local params=()
+    if isPlatform "videocore"; then
+        if isPlatform "armv6"; then
+            params+=(-DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/raspberry.armv6.cmake -DFORCED_CPU=armv6)
+        else
+            params+=(-DCMAKE_TOOLCHAIN_FILE=cmake/Toolchains/raspberry.armv7.cmake)
+        fi
+    elif isPlatform "mesa"; then
+        params+=(-DUSING_GLES2=ON -DUSING_EGL=OFF)
+    elif isPlatform "mali"; then
+        params+=(-DUSING_GLES2=ON -DUSING_FBDEV=ON)
+        # remove -DGL_GLEXT_PROTOTYPES on odroid-xu/tinker to avoid errors due to header prototype differences
+        params+=(-DCMAKE_C_FLAGS="${CFLAGS/-DGL_GLEXT_PROTOTYPES/}")
+        params+=(-DCMAKE_CXX_FLAGS="${CXXFLAGS/-DGL_GLEXT_PROTOTYPES/}")
+    elif isPlatform "tinker"; then
+        params+=(-DCMAKE_TOOLCHAIN_FILE="$md_data/tinker.armv7.cmake")
+    elif isPlatform "vero4k"; then
+        params+=(-DCMAKE_TOOLCHAIN_FILE="cmake/Toolchains/vero4k.armv8.cmake")
+    fi
+    if isPlatform "arm" && ! isPlatform "x11"; then
+        params+=(-DARM_NO_VULKAN=ON)
+    fi
+    if [[ "$md_id" == "lr-ppsspp" ]]; then
+        params+=(-DLIBRETRO=On)
+        ppsspp_binary="lib/ppsspp_libretro.so"
+    fi
     "$cmake" "${params[@]}" .
     make clean
     make -j2
 
-    md_ret_require="$md_build/$md_id/$ppsspp_binary"
+    md_ret_require="$md_build/ppsspp/$ppsspp_binary"
 }
 
 function install_ppsspp() {

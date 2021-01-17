@@ -45,9 +45,9 @@ function install_linapple() {
 
 function configure_linapple() {
     mkRomDir "apple2"
-    mkUserDir "$md_conf_root/apple2"
 
-    moveConfigDir "$home/.linapple" "$md_conf_root/apple2"
+    addEmulator 1 "$md_id" "apple2" "$md_inst/linapple.sh -1 %ROM%"
+    addSystem "apple2"
 
     # copy basic QJOYPAD layout - enable gamepad support
     cp -p $md_data/apple2.lyt /home/pi/.qjoypad3/

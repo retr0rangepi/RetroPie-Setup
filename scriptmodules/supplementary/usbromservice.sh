@@ -18,7 +18,7 @@ function _get_ver_usbromservice() {
 }
 
 function _update_hook_usbromservice() {
-    ! rp_isInstalled "$md_idx" && return
+    ! rp_isInstalled "$md_id" && return
     [[ ! -f "$md_inst/disabled" ]] && install_scripts_usbromservice
 }
 
@@ -71,7 +71,10 @@ function remove_usbromservice() {
 }
 
 function configure_usbromservice() {
+    [[ "$md_mode" == "remove" ]] && return
+
     iniConfig "=" '"' /etc/usbmount/usbmount.conf
+
     local fs
     for fs in ntfs exfat; do
         iniGet "FILESYSTEMS"

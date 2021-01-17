@@ -17,11 +17,11 @@ rp_module_section="opt"
 rp_module_flags=""
 
 function depends_stella() {
-    getDepends libsdl2-dev libpng12-dev zlib1g-dev xz-utils
+    getDepends libpng-dev zlib1g-dev
 }
 
 function sources_stella() {
-    downloadAndExtract "$__archive_url/stella-5.0.2-src.tar.xz" "$md_build" --strip-components 1
+    gitPullOrClone "$md_build" "https://github.com/stella-emu/stella.git" 6.0.1
 }
 
 function build_stella() {

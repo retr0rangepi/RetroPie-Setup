@@ -14,16 +14,24 @@ rp_module_desc="DOS emulator"
 rp_module_help="ROM Extensions: .bat .com .exe .sh .conf\n\nCopy your DOS games to $romdir/pc"
 rp_module_licence="GPL2 https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox/trunk/COPYING"
 rp_module_section="opt"
-rp_module_flags=""
 
 function depends_dosbox() {
-    local depends=(libsdl1.2-dev libsdl-net1.2-dev libsdl-sound1.2-dev libasound2-dev libpng12-dev automake autoconf zlib1g-dev subversion "$@")
+    local depends=(libasound2-dev libpng-dev automake autoconf zlib1g-dev subversion "$@")
+    [[ "$md_id" == "dosbox" ]] && depends+=(libsdl1.2-dev libsdl-net1.2-dev libsdl-sound1.2-dev)
     isPlatform "rpi" && depends+=(timidity freepats)
     getDepends "${depends[@]}"
 }
 
 function sources_dosbox() {
-    gitPullOrClone "$md_build" https://github.com/aqualung99/dosbox-0.74-ES
+#<<<<<<< HEAD
+#    gitPullOrClone "$md_build" https://github.com/aqualung99/dosbox-0.74-ES
+#=======
+    local revision="$1"
+    [[ -z "$revision" ]] && revision="4252"
+
+    svn checkout https://svn.code.sf.net/p/dosbox/code-0/dosbox/trunk "$md_build" -r "$revision"
+    applyPatch "$md_data/01-fully-bindable-joystick.diff"
+#>>>>>>> e8251fdfd3563af8a58e5cbe72e11d1d3fa779fc
 }
 
 function build_dosbox() {
@@ -70,8 +78,10 @@ function midi_synth() {
     case "\$1" in
         "start")
             timidity -Os -iAD &
-            until [[ -n "\$(aconnect -o | grep TiMidity)" ]]; do
+            i=0
+            until [[ -n "\$(aconnect -o | grep TiMidity)" || "\$i" -ge 10 ]]; do
                 sleep 1
+                ((i++))
             done
             ;;
         "stop")
@@ -84,7 +94,7 @@ function midi_synth() {
 
 params=("\$@")
 if [[ -z "\${params[0]}" ]]; then
-    params=(-c "@MOUNT C $romdir/pc" -c "@C:")
+    params=(-c "@MOUNT C $romdir/pc -freesize 1024" -c "@C:")
 elif [[ "\${params[0]}" == *.sh ]]; then
     midi_synth start
     bash "\${params[@]}"
@@ -100,24 +110,26 @@ midi_synth start
 "$md_inst/bin/dosbox" "\${params[@]}"
 midi_synth stop
 _EOF_
-    chmod +x "$romdir/pc/+Start DOSBox.sh"
-    chown $user:$user "$romdir/pc/+Start DOSBox.sh"
+        chmod +x "$romdir/pc/$launcher_name"
+        chown $user:$user "$romdir/pc/$launcher_name"
 
-    local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
-    if [[ -f "$config_path" ]]; then
-        iniConfig "=" "" "$config_path"
-        iniSet "core" "dynamic"
-        iniSet "cycles" "max"
-        iniSet "fullscreen" "true"
-        iniSet "fullresolution" "1280x720"
-        iniSet "windowresolution" "original"
-        iniSet "output" "opengles"
-        if isPlatform "rpi" || [[ -n "$(aconnect -o | grep -e TiMidity -e FluidSynth)" ]]; then
-            iniSet "mididevice" "alsa"
-            iniSet "midiconfig" "128:0"
+        local config_path=$(su "$user" -c "\"$md_inst/bin/dosbox\" -printconf")
+        if [[ -f "$config_path" ]]; then
+            iniConfig " = " "" "$config_path"
+            iniSet "usescancodes" "false"
+            iniSet "core" "dynamic"
+            iniSet "cycles" "max"
+            iniSet "scaler" "none"
+            if isPlatform "rpi" || [[ -n "$(aconnect -o | grep -e TiMidity -e FluidSynth)" ]]; then
+                iniSet "mididevice" "alsa"
+                iniSet "midiconfig" "128:0"
+            fi
         fi
     fi
-fi
+
+    # default to dispmanx on rpi4/kms
+    isPlatform "mesa" && setDispmanx "$md_id" 1
+
     moveConfigDir "$home/.$md_id" "$md_conf_root/pc"
 
     addEmulator "$def" "$md_id" "pc" "$romdir/pc/${launcher_name// /\\ } %ROM%"
