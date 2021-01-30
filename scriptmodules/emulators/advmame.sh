@@ -18,6 +18,8 @@ rp_module_flags=""
 
 function depends_advmame() {
     local depends=(autoconf automake)
+    isPlatform "mali" && depends+=(libsdl2-dev)
+    isPlatform "rpi" && depends+=(libraspberrypi-dev)
     getDepends "${depends[@]}"
 }
 
@@ -26,14 +28,8 @@ function sources_advmame() {
 }
 
 function build_advmame() {
-    local params=()
-    if isPlatform "videocore"; then
-        params+=(--enable-sdl1 --disable-sdl2 --enable-vc)
-    else
-        params+=(--enable-sdl2 --disable-sdl1 --disable-vc)
-    fi
     ./autogen.sh
-    ./configure CFLAGS="$CFLAGS -fno-stack-protector" --prefix="$md_inst" "${params[@]}"
+    ./configure CFLAGS="$CFLAGS -fno-stack-protector" --prefix="$md_inst"
     make clean
     make -j4
     md_ret_require="$md_build/advmame"
@@ -101,14 +97,6 @@ function configure_advmame() {
             iniSet "display_resizeeffect" "none"
             iniSet "display_resize" "integer"
             iniSet "display_magnify" "1"
-        elif isPlatform "kms" || isPlatform "mali"; then
-            iniSet "device_video" "sdl"
-            # need to force keyboard device as auto will choose event driver which doesn't work with sdl
-            iniSet "device_keyboard" "sdl"
-            # default for best performance
-            iniSet "display_magnify" "1"
-            # disable threading to get rid of the crash-on-exit when using SDL, preventing config save
-            initSet "misc_smp" "no"
         else
             iniSet "device_video_output" "overlay"
             iniSet "display_aspectx" 16

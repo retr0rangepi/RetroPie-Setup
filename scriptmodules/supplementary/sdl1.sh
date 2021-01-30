@@ -35,8 +35,13 @@ function get_pkg_ver_sdl1() {
     elif [[ "$1" == "base" ]]; then
         echo "$basever"
     else
-        echo "$basever-$(($revision + 2))rpi"
+        echo "$basever-$(($revision + 3))rpi"
     fi
+}
+
+function _get_arch_sdl1() {
+    isPlatform "arm" && echo "armhf"
+    isPlatform "aarch64" && echo "arm64"
 }
 
 function depends_sdl1() {
@@ -44,15 +49,25 @@ function depends_sdl1() {
 }
 
 function sources_sdl1() {
+    local files=()
+    if compareVersions "$__os_debian_ver" eq 9; then
+        files+=(libsdl1.2_$(get_pkg_ver_sdl1 base).orig.tar.xz)
+    else
+        files+=(libsdl1.2_$(get_pkg_ver_sdl1 base).orig.tar.gz)
+    fi
+    files+=(
+        libsdl1.2_$(get_pkg_ver_sdl1 source).dsc
+        libsdl1.2_$(get_pkg_ver_sdl1 source).debian.tar.xz
+    )
     local file
-    for file in libsdl1.2_$(get_pkg_ver_sdl1 base).orig.tar.xz libsdl1.2_$(get_pkg_ver_sdl1 base).orig.tar.gz libsdl1.2_$(get_pkg_ver_sdl1 source).dsc libsdl1.2_$(get_pkg_ver_sdl1 source).debian.tar.xz; do
-        wget -q -O "$file" "http://mirrordirector.raspbian.org/raspbian/pool/main/libs/libsdl1.2/$file" || rm -f "$file"
+    for file in "${files[@]}"; do
+        download "http://mirrordirector.raspbian.org/raspbian/pool/main/libs/libsdl1.2/$file" "$file"
     done
     dpkg-source -x libsdl1.2_$(get_pkg_ver_sdl1 source).dsc
 
     cd libsdl1.2-$(get_pkg_ver_sdl1 base)
     # add fixes from https://github.com/RetroPie/sdl1/compare/master...rpi
-    wget https://github.com/RetroPie/sdl1/compare/master...rpi.diff -O debian/patches/rpi.diff
+    download "https://github.com/RetroPie/sdl1/compare/master...rpi.diff" "debian/patches/rpi.diff"
     echo "rpi.diff" >>debian/patches/series
     # force building without tslib on Jessie (as Raspbian Jessie has tslib, but Debian Jessie doesn't and we want cross compatibility
     sed -i "s/--enable-video-caca/--enable-video-caca --disable-input-tslib/" debian/rules
@@ -64,12 +79,21 @@ function build_sdl1() {
     dpkg-buildpackage
     local dest="$__tmpdir/archives/$__binary_path"
     mkdir -p "$dest"
-    cp ../*.deb "$dest/"
+
+    local file
+    for file in ../*.deb; do
+        if gpg --list-secret-keys "$__gpg_signing_key" &>/dev/null; then
+            signFile "$file" || return 1
+            cp "${file}.asc" "$dest/"
+        fi
+        cp ../*.deb "$dest/"
+    done
 }
 
 function install_sdl1() {
+    local arch="$(_get_arch_sdl1)"
     # if the packages don't install completely due to missing dependencies the apt-get -y -f install will correct it
-    if ! dpkg -i libsdl1.2debian_$(get_pkg_ver_sdl1)_armhf.deb libsdl1.2-dev_$(get_pkg_ver_sdl1)_armhf.deb; then
+    if ! dpkg -i libsdl1.2debian_$(get_pkg_ver_sdl1)_${arch}.deb libsdl1.2-dev_$(get_pkg_ver_sdl1)_${arch}.deb; then
         apt-get -y -f --no-install-recommends install
     fi
     echo "libsdl1.2-dev hold" | dpkg --set-selections
@@ -77,14 +101,22 @@ function install_sdl1() {
 
 
 function __binary_url_sdl1() {
-    rp_hasBinaries && echo "$__binary_url/libsdl1.2debian_$(get_pkg_ver_sdl1)_armhf.deb"
+    rp_hasBinaries && echo "$__binary_url/libsdl1.2debian_$(get_pkg_ver_sdl1)_$(_get_arch_sdl1).deb"
 }
 
 function install_bin_sdl1() {
-    wget "$__binary_url/libsdl1.2debian_$(get_pkg_ver_sdl1)_armhf.deb"
-    wget "$__binary_url/libsdl1.2-dev_$(get_pkg_ver_sdl1)_armhf.deb"
-    install_sdl1
-    rm ./*.deb
+    local arch="$(_get_arch_sdl1)"
+    local tmp="$(mktemp -d)"
+    pushd "$tmp" >/dev/null
+    local ret=1
+    if downloadAndVerify "$__binary_url/libsdl1.2debian_$(get_pkg_ver_sdl1)_${arch}.deb" && \
+       downloadAndVerify "$__binary_url/libsdl1.2-dev_$(get_pkg_ver_sdl1)_${arch}.deb"; then
+        install_sdl1
+        ret=0
+    fi
+    popd >/dev/null
+    rm -rf "$tmp"
+    return "$ret"
 }
 
 function remove_sdl1() {

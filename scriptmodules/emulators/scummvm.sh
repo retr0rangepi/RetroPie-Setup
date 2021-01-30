@@ -32,19 +32,16 @@ function depends_scummvm() {
 }
 
 function sources_scummvm() {
-    gitPullOrClone "$md_build" https://github.com/scummvm/scummvm.git v2.1.1
-    if isPlatform "rpi"; then
-        applyPatch "$md_data/01_rpi_enable_scalers.diff"
-    fi
+    gitPullOrClone "$md_build" https://github.com/scummvm/scummvm.git v2.2.0
 }
 
 function build_scummvm() {
     local params=(
-        --enable-release --enable-vkeybd --enable-keymapper
+        --enable-release --enable-vkeybd
         --disable-debug --disable-eventrecorder --prefix="$md_inst"
     )
-    isPlatform "rpi" && params+=(--host=raspberrypi)
-    isPlatform "vero4k" && params+=(--opengl-mode=gles2)
+    isPlatform "rpi" && isPlatform "32bit" && params+=(--host=raspberrypi)
+    isPlatform "gles" && params+=(--opengl-mode=gles2)
     # stop scummvm using arm-linux-gnueabihf-g++ which is v4.6 on
     # wheezy and doesn't like rpi2 cpu flags
     if isPlatform "rpi"; then

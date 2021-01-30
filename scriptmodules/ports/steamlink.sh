@@ -17,7 +17,7 @@ rp_module_flags="!all rpi3 rpi4"
 rp_module_help="Stream games from your computer with Steam"
 
 function depends_steamlink() {
-    getDepends python3-dev curl xz-utils libinput10 libxkbcommon-x11-0 matchbox-window-manager xorg zenity
+    getDepends python3-dev curl libinput10 libxkbcommon-x11-0 matchbox-window-manager xorg zenity
 }
 
 function install_bin_steamlink() {
@@ -33,17 +33,17 @@ function configure_steamlink() {
     local sl_dir="$home/.local/share/SteamLink"
     local valve_dir="$home/.local/share/Valve Corporation"
 
-    mkUserDir "$sl_dir"
-    mkUserDir "$valve_dir"
-    mkUserDir "$valve_dir/SteamLink"
-
-    # create optional streaming_args.txt for user modification
-    touch "$valve_dir/SteamLink/streaming_args.txt"
-    chown $user:$user "$valve_dir/SteamLink/streaming_args.txt"
-    moveConfigFile "$valve_dir/SteamLink/streaming_args.txt" "$md_conf_root/$md_id/streaming_args.txt"
-
-
     if [[ "$md_mode" == "install" ]]; then
+        mkUserDir "$sl_dir"
+        mkUserDir "$valve_dir"
+        mkUserDir "$valve_dir/SteamLink"
+        mkUserDir "$md_conf_root/$md_id"
+
+        # create optional streaming_args.txt for user modification
+        touch "$valve_dir/SteamLink/streaming_args.txt"
+        chown $user:$user "$valve_dir/SteamLink/streaming_args.txt"
+        moveConfigFile "$valve_dir/SteamLink/streaming_args.txt" "$md_conf_root/$md_id/streaming_args.txt"
+
         cat > "$sl_script" << _EOF_
 #!/bin/bash
 xset -dpms s off s noblank

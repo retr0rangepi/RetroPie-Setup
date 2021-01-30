@@ -16,7 +16,7 @@ rp_module_licence="GPL2 https://sourceforge.net/p/dosbox/code-0/HEAD/tree/dosbox
 rp_module_section="exp"
 
 function depends_dosbox-sdl2() {
-    local depends=(libsdl2-net-dev libfluidsynth-dev fluid-soundfont-gm)
+    local depends=(libsdl2-net-dev libfluidsynth-dev fluid-soundfont-gm libglew-dev)
     depends_dosbox "${depends[@]}"
 }
 

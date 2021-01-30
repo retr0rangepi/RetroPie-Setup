@@ -17,12 +17,12 @@ rp_module_section="opt"
 rp_module_flags="!armv6"
 
 function depends_reicast() {
-    local depends=(python-dev python-pip alsa-oss python-setuptools libevdev-dev libasound2-dev libudev-dev)
+    local depends=(python3-dev python3-pip alsa-oss python3-setuptools libevdev-dev libasound2-dev libudev-dev)
     isPlatform "vero4k" && depends+=(vero3-userland-dev-osmc)
     isPlatform "mesa" && depends+=(libgles2-mesa-dev)
     getDepends "${depends[@]}"
-    isPlatform "vero4k" && pip install wheel
-    pip install evdev
+    isPlatform "vero4k" && pip3 install wheel
+    pip3 install evdev
 }
 
 function sources_reicast() {
@@ -30,6 +30,7 @@ function sources_reicast() {
     applyPatch "$md_data/0001-enable-rpi4-sdl2-target.patch"
     applyPatch "$md_data/0002-enable-vsync.patch"
     applyPatch "$md_data/0003-fix-sdl2-sighandler-conflict.patch"
+    sed -i "s#/usr/bin/env python#/usr/bin/env python3#" shell/linux/tools/reicast-joyconfig.py
 }
 
 function _params_reicast() {
@@ -38,7 +39,7 @@ function _params_reicast() {
     local params=()
 
     # platform-specific params
-    if isPlatform "rpi"; then
+    if isPlatform "rpi" && isPlatform "32bit"; then
         # platform configuration
         if isPlatform "rpi4"; then
             platform="rpi4"

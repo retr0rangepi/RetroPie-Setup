@@ -21,7 +21,7 @@ function _get_input_cfg_emulationstation() {
 
 function _update_hook_emulationstation() {
     # make sure the input configuration scripts and launch script are always up to date
-    if rp_isInstalled "$md_idx"; then
+    if rp_isInstalled "$md_id"; then
         copy_inputscripts_emulationstation
         install_launch_emulationstation
     fi
@@ -71,6 +71,12 @@ function _add_system_emulationstation() {
             -u "/systemList/system[name='$name']/platform" -v "$platform" \
             -u "/systemList/system[name='$name']/theme" -v "$theme" \
             "$conf"
+    fi
+
+    # alert the user if they have a custom es_systems.cfg which doesn't contain the system we are adding
+    local conf_local="$configdir/all/emulationstation/es_systems.cfg"
+    if [[ -f "$conf_local" ]] && [[ "$(xmlstarlet sel -t -v "count(/systemList/system[name='$name'])" "$conf_local")" -eq 0 ]]; then
+        md_ret_info+=("You have a custom override of the EmulationStation system config in:\n\n$conf_local\n\nYou will need to copy the updated $system config from $conf to your custom config for $system to show up in EmulationStation.")
     fi
 
     _sort_systems_emulationstation "name"
@@ -130,7 +136,9 @@ function depends_emulationstation() {
 
     compareVersions "$__os_debian_ver" gt 8 && depends+=(rapidjson-dev)
     isPlatform "x11" && depends+=(gnome-terminal)
-    isPlatform "rpi" && ! isPlatform "osmc" && depends+=(omxplayer)
+    if isPlatform "rpi" && isPlatform "32bit" && ! isPlatform "osmc"; then
+        depends+=(omxplayer)
+    fi
     getDepends "${depends[@]}"
 }
 
@@ -144,13 +152,17 @@ function sources_emulationstation() {
 
 function build_emulationstation() {
     local params=(-DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/)
-    # Temporary workaround until GLESv2 support is implemented
-    isPlatform "rpi" && isPlatform "mesa" && params+=(-DGL=On)
-    isPlatform "rpi" && params+=(-DRPI=On)
+    if isPlatform "rpi"; then
+        params+=(-DRPI=On)
+        # use OpenGL on RPI/KMS for now
+        isPlatform "mesa" && params+=(-DGL=On)
+        # force GLESv1 on videocore due to performance issue with GLESv2
+        isPlatform "videocore" && params+=(-DUSE_GLES1=On)
+    fi
     rpSwap on 1000
     cmake . -DGLSystem="OpenGL ES" -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/
     make clean
-    make -j2
+    make -j2 VERBOSE=1
     rpSwap off
     md_ret_require="$md_build/emulationstation"
 }

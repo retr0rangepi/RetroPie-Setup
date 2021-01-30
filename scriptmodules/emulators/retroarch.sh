@@ -39,18 +39,16 @@ function depends_retroarch() {
 }
 
 function sources_retroarch() {
-    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.8.5
-    applyPatch "$md_data/02_disable_search.diff"
-    applyPatch "$md_data/03_shader_path_config_enable.diff"
+    gitPullOrClone "$md_build" https://github.com/libretro/RetroArch.git v1.9.0
 }
 
 function build_retroarch() {
-    local params=(--disable-opengl --disable-opengl1 --disable-sdl --disable-sdl2 --disable-al --disable-jack --disable-qt \
-		--enable-oss --enable-pulse --enable-ffmpeg)
-    if ! isPlatform "x11"; then
-        params+=(--disable-pulse)
-        ! isPlatform "mesa" && params+=(--disable-x11)
-    fi
+    local params=(--disable-opengl --disable-opengl1 --disable-sdl --enable-sdl2 --disable-al --disable-jack --disable-qt \
+		--enable-oss --enable-pulse --disable-ffmpeg --enable-x11)
+    #if ! isPlatform "x11"; then
+     #   params+=(--disable-pulse)
+     #   ! isPlatform "mesa" && params+=(--disable-x11)
+    #fi
     if compareVersions "$__os_debian_ver" lt 9; then
         params+=(--disable-ffmpeg)
     fi
@@ -157,7 +155,6 @@ function configure_retroarch() {
     iniSet "system_directory" "$biosdir"
     iniSet "config_save_on_exit" "false"
     iniSet "video_aspect_ratio_auto" "true"
-    iniSet "video_smooth" "false"
     iniSet "rgui_show_start_screen" "false"
     iniSet "rgui_browser_directory" "$romdir"
 
@@ -167,6 +164,7 @@ function configure_retroarch() {
 
     iniSet "video_font_size" "24"
     iniSet "core_options_path" "$configdir/all/retroarch-core-options.cfg"
+    iniSet "global_core_options" "true"
     isPlatform "x11" && iniSet "video_fullscreen" "true"
     isPlatform "mesa" && iniSet "video_fullscreen" "true"
 
@@ -261,6 +259,9 @@ function configure_retroarch() {
 
     # enable video shaders on existing configs
     _set_config_option_retroarch "video_shader_enable" "true"
+
+    # (compat) keep all core options in a single file
+    _set_config_option_retroarch "global_core_options" "true"
 
     # remapping hack for old 8bitdo firmware
     addAutoConf "8bitdo_hack" 0

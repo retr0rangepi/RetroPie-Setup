@@ -103,7 +103,7 @@ function hasFlag() {
 ## @brief Test for current platform / platform flags.
 function isPlatform() {
     local flag="$1"
-    if hasFlag "$__platform $__platform_flags" "$flag"; then
+    if hasFlag "${__platform_flags[*]}" "$flag"; then
         return 0
     fi
     return 1
@@ -145,17 +145,28 @@ function hasPackage() {
     local req_ver="$2"
     local comp="$3"
     [[ -z "$comp" ]] && comp="ge"
-    local status=$(dpkg-query -W --showformat='${Status} ${Version}' $1 2>/dev/null)
-    if [[ $? -eq 0 ]]; then
-        local ver="${status##* }"
-        local status="${status% *}"
-        if [[ -z "$req_ver" ]]; then
-            # if we are not checking on a specific version and the package is installed we are happy
-            [[ "$status" == *"ok installed" ]] && return 0
-        else
-            # otherwise check the version
-            compareVersions "$ver" "$comp" "$req_ver" && return 0
-        fi
+
+    local ver
+    local status
+    local out=$(dpkg-query -W --showformat='${Status} ${Version}' $1 2>/dev/null)
+    if [[ "$?" -eq 0 ]]; then
+        ver="${out##* }"
+        status="${out% *}"
+    fi
+
+    local installed=0
+    [[ "$status" == *"ok installed" ]] && installed=1
+    # if we are not checking version
+    if [[ -z "$req_ver" ]]; then
+        # if the package is installed return true
+        [[ "$installed" -eq 1 ]] && return 0
+    else
+        # if checking version and the package is not installed we need to clear "ver" as it may contain
+        # the version number of a removed package and give a false positive with compareVersions.
+        # we still need to do the version check even if not installed due to the varied boolean operators
+        [[ "$installed" -eq 0 ]] && ver=""
+
+        compareVersions "$ver" "$comp" "$req_ver" && return 0
     fi
     return 1
 }
@@ -228,7 +239,11 @@ function _mapPackage() {
                 isPlatform "x11" && own_sdl2=0
                 iniConfig " = " '"' "$configdir/all/retropie.cfg"
                 iniGet "own_sdl2"
-                [[ "$ini_value" == "1" ]] && own_sdl2=1
+                if [[ "$ini_value" == "1" ]]; then
+                    own_sdl2=1
+                elif [[ "$ini_value" == "0" ]]; then
+                    own_sdl2=0
+                fi
                 [[ "$own_sdl2" -eq 1 ]] && pkg="RP sdl2 $pkg"
             fi
             ;;
@@ -964,6 +979,75 @@ function applyPatch() {
     return 0
 }
 
+## @fn download()
+## @param url url of file
+## @param dest destination name (optional)
+## @brief Download a file
+## @details Download a file - if the dest parameter is ommitted, the file will be downloaded to the current directory
+## @retval 0 on success
+function download() {
+    local url="$1"
+    local dest="$2"
+
+    # if no destination, get the basename from the url (supported by GNU basename)
+    [[ -z "$dest" ]] && dest="${PWD}/$(basename "$url")"
+
+    # set up additional file descriptor for stdin
+    exec 3>&1
+
+    local cmd_err
+    local ret
+    # get the last non zero exit status (ignoring tee)
+    set -o pipefail
+    printMsgs "console" "Downloading $url ..."
+    # capture stderr - while passing both stdout and stderr to terminal
+    # wget by default outputs the progress to stderr - if we force it to log to stdout, we get no useful error msgs
+    # however this code will be useful when switching away from wget to curl. For now it's best left with -nv
+    # no progress, but less log spam, and output can be useful on failure
+    cmd_err=$(wget -nv -O"$dest" "$url" 2>&1 1>&3 | tee /dev/stderr)
+    ret="$?"
+    set +o pipefail
+    # remove stdin copy
+    exec 3>&-
+
+    # if download failed, remove file, log error and return error code
+    if [[ "$ret" -ne 0 ]]; then
+        rm "$dest"
+        md_ret_errors+=("URL $url failed to download.\n\n$cmd_err")
+        return "$ret"
+    fi
+    return 0
+}
+
+## @fn downloadAndVerify()
+## @param url url of file
+## @param dest destination file (optional)
+## @brief Download a file and a corresponding .asc signature and verify the contents
+## @details Download a file and a corresponding .asc signature and verify the contents.
+## The .asc file will be downloaded to verify the file, but will be removed after downloading.
+## If the dest parameter is omitted, the file will be downloaded to the current directory
+## @retval 0 on success
+function downloadAndVerify() {
+    local url="$1"
+    local dest="$2"
+
+    # if no destination, get the basename from the url (supported by GNU basename)
+    [[ -z "$dest" ]] && dest="${PWD}/$(basename "$url")"
+
+    local cmd_out
+    local ret=1
+    if download "${url}.asc" "${dest}.asc"; then
+        if download "$url" "$dest"; then
+            cmd_out="$(gpg --verify "${dest}.asc" 2>&1)"
+            ret="$?"
+            if [[ "$ret" -ne 0 ]]; then
+                md_ret_errors+=("$dest failed signature check:\n\n$cmd_out")
+            fi
+        fi
+    fi
+    return "$ret"
+}
+
 ## @fn downloadAndExtract()
 ## @param url url of archive
 ## @param dest destination folder for the archive
@@ -1112,13 +1196,6 @@ function getPlatformConfig() {
 ## @param exts optional extensions for the frontend (if not present in platforms.cfg)
 ## @details Adds a system to one of the frontend launchers
 function addSystem() {
-    # backward compatibility for old addSystem functionality
-    if [[ $# > 3 ]]; then
-        addEmulator "$@"
-        addSystem "$3"
-        return
-    fi
-
     local system="$1"
     local fullname="$2"
     local exts=($3)
@@ -1128,9 +1205,9 @@ function addSystem() {
     local cmd
     local path
 
-    # check if we are removing the system
-    if [[ "$md_mode" == "remove" ]]; then
-        delSystem "$id" "$system"
+    # if removing and we don't have an emulators.cfg we can remove the system from the frontends
+    if [[ "$md_mode" == "remove" ]] && [[ ! -f "$md_conf_root/$system/emulators.cfg" ]]; then
+        delSystem "$system" "$fullname"
         return
     fi
 
@@ -1176,7 +1253,11 @@ function addSystem() {
 ## @details deletes a system from all frontends.
 function delSystem() {
     local system="$1"
-    local fullname="$(getPlatformConfig "${system}_fullname")"
+    local fullname="$2"
+
+    local temp
+    temp="$(getPlatformConfig "${system}_fullname")"
+    [[ -n "$temp" ]] && fullname="$temp"
 
     local function
     for function in $(compgen -A function _del_system_); do
@@ -1215,13 +1296,16 @@ function addPort() {
         mv "$configdir/$port" "$md_conf_root/"
     fi
 
-    # remove the ports launch script if in remove mode
+    # remove the emulator / port
     if [[ "$md_mode" == "remove" ]]; then
-        rm -f "$file"
         delEmulator "$id" "$port"
+
+        # remove launch script if in remove mode and the ports emulators.cfg is empty
+        [[ ! -f "$md_conf_root/$port/emulators.cfg" ]] && rm -f "$file"
+
         # if there are no more port launch scripts we can remove ports from emulation station
         if [[ "$(find "$romdir/ports" -maxdepth 1 -name "*.sh" | wc -l)" -eq 0 ]]; then
-            delSystem "$id" "ports"
+            delSystem "ports"
         fi
         return
     fi
@@ -1326,13 +1410,6 @@ function delEmulator() {
         grep -q "=" "$config" || rm -f "$config"
     fi
 
-    # if we don't have an emulators.cfg we can remove the system from the frontends
-    if [[ ! -f "$md_conf_root/$system/emulators.cfg" ]]; then
-        local function
-        for function in $(compgen -A function _del_system_); do
-            "$function" "$fullname" "$system"
-        done
-    fi
 }
 
 ## @fn patchVendorGraphics()
@@ -1391,7 +1468,10 @@ function dkmsManager() {
             ;;
         reload)
             dkmsManager unload "$module_name" "$module_ver"
-            modprobe "$module_name"
+            # No reason to load modules in chroot
+            if [[ "$__chroot" -eq 0 ]]; then
+                modprobe "$module_name"
+            fi
             ;;
         unload)
             if [[ -n "$(lsmod | grep ${module_name/-/_})" ]]; then
@@ -1447,4 +1527,19 @@ function adminRsync() {
     [[ -z "$remote_port" ]] && remote_port=22
 
     rsync -av --delay-updates -e "ssh -p $remote_port" "${params[@]}" "$src" "$remote_user@$remote_host:$dest"
+}
+
+## @fn signFile()
+## @param file path to file to sign
+## @brief signs file with $__gpg_signing_key
+## @details signs file with $__gpg_signing_key creating corresponding .asc file in the same folder
+function signFile() {
+    local file="$1"
+    local cmd_out
+    cmd_out=$(gpg --default-key "$__gpg_signing_key" --detach-sign --armor --yes "$1" 2>&1)
+    if [[ "$?" -ne 0 ]]; then
+        md_ret_errors+=("Failed to sign $1\n\n$cmd_out")
+        return 1
+    fi
+    return 0
 }

@@ -12,7 +12,7 @@
 rp_module_id="love"
 rp_module_desc="Love - 2d Game Engine"
 rp_module_help="Copy your Love games to $romdir/love"
-rp_module_licence="GPL3 https://bitbucket.org/rude/love/raw/7b520c437317626da2102de1aafdad0e67b54bf5/license.txt"
+rp_module_licence="ZLIB https://raw.githubusercontent.com/love2d/love/master/license.txt"
 rp_module_section="opt"
 rp_module_flags="!aarch64"
 
@@ -23,7 +23,7 @@ function depends_love() {
 }
 
 function sources_love() {
-    hg clone https://bitbucket.org/rude/love "$md_build"
+    gitPullOrClone "$md_build" https://github.com/love2d/love
 }
 
 function build_love() {
@@ -47,9 +47,13 @@ function install_love() {
 }
 
 function game_data_love() {
-    # get Mari0 10.0 (freeware game data)
+    # get Mari0 1.6.2 (freeware game data)
     if [[ ! -f "$romdir/love/mari0.love" ]]; then
-        wget "https://github.com/radgeRayden/future-mari0/releases/download/v0.2/mari0.love" -O "$romdir/love/mari0.love"
+        downloadAndExtract "https://github.com/Stabyourself/mari0/archive/1.6.2.tar.gz" "$__tmpdir/mari0" --strip-components 1
+        pushd "$__tmpdir/mari0"
+        zip -qr "$romdir/love/mari0.love" .
+        popd
+        rm -fr "$__tmpdir/mari0"
         chown $user:$user "$romdir/love/mari0.love"
     fi
 }
