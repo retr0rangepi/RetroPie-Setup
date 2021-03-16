@@ -48,11 +48,6 @@ function configure_ags() {
         download "http://www.eglebbk.dds.nl/program/download/digmid.dat" - | bzcat >"$md_inst/bin/patches.dat"
     fi
 
-    # copy basic QJOYPAD layout (mappings to mouse buttons,F1,F2,F12,ESC so switching to main menu and quitting will be easier).
-    cp -p $md_data/ags.lyt /home/pi/.qjoypad3/
-    # copy run script with needed parameters + Qjoypad support
-    cp -p $md_data/ags.sh $md_conf_root/ags/
-
     if isPlatform "x11"; then
         addEmulator 1 "$md_id" "ags" "$md_inst/bin/ags --fullscreen %ROM%" "Adventure Game Studio" ".exe"
     else

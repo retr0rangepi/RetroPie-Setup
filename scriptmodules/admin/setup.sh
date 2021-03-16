@@ -534,8 +534,6 @@ function update_packages_setup() {
     done
 }
 
-<<<<<<< HEAD
-=======
 function check_connection_gui_setup() {
     local ip="$(getIPAddress)"
     if [[ -z "$ip" ]]; then

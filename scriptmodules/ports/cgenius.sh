@@ -16,7 +16,7 @@ rp_module_repo="git https://gitlab.com/Dringgstein/Commander-Genius.git v2.7.7"
 rp_module_section="exp"
 
 function depends_cgenius() {
-    getDepends build-essential cmake libcurl4-openssl-dev libvorbis-dev libogg-dev  libsdl2-image-dev libsdl2-mixer-dev libboost-dev python3-dev
+    getDepends cmake libcurl4-openssl-dev libvorbis-dev libogg-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
 }
 
 function sources_cgenius() {

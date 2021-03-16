@@ -13,6 +13,7 @@ rp_module_id="lr-bsnes"
 rp_module_desc="Super Nintendo Emulator - bsnes port for libretro with added SGB support (v115)"
 rp_module_help="ROM Extensions: .7z .bml .gb .gbc .sgb .smc .sfc .zip\n\nCopy your SNES roms to $romdir/snes\nCopy your SGB roms to $romdir/sgb\n\nPlace SGB BIOS named Super Game Boy (World\) (Rev 2).sfc into your BIOS directory."
 rp_module_licence="GPL3 https://raw.githubusercontent.com/libretro/bsnes/master/LICENSE.txt"
+rp_module_repo="git https://github.com/libretro/bsnes.git master"
 rp_module_section="opt"
 rp_module_flags="!armv6"
 
@@ -24,7 +25,7 @@ function depends_lr-bsnes() {
 }
 
 function sources_lr-bsnes() {
-    gitPullOrClone "$md_build" https://github.com/libretro/bsnes.git
+    gitPullOrClone
 }
 
 function build_lr-bsnes() {

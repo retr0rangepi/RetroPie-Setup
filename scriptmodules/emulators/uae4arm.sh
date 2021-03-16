@@ -22,7 +22,7 @@ function depends_uae4arm() {
 }
 
 function sources_uae4arm() {
-    gitPullOrClone "$md_build" https://github.com/Chips-fr/uae4arm-rpi/
+    gitPullOrClone
     # RetrOrangePi fullscreen hack
     sed -i -e 's/800,480,16/1280,720,16/g' src/od-gles/gles_gfx.cpp
 }
