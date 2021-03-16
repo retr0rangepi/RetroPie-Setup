@@ -12,6 +12,7 @@
 rp_module_id="eduke32"
 rp_module_desc="Duke3D source port"
 rp_module_licence="GPL2 https://voidpoint.io/terminx/eduke32/-/raw/master/package/common/gpl-2.0.txt?inline=false"
+rp_module_repo="git https://voidpoint.io/terminx/eduke32.git master dfc16b08"
 rp_module_section="opt"
 
 function depends_eduke32() {
@@ -27,10 +28,7 @@ function depends_eduke32() {
 }
 
 function sources_eduke32() {
-    # was svn rev -r8090
-    local revision="dfc16b08"
-
-    gitPullOrClone "$md_build" https://voidpoint.io/terminx/eduke32.git "" "$revision"
+    gitPullOrClone
 
     # r6918 causes a 20+ second delay on startup on ARM devices
     isPlatform "arm" && applyPatch "$md_data/0001-revert-r6918.patch"
@@ -75,15 +73,16 @@ function install_eduke32() {
 }
 
 function game_data_eduke32() {
-    cd "$_tmpdir"
-
+    local dest="$romdir/ports/duke3d"
     if [[ "$md_id" == "eduke32" ]]; then
-        if [[ ! -f "$romdir/ports/duke3d/duke3d.grp" ]]; then
-            wget -O 3dduke13.zip "$__archive_url/3dduke13.zip"
-            unzip -L -o 3dduke13.zip dn3dsw13.shr
-            unzip -L -o dn3dsw13.shr -d "$romdir/ports/duke3d" duke3d.grp duke.rts
-            rm 3dduke13.zip dn3dsw13.shr
-            chown -R $user:$user "$romdir/ports/duke3d"
+        if [[ ! -f "$dest/duke3d.grp" ]]; then
+            mkUserDir "$dest"
+            local temp="$(mktemp -d)"
+            download "$__archive_url/3dduke13.zip" "$temp"
+            unzip -L -o "$temp/3dduke13.zip" -d "$temp" dn3dsw13.shr
+            unzip -L -o "$temp/dn3dsw13.shr" -d "$dest" duke3d.grp duke.rts
+            rm -rf "$temp"
+            chown -R $user:$user "$dest"
         fi
     fi
 }

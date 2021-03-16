@@ -388,20 +388,35 @@ function rpSwap() {
 ## A depth parameter of 0 will do a full clone with all history.
 function gitPullOrClone() {
     local dir="$1"
+    [[ -z "$dir" ]] && dir="$md_build"
     local repo="$2"
     local branch="$3"
-    [[ -z "$branch" ]] && branch="master"
     local commit="$4"
     local depth="$5"
+    # if repo is blank then use the rp_module_repo info
+    if [[ -z "$repo" && -n "$md_repo_url" ]]; then
+        repo="$(rp_resolveRepoParam "$md_repo_url")"
+        branch="$(rp_resolveRepoParam "$md_repo_branch")"
+        commit="$(rp_resolveRepoParam "$md_repo_commit")"
+    fi
+    [[ -z "$repo" ]] && return 1
+    [[ -z "$branch" ]] && branch="master"
     if [[ -z "$depth" && "$__persistent_repos" -ne 1 && -z "$commit" ]]; then
         depth=1
     else
         depth=0
     fi
 
+    # record the source directory in __mod_info[ID/repo_dir] if not previously set which will be used
+    # by the packaging functions later to grab repository information
+    if [[ -z "${__mod_info[$md_id/repo_dir]}" ]]; then
+        __mod_info[$md_id/repo_dir]="$dir"
+    fi
+
     if [[ -d "$dir/.git" ]]; then
         pushd "$dir" > /dev/null
-        runCmd git pull
+        runCmd git checkout "$branch"
+        runCmd git pull --ff-only
         runCmd git submodule update --init --recursive
         popd > /dev/null
     else
@@ -431,8 +446,8 @@ function setupDirectories() {
 
     # make sure we have inifuncs.sh in place and that it is up to date
     mkdir -p "$rootdir/lib"
-    local helper_libs=(inifuncs.sh archivefuncs.sh)
-    for helper in "${helper_libs[@]}"; do
+    local helper
+    for helper in inifuncs.sh archivefuncs.sh; do
         if [[ ! -f "$rootdir/lib/$helper" || "$rootdir/lib/$helper" -ot "$scriptdir/scriptmodules/$helper" ]]; then
             cp --preserve=timestamps "$scriptdir/scriptmodules/$helper" "$rootdir/lib/$helper"
         fi
@@ -979,44 +994,90 @@ function applyPatch() {
     return 0
 }
 
-## @fn download()
-## @param url url of file
-## @param dest destination name (optional)
-## @brief Download a file
-## @details Download a file - if the dest parameter is ommitted, the file will be downloaded to the current directory
-## @retval 0 on success
-function download() {
-    local url="$1"
-    local dest="$2"
+## @fn runCurl()
+## @params ... commandline arguments to pass to curl
+## @brief Run curl with chosen parameters and handle curl errors
+## @details Runs curl with the provided parameters, whilst also capturing the output and extracting
+## any error message, which is stored in the global variable __NET_ERRMSG. Function returns the return
+## code provided by curl. The environment variable __curl_opts can be set to override default curl
+## parameters, eg - timeouts etc.
+## @retval curl return value
+function runCurl() {
+    local params=("$@")
+    # add any user supplied curl opts - timeouts can be overridden as curl uses the last parameters given
+    [[ -z "$__curl_opts" ]] && params+=($__curl_opts)
 
-    # if no destination, get the basename from the url (supported by GNU basename)
-    [[ -z "$dest" ]] && dest="${PWD}/$(basename "$url")"
+    local cmd_err
+    local ret
+
+    # get the last non zero exit status (ignoring tee)
+    set -o pipefail
 
     # set up additional file descriptor for stdin
     exec 3>&1
 
-    local cmd_err
-    local ret
-    # get the last non zero exit status (ignoring tee)
-    set -o pipefail
-    printMsgs "console" "Downloading $url ..."
     # capture stderr - while passing both stdout and stderr to terminal
-    # wget by default outputs the progress to stderr - if we force it to log to stdout, we get no useful error msgs
-    # however this code will be useful when switching away from wget to curl. For now it's best left with -nv
-    # no progress, but less log spam, and output can be useful on failure
-    cmd_err=$(wget -nv -O"$dest" "$url" 2>&1 1>&3 | tee /dev/stderr)
+    # curl like wget outputs the progress meter to stderr, so we will extract the error line later
+    cmd_err=$(curl "${params[@]}" 2>&1 1>&3 | tee /dev/stderr)
     ret="$?"
-    set +o pipefail
+
     # remove stdin copy
     exec 3>&-
 
+    set +o pipefail
+
+    # if there was an error, extract it and put in __NET_ERRMSG
+    if [[ "$ret" -ne 0 ]]; then
+        # as we also capture the curl progress output, extract the last line which contains the error
+        __NET_ERRMSG="${cmd_err##*$'\n'}"
+    else
+        __NET_ERRMSG=""
+    fi
+    return "$ret"
+}
+
+## @fn download()
+## @param url url of file
+## @param dest destination name (optional), use - for stdout
+## @brief Download a file
+## @details Download a file - if the dest parameter is omitted, the file will be downloaded to the current directory.
+## If the destination name is a hyphen (-), then the file will be outputted to stdout, for piping to another command
+## or retrieving the contents directly to a variable. If the destination is a folder, extract with the basename from
+## the url to the destination folder.
+## @retval 0 on success
+function download() {
+    local url="$1"
+    local dest="$2"
+    local file="${url##*/}"
+
+    # if no destination, get the basename from the url
+    [[ -z "$dest" ]] && dest="${PWD}/$file"
+
+    # if the destination is a folder, download to that with filename from url
+    [[ -d "$dest" ]] && dest="$dest/$file"
+
+    local params=(--location)
+    if [[ "$dest" == "-" ]]; then
+        params+=(-s)
+    else
+        printMsgs "console" "Downloading $url to $dest ..."
+        params+=(-o "$dest")
+    fi
+    params+=(--connect-timeout 10 --speed-limit 1 --speed-time 60)
+    # add the url
+    params+=("$url")
+
+    local ret
+    runCurl "${params[@]}"
+    ret="$?"
+
     # if download failed, remove file, log error and return error code
     if [[ "$ret" -ne 0 ]]; then
-        rm "$dest"
-        md_ret_errors+=("URL $url failed to download.\n\n$cmd_err")
-        return "$ret"
+        # remove dest if not set to stdout and exists
+        [[ "$dest" != "-" && -f "$dest" ]] && rm "$dest"
+        md_ret_errors+=("URL $url failed to download.\n\n$__NET_ERRMSG")
     fi
-    return 0
+    return "$ret"
 }
 
 ## @fn downloadAndVerify()
@@ -1030,9 +1091,10 @@ function download() {
 function downloadAndVerify() {
     local url="$1"
     local dest="$2"
+    local file="${url##*/}"
 
     # if no destination, get the basename from the url (supported by GNU basename)
-    [[ -z "$dest" ]] && dest="${PWD}/$(basename "$url")"
+    [[ -z "$dest" ]] && dest="${PWD}/$file"
 
     local cmd_out
     local ret=1
@@ -1062,37 +1124,29 @@ function downloadAndExtract() {
     local opts=("$@")
 
     local ext="${url##*.}"
-    local cmd=(tar -zxv)
-    local is_tar=1
+    local file="${url##*/}"
+
+    local temp="$(mktemp -d)"
+    # download file, removing temporary folder and returning on error
+    if ! download "$url" "$temp/$file"; then
+        rm -rf "$temp"
+        return 1
+    fi
+
+    mkdir -p "$dest"
 
     local ret
     case "$ext" in
-        gz|tgz)
-            cmd+=(-z)
-            ;;
-        bz2)
-            cmd+=(-j)
-            ;;
-        xz)
-            cmd+=(-J)
-            ;;
         exe|zip)
-            is_tar=0
-            local tmp="$(mktemp -d)"
-            local file="${url##*/}"
-            runCmd wget -q -O"$tmp/$file" "$url"
-            runCmd unzip "${opts[@]}" -o "$tmp/$file" -d "$dest"
-            rm -rf "$tmp"
-            ret=$?
+            runCmd unzip "${opts[@]}" -o "$temp/$file" -d "$dest"
+            ;;
+        *)
+            tar -xvf "$temp/$file" -C "$dest" "${opts[@]}"
+            ;;
     esac
+    ret=$?
 
-    if [[ "$is_tar" -eq 1 ]]; then
-        mkdir -p "$dest"
-        cmd+=(-C "$dest" "${opts[@]}")
-
-        runCmd "${cmd[@]}" < <(wget -q -O- "$url")
-        ret=$?
-    fi
+    rm -rf "$temp"
 
     return $ret
 }
@@ -1449,13 +1503,19 @@ function dkmsManager() {
             if dkms status | grep -q "^$module_name"; then
                 dkmsManager remove "$module_name" "$module_ver"
             fi
-            if [[ "$__chroot" -eq 1 ]]; then
-                kernel="$(ls -1 /lib/modules | tail -n -1)"
-            fi
             ln -sf "$md_inst" "/usr/src/${module_name}-${module_ver}"
-            dkms install --force -m "$module_name" -v "$module_ver" -k "$kernel"
-            if dkms status | grep -q "^$module_name"; then
-                md_ret_error+=("Failed to install $md_id")
+            dkms install --no-initrd --force -m "$module_name" -v "$module_ver" -k "$kernel"
+            if ! dkms status "$module_name/$module_ver" -k "$kernel" | grep -q installed; then
+                # Force building for any kernel that has source/headers
+                local k_ver
+                while read k_ver; do
+                    if [[ -d "$(realpath /lib/modules/$k_ver/build)" ]]; then
+                        dkms install --no-initrd --force -m "$module_name/$module_ver" -k "$k_ver"
+                    fi
+                done < <(ls -r1 /lib/modules)
+            fi
+            if ! dkms status "$module_name/$module_ver" | grep -q installed; then
+                md_ret_errors+=("Failed to install $md_id")
                 return 1
             fi
             ;;
@@ -1501,6 +1561,21 @@ function getIPAddress() {
 
     # if an external route was found, report its source address
     [[ -n "$ip_route" ]] && grep -oP "src \K[^\s]+" <<< "$ip_route"
+}
+
+## @fn isConnected()
+## @brief Simple check to see if there is a connection to the Internet.
+## @details Uses the getIPAddress function to check if we have a route to the Internet. Also sets
+## __NET_ERRMSG with an error message for use in packages / setup to display to the user if not.
+## @retval 0 on success
+## @retval 1 on failure
+function isConnected() {
+    local ip="$(getIPAddress)"
+    if [[ -z "$ip" ]]; then
+        __NET_ERRMSG="Not connected to the Internet"
+        return 1
+    fi
+    return 0
 }
 
 ## @fn adminRsync()

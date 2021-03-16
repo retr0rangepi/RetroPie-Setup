@@ -12,6 +12,7 @@
 rp_module_id="attractmode"
 rp_module_desc="Attract Mode emulator frontend"
 rp_module_licence="GPL3 https://raw.githubusercontent.com/mickelson/attract/master/License.txt"
+rp_module_repo="git https://github.com/mickelson/attract master"
 rp_module_section="exp"
 rp_module_flags="!mali frontend"
 
@@ -139,8 +140,8 @@ function depends_attractmode() {
 }
 
 function sources_attractmode() {
+    gitPullOrClone "$md_build/attract"
     isPlatform "rpi" && gitPullOrClone "$md_build/sfml-pi" "https://github.com/mickelson/sfml-pi"
-    gitPullOrClone "$md_build/attract" "https://github.com/mickelson/attract"
 }
 
 function build_attractmode() {
@@ -209,7 +210,7 @@ _EOF_
 
     local id
     for id in "${__mod_id[@]}"; do
-        if rp_isInstalled "$id" && [[ -n "${__mod_section[$id]}" ]] && ! hasFlag "${__mod_flags[$id]}" "frontend"; then
+        if rp_isInstalled "$id" && [[ -n "${__mod_info[$id/section]}" ]] && ! hasFlag "${__mod_info[$id/flags]}" "frontend"; then
             rp_callModule "$id" configure
         fi
     done

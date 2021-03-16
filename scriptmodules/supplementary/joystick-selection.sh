@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
-##############
-# ATTENTION! #
-##############
-# This file has changed (26-March-2017). Now it works as RetroPie scriptmodule.
-# Name this file as ~/RetroPie-Setup/scriptmodules/suplementary/joystick-selection.sh
-# and then execute the retropie_setup.sh script.
-# To install the joystick-selection tool, go to
-# Manage packages >> Manage experimental packages >> joystick-selection >> Install from source
 
 rp_module_id="joystick-selection"
 rp_module_desc="Set controllers for RetroArch players 1-4 (global or system specific)."
 rp_module_help="Follow the instructions on the dialogs to configure which joystick to use for RetroArch players 1-4 (global or system specific)."
 rp_module_section="exp"
+
+function depends_joystick-selection() {
+    getDepends "libsdl2-dev"
+}
 
 function sources_joystick-selection() {
     gitPullOrClone "$md_build" "https://github.com/meleu/RetroPie-joystick-selection.git"

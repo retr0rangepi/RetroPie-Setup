@@ -13,8 +13,18 @@ rp_module_id="openmsx"
 rp_module_desc="MSX emulator OpenMSX"
 rp_module_help="ROM Extensions: .cas .rom .mx1 .mx2 .col .dsk .zip\n\nCopy your MSX/MSX2 games to $romdir/msx\nCopy the BIOS files to $biosdir/openmsx"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/openMSX/openMSX/master/doc/GPL.txt"
+rp_module_repo="git https://github.com/openMSX/openMSX.git master :_get_commit_openmsx"
 rp_module_section="opt"
 rp_module_flags=""
+
+function _get_commit_openmsx() {
+    local commit
+    # latest code requires at least GCC 8.3 (Debian Buster) for full C++17 support
+    compareVersions $__gcc_version lt 8 && commit="c8d90e70"
+    # for GCC before 7, build from an earlier commit, before C++17 support was added
+    compareVersions $__gcc_version lt 7 && commit="5ee25b62"
+    echo "$commit"
+}
 
 function depends_openmsx() {
     local depends=(libsdl2-dev libsdl2-ttf-dev libao-dev libogg-dev libtheora-dev libxml2-dev libvorbis-dev tcl-dev libasound2-dev)
@@ -24,12 +34,7 @@ function depends_openmsx() {
 }
 
 function sources_openmsx() {
-    local commit
-    # latest code requires at least GCC 7 as it contains C++17 code
-    # build from earlier commit before C++17 changes for GCC < 7
-    compareVersions $__gcc_version lt 7 && commit="5ee25b62"
-
-    gitPullOrClone "$md_build" https://github.com/openMSX/openMSX.git "" "$commit"
+    gitPullOrClone
     sed -i "s|INSTALL_BASE:=/opt/openMSX|INSTALL_BASE:=$md_inst|" build/custom.mk
     sed -i "s|SYMLINK_FOR_BINARY:=true|SYMLINK_FOR_BINARY:=false|" build/custom.mk
 }
@@ -58,9 +63,9 @@ function configure_openmsx() {
     cp -p $md_data/openmsx.sh $md_conf_root/msx/
     addEmulator 1 "$md_id-x11" "msx" "startx $md_conf_root/msx/openmsx.sh %ROM%"
     addEmulator 0 "$md_id" "msx" "$md_inst/bin/openmsx %ROM%"
-    addEmulator 0 "$md_id-msx2" "msx" "$md_inst/bin/openmsx -m 'Boosted_MSX2_EN' %ROM%"
-    addEmulator 0 "$md_id-msx2+" "msx" "$md_inst/bin/openmsx -m 'Boosted_MSX2+_JP' %ROM%"
-    addEmulator 0 "$md_id-msx-turbor" "msx" "$md_inst/bin/openmsx -m 'Panasonic_FS-A1GT' %ROM%"
+    addEmulator 0 "$md_id-msx2" "msx" "$md_inst/bin/openmsx -machine 'Boosted_MSX2_EN' %ROM%"
+    addEmulator 0 "$md_id-msx2-plus" "msx" "$md_inst/bin/openmsx -machine 'Boosted_MSX2+_JP' %ROM%"
+    addEmulator 0 "$md_id-msx-turbor" "msx" "$md_inst/bin/openmsx -machine 'Panasonic_FS-A1GT' %ROM%"
     addSystem "msx"
 
     [[ $md_mode == "remove" ]] && return

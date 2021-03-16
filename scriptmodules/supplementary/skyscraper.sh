@@ -12,14 +12,19 @@
 rp_module_id="skyscraper"
 rp_module_desc="Scraper for EmulationStation by Lars Muldjord"
 rp_module_licence="GPL3 https://raw.githubusercontent.com/muldjord/skyscraper/master/LICENSE"
+rp_module_repo="git https://github.com/muldjord/skyscraper :_get_branch_skyscraper"
 rp_module_section="opt"
+
+function _get_branch_skyscraper() {
+    download https://api.github.com/repos/muldjord/skyscraper/releases/latest - | grep -m 1 tag_name | cut -d\" -f4
+}
 
 function depends_skyscraper() {
     getDepends qt5-default p7zip-full
 }
 
 function sources_skyscraper() {
-    gitPullOrClone "$md_build" "https://github.com/muldjord/skyscraper" "$(_latest_ver_skyscraper)"
+    gitPullOrClone
 }
 
 function build_skyscraper() {
@@ -126,10 +131,6 @@ function _get_ver_skyscraper() {
     fi
 }
 
-function _latest_ver_skyscraper() {
-    wget -qO- https://api.github.com/repos/muldjord/skyscraper/releases/latest | grep -m 1 tag_name | cut -d\" -f4
-}
-
 function _check_ver_skyscraper() {
     ver=$(_get_ver_skyscraper)
     if compareVersions "$ver" lt "3.5" ]]; then
@@ -211,7 +212,7 @@ function _init_config_skyscraper() {
     # If we don't have a previous config.ini file, copy the example one
     [[ ! -f "$scraper_conf_dir/config.ini" ]] && cp "$md_inst/config.ini.example" "$scraper_conf_dir/config.ini"
 
-    # Try to find the rest of the necesary files from the qmake build file
+    # Try to find the rest of the necessary files from the qmake build file
     # They should be listed in the `unix:examples.file` configuration line
     if [[ $(grep unix:examples.files "$md_build/skyscraper.pro" 2>/dev/null | cut -d= -f2-) ]]; then
         local files=$(grep unix:examples.files "$md_build/skyscraper.pro" | cut -d= -f2-)
@@ -646,7 +647,7 @@ function gui_skyscraper() {
                     ;;
 
                 U)
-                    local latest_ver="$(_latest_ver_skyscraper)"
+                    local latest_ver="$(_get_branch_skyscraper)"
                     # check for update
                     if compareVersions "$latest_ver" gt "$ver" ; then
                         printMsgs "dialog" "There is a new version available. Latest released version is $latest_ver (You are running $ver).\n\nYou can update the package from RetroPie-Setup -> Manage Packages"

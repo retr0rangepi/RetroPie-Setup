@@ -53,7 +53,7 @@ function create_chroot_image() {
     local base="raspbian-${dist}-lite"
     local image="$base.img"
     if [[ ! -f "$image" ]]; then
-        wget -c -O "$base.zip" "$url"
+        download "$url" "$base.zip"
         unzip -o "$base.zip"
         mv "$(unzip -Z -1 "$base.zip")" "$image"
         rm "$base.zip"
@@ -154,7 +154,7 @@ function _init_chroot_image() {
     # unmount on ctrl+c
     trap "_trap_chroot_image '$chroot'" INT
 
-    # mount special filesytems to chroot
+    # mount special filesystems to chroot
     mkdir -p "$chroot"/dev/pts
     mount none -t devpts "$chroot/dev/pts"
     mount -t proc /proc "$chroot/proc"

@@ -83,15 +83,17 @@ function configure_usbromservice() {
         fi
     done
 
-    iniGet "MOUNTOPTIONS"
-    iniSet "MOUNTOPTIONS" "sync,exec"
+    # set our mount options (usbmount has sync by default which we don't want)
+    iniSet "MOUNTOPTIONS" "nodev,noexec,noatime"
 
-    iniGet "FS_MOUNTOPTIONS"
-    local uid=$(id -u $user)
-    local gid=$(id -g $user)
-    if [[ ! "$ini_value" =~ uid|gid ]]; then 
-        iniSet "FS_MOUNTOPTIONS" "$ini_value -fstype=vfat,umask=022,uid=$uid,gid=$gid"
-    fi
+    # set per filesystem mount options
+    local options="uid=$(id -u $user),gid=$(id -g $user)"
+    local fs_options
+    local fs
+    for fs in vfat hfsplus ntfs exfat; do
+        fs_options+=("-fstype=${fs},${options}")
+    done
+    iniSet "FS_MOUNTOPTIONS" "${fs_options[*]}"
 }
 
 function gui_usbromservice() {

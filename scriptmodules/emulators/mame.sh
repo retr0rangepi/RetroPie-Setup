@@ -13,11 +13,12 @@ rp_module_id="mame"
 rp_module_desc="MAME emulator"
 rp_module_help="ROM Extensions: .zip .7z\n\nCopy your MAME roms to either $romdir/mame or\n$romdir/arcade"
 rp_module_licence="GPL2 https://github.com/mamedev/mame/blob/master/COPYING"
+rp_module_repo="git https://github.com/mamedev/mame.git :_get_branch_mame"
 rp_module_section="exp"
 rp_module_flags="!mali !armv6"
 
-function _latest_ver_mame() {
-    wget -qO- https://api.github.com/repos/mamedev/mame/releases/latest | grep -m 1 tag_name | cut -d\" -f4
+function _get_branch_mame() {
+    download https://api.github.com/repos/mamedev/mame/releases/latest - | grep -m 1 tag_name | cut -d\" -f4
 }
 
 function _get_binary_name_mame() {
@@ -41,7 +42,7 @@ function depends_mame() {
 }
 
 function sources_mame() {
-    gitPullOrClone "$md_build" https://github.com/mamedev/mame.git "$(_latest_ver_mame)"
+    gitPullOrClone
 }
 
 function build_mame() {

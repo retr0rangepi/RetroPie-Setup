@@ -13,6 +13,7 @@ rp_module_id="moonlight"
 rp_module_desc="Moonlight Embedded - an open source gamestream client for embedded systems"
 rp_module_help="ROM Extensions: .ml\n\nCopy your moonlight launch configurations to $romdir/steam\n\nDon't forget to first pair with your remote host before using moonlight. You can use the configuration menu for pairing/unpairing to/from a remote machine."
 rp_module_licence="GPL3 https://raw.githubusercontent.com/irtimmer/moonlight-embedded/master/LICENSE"
+rp_module_repo="git https://github.com/irtimmer/moonlight-embedded.git master"
 rp_module_section="exp"
 rp_module_flags="!all arm"
 
@@ -79,7 +80,7 @@ function depends_moonlight() {
 }
 
 function sources_moonlight() {
-    gitPullOrClone "$md_build" https://github.com/irtimmer/moonlight-embedded.git
+    gitPullOrClone
 }
 
 function build_moonlight() {
@@ -120,7 +121,7 @@ _EOF_
         chown $user:$user "$(_global_cfg_file_moonlight)"
     fi
 
-    # create wrapper for moonlight with appropiate directories set
+    # create wrapper for moonlight with appropriate directories set
     # note: moonlight adds /moonlight to XDG_* variables
     cat > "$md_inst/moonlight.sh" << _EOF_
 #!/usr/bin/env bash

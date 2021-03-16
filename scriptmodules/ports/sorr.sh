@@ -11,15 +11,16 @@
 
 rp_module_id="sorr"
 rp_module_desc="Streets of Rage Remake"
-rp_module_help="Subscribe to BennuGD forum, download BennuGD-rpi-v333.zip to $romdir/ports before running this script. Please copy SorR.dat and mod/palettes files into $romdir/ports/sorr/ after installation."
+rp_module_help="Please copy your SorR.dat file along with the mod and palettes folders into $romdir/ports/$md_id."
 rp_module_section="exp"
-rp_module_flags="!x86 !x11"
+rp_module_flags="!x86 !x11 !mali"
+
+function depends_sorr() {
+    getDepends libsdl-mixer1.2 libpng12-0
+}
 
 function sources_sorr() {
-        # get BennuGD Engine - original download site: http://forum.bennugd.org/index.php?action=dlattach;topic=4281.0;attach=3564
-        # copy BennuGD-rpi-v333.zip to /home/pi/RetroPie/roms/ports
-        unzip -j -o /home/pi/RetroPie/roms/ports/BennuGD-rpi-v333.zip
-        getDepends libsdl-mixer1.2
+    gitPullOrClone "$md_build" https://github.com/zerojay/bennugd.git
 }
 
 function install_sorr() {
@@ -29,8 +30,12 @@ function install_sorr() {
 }
 
 function configure_sorr() {
-    mkRomDir "ports/sorr"
+    mkRomDir "ports/$md_id"
     chmod 755 "$md_inst/bgdi-333"
+    ln -s "$romdir/ports/$md_id/SorR.dat" "$md_inst/SorR.dat"
+    ln -s "$romdir/ports/$md_id/mod" "$md_inst/mod"
+    ln -s "$romdir/ports/$md_id/palettes" "$md_inst/palettes"
+    ln -s "$romdir/ports/$md_id/SorMaker.dat" "$md_inst/SorMaker.dat"
     moveConfigFile "$md_inst/savegame" "$md_conf_root/$md_id/"
-    addPort "$md_id" "sorr" "Streets of Rage Remake" "pushd $romdir/ports/$md_id/; LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/bgdi-333 ./SorR.dat; popd"
+    addPort "$md_id" "sorr" "Streets of Rage Remake" "pushd $md_inst; ./bgdi-333 ./SorR.dat; popd"
 }

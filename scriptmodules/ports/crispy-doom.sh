@@ -14,10 +14,10 @@ rp_module_desc="Crispy Doom - Enhanced port of the official DOOM source"
 rp_module_licence="GPL2 https://raw.githubusercontent.com/fabiangreffrath/crispy-doom/master/COPYING"
 rp_module_help="Please add your iWAD files to $romdir/ports/doom/ and reinstall $md_id to create entries for each game to EmulationStation. Run 'crispy-setup' to configure your controls and options."
 rp_module_section="exp"
-rp_module_flags="!x86"
+rp_module_flags="!mali !x86"
 
 function depends_crispy-doom() {
-    getDepends libsdl2-mixer-dev libsdl2-net-dev python-pil automake autoconf
+    getDepends libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev python-pil automake autoconf
 }
 
 function sources_crispy-doom() {
@@ -53,11 +53,11 @@ function configure_crispy-doom() {
     fi
 
     if [[ ! -f "$romdir/ports/doom/freedoom1.wad" ]]; then
-        wget "https://github.com/freedoom/freedoom/releases/download/v0.11.3/freedoom-0.11.3.zip"
-        unzip freedoom-0.11.3.zip 
-        mv freedoom-0.11.3/*.wad "$romdir/ports/doom"
-        rm -rf freedoom-0.11.3
-        rm freedoom-0.11.3.zip
+        wget "https://github.com/freedoom/freedoom/releases/download/v0.12.1/freedoom-0.12.1.zip"
+        unzip freedoom-0.12.1.zip 
+        mv freedoom-0.12.1/*.wad "$romdir/ports/doom"
+        rm -rf freedoom-0.12.1
+        rm freedoom-0.12.1.zip
     fi
 
     # Temporary until the official RetroPie WAD selector is complete.

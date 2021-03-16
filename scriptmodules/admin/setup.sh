@@ -94,6 +94,9 @@ function depends_setup() {
 
     # set a global __setup to 1 which is used to adjust package function behaviour if called from the setup gui
     __setup=1
+
+    # print any pending msgs - eg during module scanning which wouldn't be seen otherwise
+    rps_printInfo
 }
 
 function updatescript_setup()
@@ -108,7 +111,7 @@ function updatescript_setup()
         return 1
     fi
     local error
-    if ! error=$(su $user -c "git pull 2>&1 >/dev/null"); then
+    if ! error=$(su $user -c "git pull --ff-only 2>&1 >/dev/null"); then
         printMsgs "dialog" "Update failed:\n\n$error"
         popd >/dev/null
         return 1
@@ -148,6 +151,11 @@ function package_setup() {
     local id="$1"
     local default=""
 
+    if ! rp_isEnabled "$id"; then
+        printMsgs "dialog" "Sorry but package '$id' is not available for your system ($__platform)\n\nPackage flags: ${__mod_info[$id/flags]}\n\nYour $__platform flags: ${__platform_flags[*]}"
+        return 1
+    fi
+
     # associative array so we can pull out the messages later for the confirmation requester
     declare -A option_msgs=(
         ["U"]=""
@@ -161,62 +169,86 @@ function package_setup() {
         local status
 
         local has_binary=0
-        rp_hasBinary "$id"
-        local binary_ret="$?"
-        [[ "$binary_ret" -eq 0 ]] && has_binary=1
+        local has_net=0
+
+        isConnected && has_net=1
+
+        # for modules with nonet flag that don't need to download data, we force has_net to 1, so we get install options
+        hasFlag "${__mod_info[$id/flags]}" "nonet" && has_net=1
+
+        if [[ "$has_net" -eq 1 ]]; then
+            dialog --backtitle "$__backtitle" --infobox "Checking for updates for $id ..." 3 60 >/dev/tty
+            rp_hasBinary "$id"
+            local ret="$?"
+            [[ "$ret" -eq 0 ]] && has_binary=1
+            [[ "$ret" -eq 2 ]] && has_net=0
+        fi
+
+        local is_installed=0
 
         local pkg_origin=""
-        local source_update=0
-        local binary_update=0
-        if rp_isInstalled "$id"; then
-            eval $(rp_getPackageInfo "$id")
+        local pkg_date=""
+        if ! rp_isInstalled "$id"; then
+            status="Not installed"
+        else
+            is_installed=1
+
+            rp_loadPackageInfo "$id"
+            pkg_origin="${__mod_info[$id/pkg_origin]}"
+            pkg_date="${__mod_info[$id/pkg_date]}"
+            [[ -n "$pkg_date" ]] && pkg_date="$(date -u -d "$pkg_date" 2>/dev/null)"
+
             status="Installed - via $pkg_origin"
+
             [[ -n "$pkg_date" ]] && status+=" (built: $pkg_date)"
 
-            if [[ "$pkg_origin" != "source" && "$has_binary" -eq 1 ]]; then
-                rp_hasNewerBinary "$id"
+            if [[ "$has_net" -eq 1 ]]; then
+                rp_hasNewerModule "$id" "$pkg_origin"
                 local has_newer="$?"
-                binary_update=1
-                option_msgs["U"]="Update (from pre-built binary)"
                 case "$has_newer" in
                     0)
-                        status+="\nBinary update is available."
+                        status+="\nUpdate is available."
+                        option_msgs["U"]="Update (from $pkg_origin)"
                         ;;
                     1)
-                        status+="\nYou are running the latest binary."
-                        option_msgs["U"]="Re-install (from pre-built binary)"
+                        status+="\nYou are running the latest $pkg_origin."
+                        option_msgs["U"]="Re-install (from $pkg_origin)"
                         ;;
                     2)
-                        status+="\nBinary update may be available (Unable to check for this package)."
+                        if [[ "$pkg_origin" == "unknown" ]]; then
+                            if [[ "$has_binary" -eq 1 ]]; then
+                                pkg_origin="binary"
+                            else
+                                pkg_origin="source"
+                            fi
+                        fi
+                        option_msgs["U"]="Update (from $pkg_origin)"
+                        status+="\nUpdate may be available (Unable to check for this package)."
+                        ;;
+                    3)
+                        has_net=0
                         ;;
                 esac
             fi
-            if [[ "$binary_update" -eq 0 && "$binary_ret" -ne 4 ]]; then
-                source_update=1
-                option_msgs["U"]="Update (from source)"
-            fi
-        else
-            status="Not installed"
         fi
 
-        # if we had a network error don't display install options
-        if [[ "$binary_ret" -eq 4 ]]; then
-            status+="\nInstall options disabled (Unable to access internet)"
-        else
-            if [[ "$source_update" -eq 1 || "$binary_update" -eq 1 ]]; then
+        if [[ "$has_net" -eq 1 ]]; then
+            if [[ "$is_installed" -eq 1 ]]; then
                 options+=(U "${option_msgs["U"]}")
             fi
 
-            if [[ "$binary_update" -eq 0 && "$has_binary" -eq 1 ]]; then
+            if [[ "$pkg_origin" != "binary" && "$has_binary" -eq 1 ]]; then
                 options+=(B "${option_msgs["B"]}")
             fi
 
-            if [[ "$source_update" -eq 0 ]] && fnExists "sources_${id}"; then
+            if [[ "$pkg_origin" != "source" ]] && fnExists "sources_${id}"; then
                 options+=(S "${option_msgs[S]}")
            fi
+        else
+            status+="\nInstall options disabled:\n$__NET_ERRMSG"
         fi
 
-        if rp_isInstalled "$id"; then
+        if [[ "$is_installed" -eq 1 ]]; then
             if fnExists "gui_${id}"; then
                 options+=(C "Configuration / Options")
             fi
@@ -227,9 +259,13 @@ function package_setup() {
             options+=(Z "Clean source folder")
         fi
 
-        local help="${__mod_desc[$id]}\n\n${__mod_help[$id]}"
+        local help="${__mod_info[$id/desc]}\n\n${__mod_info[$id/help]}"
         if [[ -n "$help" ]]; then
-            options+=(H "Package Help")
+            options+=(H "Package help")
+        fi
+
+        if [[ "$is_installed" -eq 1 ]]; then
+            options+=(V "Package version information")
         fi
 
         cmd=(dialog --backtitle "$__backtitle" --cancel-label "Back" --default-item "$default" --menu "Choose an option for $id\n$status" 22 76 16)
@@ -266,7 +302,7 @@ function package_setup() {
                 ;;
             X)
                 local text="Are you sure you want to remove $id?"
-                case "${__mod_section[$id]}" in
+                case "${__mod_info[$id/section]}" in
                     core)
                         text+="\n\nWARNING - core packages are needed for RetroPie to function!"
                         ;;
@@ -288,6 +324,23 @@ function package_setup() {
             H)
                 printMsgs "dialog" "$help"
                 ;;
+            V)
+                local info
+                rp_loadPackageInfo "$id"
+                read -r -d '' info << _EOF_
+Package Origin: ${__mod_info[$id/pkg_origin]}
+Build Date: ${__mod_info[$id/pkg_date]}
+
+Built from source via:
+
+Type: ${__mod_info[$id/pkg_repo_type]}
+URL: ${__mod_info[$id/pkg_repo_url]}
+Branch: ${__mod_info[$id/pkg_repo_branch]}
+Commit: ${__mod_info[$id/pkg_repo_commit]}
+Date: ${__mod_info[$id/pkg_repo_date]}
+_EOF_
+               printMsgs "dialog" "$info"
+               ;;
             Z)
                 rp_callModule "$id" clean
                 printMsgs "dialog" "$__builddir/$id has been removed."
@@ -304,32 +357,55 @@ function section_gui_setup() {
     local section="$1"
 
     local default=""
+    local status=""
+    local has_net=1
     while true; do
         local options=()
         local pkgs=()
 
+        status="Please choose a package from below"
+        if ! isConnected; then
+            status+="\nInstall options disabled ($__NET_ERRMSG)"
+            has_net=0
+        fi
+
         local id
-        local pkg_origin
         local num_pkgs=0
+        local info
+        local type
+        local last_type=""
         for id in $(rp_getSectionIds $section); do
-            if rp_isInstalled "$id"; then
-                eval $(rp_getPackageInfo "$id")
-                installed="\Zb(Installed - via $pkg_origin)\Zn"
-                ((num_pkgs++))
-            else
-                installed=""
+            local type="${__mod_info[$id/vendor]} - ${__mod_info[$id/type]}"
+            # do a heading for each origin and module type
+            if [[ "$last_type" != "$type" ]]; then
+                info="$type"
+                pkgs+=("----" "\Z4$info ----" "Packages from $info")
+                last_type="$type"
             fi
-            pkgs+=("${__mod_idx[$id]}" "$id $installed" "$id - ${__mod_desc[$id]}"$'\n\n'"${__mod_help[$id]}")
+            if ! rp_isEnabled "$id"; then
+                info="\Z1$id\Zn"
+            else
+                if rp_isInstalled "$id"; then
+                    rp_loadPackageInfo "$id" "pkg_origin"
+                    local pkg_origin="${__mod_info[$id/pkg_origin]}"
+
+                    info="$id (Installed - via $pkg_origin)"
+                    ((num_pkgs++))
+                else
+                    info="$id"
+                fi
+            fi
+            pkgs+=("${__mod_idx[$id]}" "$info" "$id - ${__mod_info[$id/desc]}"$'\n\n'"${__mod_info[$id/help]}")
         done
 
-        if [[ "$num_pkgs" -gt 0 ]]; then
+        if [[ "$has_net" -eq 1 && "$num_pkgs" -gt 0 ]]; then
             options+=(
                 U "Update all installed ${__sections[$section]} packages" "This will update any installed ${__sections[$section]} packages. The packages will be updated by the method used previously."
             )
         fi
 
         # allow installing an entire section except for drivers and dependencies - as it's probably a bad idea
-        if [[ "$section" != "driver" && "$section" != "depends" ]]; then
+        if [[ "$has_net" -eq 1 && "$section" != "driver" && "$section" != "depends" ]]; then
             options+=(
                 I "Install all ${__sections[$section]} packages" "This will install all ${__sections[$section]} packages. If a package is not installed, and a pre-compiled binary is available it will be used. If a package is already installed, it will be updated by the method used previously"
                 X "Remove all ${__sections[$section]} packages" "X This will remove all $section packages."
@@ -338,7 +414,7 @@ function section_gui_setup() {
 
         options+=("${pkgs[@]}")
 
-        local cmd=(dialog --colors --backtitle "$__backtitle" --cancel-label "Back" --item-help --help-button --default-item "$default" --menu "Choose an option" 22 76 16)
+        local cmd=(dialog --colors --backtitle "$__backtitle" --cancel-label "Back" --item-help --help-button --default-item "$default" --menu "$status" 22 76 16)
 
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         [[ -z "$choice" ]] && break
@@ -365,6 +441,7 @@ function section_gui_setup() {
                 {
                     rps_logStart
                     for id in $(rp_getSectionIds $section); do
+                        ! rp_isEnabled "$id" && continue
                         # if we are updating, skip packages that are not installed
                         if [[ "$mode" == "update" ]]; then
                             if rp_isInstalled "$id"; then
@@ -392,6 +469,8 @@ function section_gui_setup() {
                 } &> >(_setup_gzip_log "$logfilename")
                 rps_printInfo "$logfilename"
                 ;;
+            ----)
+                ;;
             *)
                 package_setup "${__mod_id[$choice]}"
                 ;;
@@ -407,8 +486,8 @@ function config_gui_setup() {
         local id
         for id in "${__mod_id[@]}"; do
             # show all configuration modules and any installed packages with a gui function
-            if [[ "${__mod_section[$id]}" == "config" ]] || rp_isInstalled "$id" && fnExists "gui_$id"; then
-                options+=("${__mod_idx[$id]}" "$id  - ${__mod_desc[$id]}" "${__mod_idx[$id]} ${__mod_desc[$id]}")
+            if [[ "${__mod_info[$id/section]}" == "config" ]] || rp_isInstalled "$id" && fnExists "gui_$id"; then
+                options+=("${__mod_idx[$id]}" "$id  - ${__mod_info[$id/desc]}" "${__mod_idx[$id]} ${__mod_info[$id/desc]}")
             fi
         done
 
@@ -449,12 +528,69 @@ function update_packages_setup() {
     clear
     local id
     for id in ${__mod_id[@]}; do
-        if rp_isInstalled "$id" && [[ "${__mod_section[$id]}" != "depends" ]]; then
+        if rp_isInstalled "$id" && [[ "${__mod_info[$id/section]}" != "depends" ]]; then
             rp_installModule "$id" "_update_"
         fi
     done
 }
 
+<<<<<<< HEAD
+=======
+function check_connection_gui_setup() {
+    local ip="$(getIPAddress)"
+    if [[ -z "$ip" ]]; then
+        printMsgs "dialog" "Sorry, you don't seem to be connected to the internet, so installing/updating is not available."
+        return 1
+    fi
+    return 0
+}
+
+function update_packages_gui_setup() {
+    local update="$1"
+    if [[ "$update" != "update" ]]; then
+        ! check_connection_gui_setup && return 1
+        dialog --defaultno --yesno "Are you sure you want to update installed packages?" 22 76 2>&1 >/dev/tty || return 1
+        updatescript_setup || return 1
+        # restart at post_update and then call "update_packages_gui_setup update" afterwards
+        joy2keyStop
+        exec "$scriptdir/retropie_packages.sh" setup post_update update_packages_gui_setup update
+    fi
+
+    local update_os=0
+    dialog --yesno "Would you like to update the underlying OS packages (eg kernel etc) ?" 22 76 2>&1 >/dev/tty && update_os=1
+
+    clear
+
+    local logfilename
+    rps_logInit
+    {
+        rps_logStart
+        if [[ "$update_os" -eq 1 ]]; then
+            if rp_isEnabled "raspbiantools"; then
+                rp_callModule raspbiantools apt_upgrade
+            else
+                aptUpdate
+                apt-get -y dist-upgrade
+            fi
+        fi
+        update_packages_setup
+        rps_logEnd
+    } &> >(_setup_gzip_log "$logfilename")
+
+    rps_printInfo "$logfilename"
+    printMsgs "dialog" "Installed packages have been updated."
+    gui_setup
+}
+
+function basic_install_setup() {
+    local id
+    for id in $(rp_getSectionIds core) $(rp_getSectionIds main); do
+        rp_installModule "$id"
+    done
+    return 0
+}
+
+>>>>>>> 09120cff406a50441789e1a62b4963f18e5195c8
 function packages_gui_setup() {
     local section
     local default
@@ -526,6 +662,7 @@ function gui_setup() {
 
         case "$choice" in
             I)
+                ! check_connection_gui_setup && continue
                 dialog --defaultno --yesno "Are you sure you want to do a basic install?\n\nThis will install all packages from the 'Core' and 'Main' package sections." 22 76 2>&1 >/dev/tty || continue
                 clear
                 local logfilename
@@ -547,6 +684,7 @@ function gui_setup() {
                 config_gui_setup
                 ;;
             S)
+                ! check_connection_gui_setup && continue
                 dialog --defaultno --yesno "Are you sure you want to update the RetroPie-Setup script ?" 22 76 2>&1 >/dev/tty || continue
                 if updatescript_setup; then
                     joy2keyStop

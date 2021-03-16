@@ -13,6 +13,7 @@ rp_module_id="uae4arm"
 rp_module_desc="Amiga emulator with JIT support"
 rp_module_help="ROM Extension: .adf\n\nCopy your Amiga games to $romdir/amiga\n\nCopy the required BIOS files\nkick13.rom\nkick20.rom\nkick31.rom\nto $biosdir"
 rp_module_licence="GPL2"
+rp_module_repo="git https://github.com/Chips-fr/uae4arm-rpi.git master"
 rp_module_section="opt"
 rp_module_flags="!all videocore"
 
@@ -107,8 +108,8 @@ _EOF_
         fi
     fi
 
-    addEmulator 1 "$md_id" "amiga" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh auto %ROM%"
-    addEmulator 1 "$md_id-a500" "amiga" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh rp-a500.uae %ROM%"
-    addEmulator 1 "$md_id-a1200" "amiga" "LD_LIBRARY_PATH=/usr/lib/GLSHIM:/usr/lib startx $md_inst/$md_id.sh rp-a1200.uae %ROM%"
+    addEmulator 1 "$md_id" "amiga" "startx $md_inst/$md_id.sh auto %ROM%"
+    addEmulator 1 "$md_id-a500" "amiga" "startx $md_inst/$md_id.sh rp-a500.uae %ROM%"
+    addEmulator 1 "$md_id-a1200" "amiga" "startx $md_inst/$md_id.sh rp-a1200.uae %ROM%"
     addSystem "amiga"
 }

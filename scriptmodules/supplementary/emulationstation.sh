@@ -12,6 +12,7 @@
 rp_module_id="emulationstation"
 rp_module_desc="EmulationStation - Frontend used by RetroPie for launching emulators"
 rp_module_licence="MIT https://raw.githubusercontent.com/RetroPie/EmulationStation/master/LICENSE.md"
+rp_module_repo="git https://github.com/RetroPie/EmulationStation :_get_branch_emulationstation"
 rp_module_section="core"
 rp_module_flags="frontend"
 
@@ -158,6 +159,9 @@ function build_emulationstation() {
         isPlatform "mesa" && params+=(-DGL=On)
         # force GLESv1 on videocore due to performance issue with GLESv2
         isPlatform "videocore" && params+=(-DUSE_GLES1=On)
+    elif isPlatform "x11"; then
+        local gl_ver=$(sudo -u $user glxinfo | grep -oP "OpenGL version string: \K(\d+)")
+        [[ "$gl_ver" -gt 1 ]] && params+=(-DUSE_OPENGL_21=On)
     fi
     rpSwap on 1000
     cmake . -DGLSystem="OpenGL ES" -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/

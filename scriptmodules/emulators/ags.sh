@@ -13,6 +13,7 @@ rp_module_id="ags"
 rp_module_desc="Adventure Game Studio - Adventure game engine"
 rp_module_help="ROM Extension: .exe\n\nCopy your Adventure Game Studio roms to $romdir/ags"
 rp_module_licence="OTHER https://raw.githubusercontent.com/adventuregamestudio/ags/master/License.txt"
+rp_module_repo="git https://github.com/adventuregamestudio/ags.git ags3"
 rp_module_section="opt"
 
 function depends_ags() {
@@ -20,12 +21,13 @@ function depends_ags() {
 }
 
 function sources_ags() {
-    gitPullOrClone "$md_build" https://github.com/adventuregamestudio/ags.git ags3
+    gitPullOrClone
 }
 
 function build_ags() {
     make -C Engine clean
     make -C Engine
+    md_ret_require="$md_build/Engine/ags"
 }
 
 function install_ags() {
@@ -42,7 +44,9 @@ function configure_ags() {
     mkRomDir "ags"
 
     # install Eawpatches GUS patch set (see: http://liballeg.org/digmid.html)
-    [[ "$md_mode" == "install" ]] && wget -qO- "http://www.eglebbk.dds.nl/program/download/digmid.dat" | bzcat >"$md_inst/bin/patches.dat"
+    if [[ "$md_mode" == "install" ]]; then
+        download "http://www.eglebbk.dds.nl/program/download/digmid.dat" - | bzcat >"$md_inst/bin/patches.dat"
+    fi
 
     # copy basic QJOYPAD layout (mappings to mouse buttons,F1,F2,F12,ESC so switching to main menu and quitting will be easier).
     cp -p $md_data/ags.lyt /home/pi/.qjoypad3/

@@ -12,6 +12,7 @@
 rp_module_id="runcommand"
 rp_module_desc="The 'runcommand' launch script - needed for launching the emulators from the frontend"
 rp_module_section="core"
+rp_module_flags="nonet"
 
 function _update_hook_runcommand() {
     # make sure runcommand is always updated when updating retropie-setup
@@ -61,23 +62,34 @@ function remove_runcommand() {
 }
 
 function governor_runcommand() {
-    cmd=(dialog --backtitle "$__backtitle" --cancel-label "Back" --menu "Configure CPU Governor on command launch" 22 86 16)
+    local config="$configdir/all/runcommand.cfg"
+    iniConfig " = " '"' "$config"
+    iniGet "governor"
+
+    local current="$ini_value"
+    local default=1
+    local status="Default (don't change)"
+
+    [[ -n "$current" ]] && status="$current"
+
     local governors
     local governor
     local options=("1" "Default (don't change)")
     local i=2
     if [[ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors ]]; then
         for governor in $(</sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors); do
+            [[ "$current" == "$governor" ]] && default="$i"
             governors[$i]="$governor"
             options+=("$i" "Force $governor")
             ((i++))
         done
     fi
+    cmd=(dialog --backtitle "$__backtitle" --default-item "$default" --cancel-label "Back" --menu "Configure CPU Governor on command launch\nCurrently: $status" 22 86 16)
     local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
     if [[ -n "$choice" ]]; then
         governor="${governors[$choice]}"
         iniSet "governor" "$governor"
-        chown $user:$user "$configdir/all/runcommand.cfg"
+        chown $user:$user "$config"
     fi
 }
 
@@ -96,7 +108,10 @@ function gui_runcommand() {
             'use_art=0' \
             'disable_joystick=0' \
             'image_delay=2' \
+            'governor=' \
         )"
+
+        [[ -z "$governor" ]] && governor="Default: don't change"
 
         cmd=(dialog --backtitle "$__backtitle" --cancel-label "Exit" --default-item "$default" --menu "Choose an option." 22 86 16)
         options=()
@@ -120,7 +135,7 @@ function gui_runcommand() {
         fi
 
         options+=(4 "Launch image delay in seconds (currently $image_delay)")
-        options+=(5 "CPU configuration")
+        options+=(5 "CPU governor configuration (currently: $governor)")
 
         local choice=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
         [[ -z "$choice" ]] && break
