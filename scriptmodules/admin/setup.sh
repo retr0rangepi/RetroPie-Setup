@@ -543,52 +543,6 @@ function check_connection_gui_setup() {
     return 0
 }
 
-function update_packages_gui_setup() {
-    local update="$1"
-    if [[ "$update" != "update" ]]; then
-        ! check_connection_gui_setup && return 1
-        dialog --defaultno --yesno "Are you sure you want to update installed packages?" 22 76 2>&1 >/dev/tty || return 1
-        updatescript_setup || return 1
-        # restart at post_update and then call "update_packages_gui_setup update" afterwards
-        joy2keyStop
-        exec "$scriptdir/retropie_packages.sh" setup post_update update_packages_gui_setup update
-    fi
-
-    local update_os=0
-    dialog --yesno "Would you like to update the underlying OS packages (eg kernel etc) ?" 22 76 2>&1 >/dev/tty && update_os=1
-
-    clear
-
-    local logfilename
-    rps_logInit
-    {
-        rps_logStart
-        if [[ "$update_os" -eq 1 ]]; then
-            if rp_isEnabled "raspbiantools"; then
-                rp_callModule raspbiantools apt_upgrade
-            else
-                aptUpdate
-                apt-get -y dist-upgrade
-            fi
-        fi
-        update_packages_setup
-        rps_logEnd
-    } &> >(_setup_gzip_log "$logfilename")
-
-    rps_printInfo "$logfilename"
-    printMsgs "dialog" "Installed packages have been updated."
-    gui_setup
-}
-
-function basic_install_setup() {
-    local id
-    for id in $(rp_getSectionIds core) $(rp_getSectionIds main); do
-        rp_installModule "$id"
-    done
-    return 0
-}
-
->>>>>>> 09120cff406a50441789e1a62b4963f18e5195c8
 function packages_gui_setup() {
     local section
     local default
