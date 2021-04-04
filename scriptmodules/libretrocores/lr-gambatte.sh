@@ -22,7 +22,7 @@ function sources_lr-gambatte() {
 
 function build_lr-gambatte() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -j4 -f Makefile.libretro
     md_ret_require="$md_build/gambatte_libretro.so"
 }
 

@@ -28,7 +28,7 @@ function sources_lr-beetle-psx() {
 
 function build_lr-beetle-psx() {
     make clean
-    make HAVE_HW=1
+    make -j4 HAVE_HW=1
     md_ret_require=(
         'mednafen_psx_hw_libretro.so'
     )

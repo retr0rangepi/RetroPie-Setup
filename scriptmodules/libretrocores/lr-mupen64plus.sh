@@ -53,24 +53,8 @@ function sources_lr-mupen64plus() {
 
 function build_lr-mupen64plus() {
     rpSwap on 1024
-    local params=()
-    if isPlatform "videocore"; then
-        params+=(platform="$__platform")
-    elif isPlatform "mesa"; then
-        params+=(platform="$__platform-mesa")
-    elif isPlatform "mali"; then
-        params+=(platform="odroid")
-    else
-        isPlatform "arm" && params+=(WITH_DYNAREC=arm)
-        isPlatform "neon" && params+=(HAVE_NEON=1)
-    fi
-    if isPlatform "gles3"; then
-        params+=(FORCE_GLES3=1)
-    elif isPlatform "gles"; then
-        params+=(FORCE_GLES=1)
-    fi
     make clean
-    LDFLAGS="-I/usr/local/include/libpng17/ -L/usr/local/lib/linpng17 -lpng17" make -j2 "${params[@]}"
+    make -j4 WITH_DYNAREC=arm HAVE_NEON=1 FORCE_GLES=1
     rpSwap off
     md_ret_require="$md_build/mupen64plus_libretro.so"
 }

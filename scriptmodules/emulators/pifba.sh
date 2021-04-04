@@ -28,7 +28,7 @@ function sources_pifba() {
 function build_pifba() {
     mkdir ".obj"
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/fba2x"
 }
 

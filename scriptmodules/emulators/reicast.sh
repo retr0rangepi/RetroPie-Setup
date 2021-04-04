@@ -72,7 +72,7 @@ function _params_reicast() {
 function build_reicast() {
     cd shell/linux
     make $(_params_reicast) clean
-    make $(_params_reicast)
+    make -j4 $(_params_reicast)
 
     md_ret_require="$md_build/shell/linux/reicast.elf"
 }

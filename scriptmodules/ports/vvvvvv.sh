@@ -30,7 +30,7 @@ function build_vvvvvv() {
     cmake desktop_version
     rpSwap on 1500
     make clean
-    make
+    make -j4
     rpSwap off
     md_ret_require="$md_build/VVVVVV"
 }

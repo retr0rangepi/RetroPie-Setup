@@ -27,7 +27,7 @@ function sources_bombermaaan() {
 function build_bombermaaan() {
     cd trunk
     cmake . -DCMAKE_INSTALL_PREFIX="$md_inst" -DLOAD_RESOURCES_FROM_FILES:BOOL=ON
-    make
+    make -j4
     mv bin/Bombermaaan bombermaaan
     md_ret_require="$md_build/trunk/bombermaaan"
 }

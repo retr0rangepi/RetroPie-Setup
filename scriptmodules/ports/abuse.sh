@@ -26,7 +26,7 @@ function sources_abuse() {
 
 function build_abuse() {
     cmake . -DCMAKE_INSTALL_PREFIX="$md_inst"
-    make
+    make -j4
     md_ret_require="$md_build/src/abuse"
 }
 

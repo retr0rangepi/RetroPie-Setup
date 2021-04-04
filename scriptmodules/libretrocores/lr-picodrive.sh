@@ -33,7 +33,7 @@ function build_lr-picodrive() {
         params+=(use_sh2drc=0)
     fi
     make clean
-    make -f Makefile.libretro "${params[@]}"
+    make -j4 -f Makefile.libretro "${params[@]}"
     md_ret_require="$md_build/picodrive_libretro.so"
 }
 

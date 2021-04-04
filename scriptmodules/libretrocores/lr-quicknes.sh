@@ -22,7 +22,7 @@ function sources_lr-quicknes() {
 
 function build_lr-quicknes() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/quicknes_libretro.so"
 }
 

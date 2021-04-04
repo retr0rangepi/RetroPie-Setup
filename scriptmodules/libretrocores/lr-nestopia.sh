@@ -24,7 +24,7 @@ function build_lr-nestopia() {
     cd libretro
     rpSwap on 512
     make clean
-    make
+    make -j4
     rpSwap off
     md_ret_require="$md_build/libretro/nestopia_libretro.so"
 }

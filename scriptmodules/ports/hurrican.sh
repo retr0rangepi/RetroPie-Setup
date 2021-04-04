@@ -38,7 +38,7 @@ function build_hurrican() {
     if isPlatform "rpi"; then
        make TARGET=rpi
     else
-       make
+       make -j4 TARGET=linux_GL2
     fi
     md_ret_require="$md_build"
 }

@@ -41,7 +41,7 @@ function build_cannonball() {
     fi
     cmake -G "Unix Makefiles" -DTARGET=$target ../cmake/
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/build/cannonball"
 }
 

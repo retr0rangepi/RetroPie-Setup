@@ -35,11 +35,11 @@ function build_fuse() {
     pushd libspectrum
     ./configure --disable-shared
     make clean
-    make
+    make -j4
     popd
     ./configure --prefix="$md_inst" --without-libao --without-gpm --without-gtk --without-libxml2 --with-sdl LIBSPECTRUM_CFLAGS="-I$md_build/libspectrum" LIBSPECTRUM_LIBS="-L$md_build/libspectrum/.libs -lspectrum"
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/fuse"
 }
 

@@ -28,7 +28,7 @@ function build_prboom-plus() {
 #    ./bootstrap
 #    ./configure
     cmake .
-    make
+    make -j4
     md_ret_require="$md_build/prboom2/prboom-plus"
 
 }

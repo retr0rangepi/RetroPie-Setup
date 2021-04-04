@@ -25,7 +25,7 @@ function sources_mayhem() {
 
 function build_mayhem() {
   make clean
-  make
+  make -j4
   md_ret_require="$md_build/mayhem2-pi"
 }
 

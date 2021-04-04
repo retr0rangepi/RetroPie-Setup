@@ -27,7 +27,7 @@ function sources_lr-beetle-wswan() {
 
 function build_lr-beetle-wswan() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/mednafen_wswan_libretro.so"
 }
 

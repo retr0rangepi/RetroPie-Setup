@@ -22,7 +22,7 @@ function sources_lr-smsplus-gx() {
 
 function build_lr-smsplus-gx() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -j4 -f Makefile.libretro
     md_ret_require="$md_build/smsplus_libretro.so"
 }
 

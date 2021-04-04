@@ -226,9 +226,6 @@ function _mapPackage() {
         libpng-dev)
             compareVersions "$__os_debian_ver" lt 9 && pkg="libpng12-dev"
             ;;
-        libsdl1.2-dev)
-            rp_hasModule "sdl1" && pkg="RP sdl1 $pkg"
-            ;;
         libsdl2-dev)
             if rp_hasModule "sdl2"; then
                 # check whether to use our own sdl2 - can be disabled to resolve issues with

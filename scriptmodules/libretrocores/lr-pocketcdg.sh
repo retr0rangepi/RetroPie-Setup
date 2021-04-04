@@ -24,7 +24,7 @@ function build_lr-pocketcdg() {
     make clean
     local params=()
     isPlatform "arm" && params+=("ARM=1")
-    make ARCH="$CFLAGS" "${params[@]}"
+    make -j4 ARCH="$CFLAGS" "${params[@]}"
     rpSwap off
     md_ret_require="$md_build/pocketcdg_libretro.so"
 }

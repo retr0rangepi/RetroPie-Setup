@@ -14,7 +14,7 @@ rp_module_desc="REminiscence - Flashback Engine"
 rp_module_licence="GPL3 https://raw.githubusercontent.com/Cheeseness/REminiscence/master/COPYING"
 rp_module_help="Please copy your Flashback data files to $romdir/ports/$md_id before running REminiscence."
 rp_module_section="exp"
-rp_module_flags="!mali !x86"
+rp_module_flags="!x86"
 
 function depends_reminiscence() {
     getDepends libsdl1.2-dev
@@ -25,7 +25,7 @@ function sources_reminiscence() {
 }
 
 function build_reminiscence() {
-    make
+    make -j4
 }
 
 function install_reminiscence() {

@@ -1,0 +1,27 @@
+From 8f6b7d6f9640f6d8f21c8aa76ad70e5688d813d7 Mon Sep 17 00:00:00 2001
+From: retrorangepi <retrorangepi@outlook.com>
+Date: Thu, 1 Apr 2021 22:46:21 +0000
+Subject: [PATCH] removing Werror flag
+
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index a4297b9..0a9419c 100755
+--- a/Makefile
++++ b/Makefile
+@@ -6,8 +6,8 @@ LINKOBJ  = allegro_compatibility.o battle_sequence.o collision.o command.o game_
+ LIBS = -lallegro -lallegro_audio -lallegro_image -lallegro_primitives -lallegro_font -lallegro_ttf -lallegro_acodec
+ INCS = 
+ BIN  = "mayhem2-pi"
+-CXXINCS= -O0 -g -Werror -Wno-write-strings -Wno-deprecated-declarations
+-INCS= -O0 -g -Werror -Wno-write-strings -Wno-deprecated-declarations
++CXXINCS= -O0 -g -Wno-write-strings -Wno-deprecated-declarations
++INCS= -O0 -g -Wno-write-strings -Wno-deprecated-declarations
+ CXXFLAGS = -std=c++11 $(CXXINCS)
+ CFLAGS = $(INCS)
+ 
+-- 
+2.25.1
+

@@ -22,7 +22,7 @@ function sources_lr-neocd() {
 
 function build_lr-neocd() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/neocd_libretro.so"
 }
 

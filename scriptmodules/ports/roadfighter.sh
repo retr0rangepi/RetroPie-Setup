@@ -21,11 +21,7 @@ function depends_roadfighter() {
 function sources_roadfighter() {
     gitPullOrClone "$md_build" https://github.com/ptitSeb/roadfighter.git
     sed -i "s/-mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -ftree-vectorize -fsingle-precision-constant -g -Ofast/-mfloat-abi=hard -g3 -O3/" "$md_build/Makefile"
-}
-
-function build_roadfighter() {
-    make
-    md_ret_require="$md_build/roadfighter"
+    sed -i 's/mask==0) return false/mask==0) return 0/g' "$md_build/src/auxiliar.cpp"
 }
 
 function install_roadfighter() {

@@ -34,13 +34,13 @@ function build_uae4all() {
     pushd guichan
     make clean
     ./configure --enable-sdlimage --enable-sdl --disable-allegro --disable-opengl --disable-shared
-    make
+    make -j4
     popd
-    make -f Makefile.pi clean
+    make -j4 -f Makefile.pi clean
     if isPlatform "neon"; then
-        make -f Makefile.pi NEON=1 DEFS="-DUSE_ARMV7 -DUSE_ARMNEON"
+        make -j4 -f Makefile.pi NEON=1 DEFS="-DUSE_ARMV7 -DUSE_ARMNEON"
     else
-        make -f Makefile.pi
+        make -j4 -f Makefile.pi
     fi
     md_ret_require="$md_build/uae4all"
 }

@@ -31,7 +31,7 @@ function build_gngeopi() {
     ./configure --disable-i386asm --prefix="$md_inst"
     make clean
     # not safe for building in parallel
-    make -j1
+    make -j2
     md_ret_require="$md_build/gngeo/src/gngeo"
 }
 

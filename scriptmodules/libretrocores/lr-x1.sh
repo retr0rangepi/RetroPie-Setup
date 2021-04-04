@@ -22,7 +22,7 @@ function sources_lr-x1() {
 function build_lr-x1() {
     cd libretro
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/libretro/x1_libretro.so"
 }
 

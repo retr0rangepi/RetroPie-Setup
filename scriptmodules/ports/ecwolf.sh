@@ -29,7 +29,7 @@ function build_ecwolf() {
     wget -N -q https://raw.githubusercontent.com/tpo1990/ECWolf-RPI/master/ecwolf_keyboardpatch.diff
     applyPatch ecwolf_keyboardpatch.diff
     cmake . -DCMAKE_BUILD_TYPE=Release -DGPL=ON
-    make
+    make -j4
     md_ret_require="$md_build"
 }
 

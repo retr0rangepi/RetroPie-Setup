@@ -27,7 +27,7 @@ function sources_lr-desmume2015() {
 function build_lr-desmume2015() {
     cd desmume
     make clean
-    make $(_params_lr-desmume)
+    make -j4 $(_params_lr-desmume)
     md_ret_require="$md_build/desmume/desmume2015_libretro.so"
 }
 

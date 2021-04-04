@@ -29,7 +29,7 @@ function build_openbor() {
     local params=()
     ! isPlatform "x11" && params+=(NO_GL=1)
     make clean
-    make "${params[@]}"
+    make -j4 "${params[@]}"
     cd "$md_build/tools/borpak/"
     ./build-linux.sh
     md_ret_require="$md_build/OpenBOR"

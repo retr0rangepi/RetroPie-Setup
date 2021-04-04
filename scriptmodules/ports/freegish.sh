@@ -28,7 +28,7 @@ function sources_freegish() {
 function build_freegish() {
     cd "$md_build/glshim"
     cmake . -DBCMHOST=1
-    make GL
+    make -j4 GL
 }
 
 function install_bin_freegish() {

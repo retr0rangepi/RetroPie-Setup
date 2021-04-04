@@ -29,12 +29,12 @@ function build_rott() {
     cd standard/
     autoreconf -fiv
     ./configure --prefix="$md_inst" --enable-datadir="$romdir/ports/$md_id/standard"
-    make
+    make -j4
     
     cd ../shareware/
     autoreconf -fiv
     ./configure --prefix="$md_inst" --enable-datadir="$romdir/ports/$md_id/shareware" --enable-shareware --enable-suffix="shareware"
-    make
+    make -j4
     md_ret_require=(
         "$md_build/standard/rott/rott"
         "$md_build/shareware/rott/rott-shareware"

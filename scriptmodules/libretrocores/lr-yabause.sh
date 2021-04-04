@@ -27,7 +27,7 @@ function build_lr-yabause() {
     isPlatform "neon" && params+=(platform=armvneonhardfloat)
     ! isPlatform "x86" && params+=(HAVE_SSE=0)
     make "${params[@]}" clean
-    make "${params[@]}"
+    make -j4 "${params[@]}"
     md_ret_require="$md_build/yabause/src/libretro/yabause_libretro.so"
 }
 

@@ -22,7 +22,7 @@ function sources_lr-gw() {
 
 function build_lr-gw() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -j4 -f Makefile.libretro
     md_ret_require="$md_build/gw_libretro.so"
 }
 

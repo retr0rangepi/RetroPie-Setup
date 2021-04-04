@@ -26,7 +26,7 @@ function sources_openblok() {
 
 function build_openblok() {
     cmake -DCMAKE_BUILD_TYPE=Release -DINSTALL_PORTABLE=ON -DCMAKE_INSTALL_PREFIX="$md_inst" -DENABLE_MP3=OFF
-    make
+    make -j4
     md_ret_require="$md_build/src/openblok"
 }
 

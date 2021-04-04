@@ -31,7 +31,7 @@ function build_oricutron() {
     if isPlatform "rpi" || isPlatform "mali"; then
         make PLATFORM=rpi SDL_LIB=sdl2
     else
-        make SDL_LIB=sdl2
+        make -j4 PLATFORM=linux SDL_LIB=sdl2
     fi
     md_ret_require="$md_build/oricutron"
 }

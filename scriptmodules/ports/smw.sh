@@ -27,7 +27,7 @@ function sources_smw() {
 function build_smw() {
     ./configure --prefix="$md_inst"
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/smw"
 }
 

@@ -46,7 +46,7 @@ function build_darkplaces-quake() {
         fi
     fi
     make clean
-    make sdl-release "${params[@]}"
+    make -j4 sdl-release "${params[@]}"
     if isPlatform "rpi4" && [[ "$force_opengl" -eq 0 ]]; then
         mv "$md_build/darkplaces-sdl" "$md_build/darkplaces-sdl-gles"
         # revert rpi4 gles change which commented out invariant line from earlier.

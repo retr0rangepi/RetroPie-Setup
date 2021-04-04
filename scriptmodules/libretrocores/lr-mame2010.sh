@@ -35,7 +35,7 @@ function build_lr-mame2010() {
     fi
     isPlatform "64bit" && params+=("PTR64=1")
     make "${params[@]}" ARCHOPTS="$CFLAGS" buildtools
-    make "${params[@]}" ARCHOPTS="$CFLAGS"
+    make -j4 "${params[@]}" ARCHOPTS="$CFLAGS"
     rpSwap off
     md_ret_require="$md_build/mame2010_libretro.so"
 }

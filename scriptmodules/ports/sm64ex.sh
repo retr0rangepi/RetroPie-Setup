@@ -45,15 +45,15 @@ function build_sm64ex() {
 	
 	if [[ -f "$md_build/baserom.us.z64" ]]
 	then
-        	 make TARGET_RPI=1 VERSION=us
+        	 make -j4 TARGET_RPI=1 VERSION=us
                  mv "$md_build/build/us_pc/sm64.us.f3dex2e.arm" "$md_build/build/sm64ex.arm"
     	elif [[ -f $home/baserom.eu.z64 ]]
     	then
-        	 make TARGET_RPI=1 VERSION=eu
+        	 make -j4 TARGET_RPI=1 VERSION=eu
 		 mv "$md_build/build/eu_pc/sm64.eu.f3dex2e.arm" "$md_build/build/sm64ex.arm"
     	elif [[ -f $home/baserom.jp.z64 ]]
     	then
-        	 make TARGET_RPI=1 VERSION=jp
+        	 make -j4 TARGET_RPI=1 VERSION=jp
 	         mv "$md_build/build/jp_pc/sm64.jp.f3dex2e.arm" "$md_build/build/sm64ex.arm"
     	else
         	dialog --msgbox "Can't find the baserom you are attempting to use so we cannot tell which version you are trying to compile." 0 0

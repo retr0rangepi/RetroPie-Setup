@@ -27,19 +27,19 @@ function sources_lr-mess2016() {
 
 function build_lr-mess2016() {
     rpSwap on 1200
-    local params=($(_get_params_lr-mame) SUBTARGET=mess)
+    local params=($(_get_params_lr-mame) SUBTARGET=arcade)
     #make clean
     make -j2 "${params[@]}"
     rpSwap off
-    md_ret_require="$md_build/mess2016_libretro.so"
+    md_ret_require="$md_build/mamearcade2016_libretro.so"
 }
 
 function install_lr-mess2016() {
     md_ret_files=(
-        'mess2016_libretro.so'
+        'mamearcade2016_libretro.so'
     )
 }
 
 function configure_lr-mess2016() {
-    configure_lr-mess "mess2016_libretro.so"
+    configure_lr-mess "mamearcade2016_libretro.so"
 }

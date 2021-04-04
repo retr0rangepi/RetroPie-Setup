@@ -25,7 +25,7 @@ function build_lr-beetle-vb() {
     local params=(NEED_STEREO_SOUND=1)
     isPlatform "arm" && params+=(platform=armv FRONTEND_SUPPORTS_RGB565=1)
     make clean
-    make "${params[@]}"
+    make -j4 "${params[@]}"
     md_ret_require="$md_build/mednafen_vb_libretro.so"
 }
 

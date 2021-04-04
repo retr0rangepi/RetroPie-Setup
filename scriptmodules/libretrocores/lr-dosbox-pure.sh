@@ -23,7 +23,7 @@ function sources_lr-dosbox-pure() {
 
 function build_lr-dosbox-pure() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/dosbox_pure_libretro.so"
 }
 

@@ -25,7 +25,7 @@ function sources_zelda3t() {
 }
 
 function build_zelda3t() {
-    make
+    make -j4
     md_ret_require="$md_build/Zelda-3T"
 }
 

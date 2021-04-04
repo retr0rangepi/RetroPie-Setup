@@ -26,7 +26,7 @@ function sources_umario() {
 function build_umario() {
     mkdir build && cd build
     cmake ..
-    make
+    make -j4
     md_ret_require="$md_build/build/uMario"
 }
 

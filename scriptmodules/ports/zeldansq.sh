@@ -27,7 +27,7 @@ function sources_zeldansq() {
 
 function build_zeldansq() {
     cd ZeldaNSQ-src-linux
-    make
+    make -j4
     md_ret_require="$md_build/ZeldaNSQ-src-linux/bin/Release/ZeldaNSQ"
 }
 

@@ -30,7 +30,7 @@ function sources_tyrquake() {
 function build_tyrquake() {
     local params=(USE_SDL=Y USE_XF86DGA=N)
     make clean
-    make "${params[@]}"
+    make -j4 "${params[@]}"
     md_ret_require="$md_build/bin/tyr-quake"
 }
 

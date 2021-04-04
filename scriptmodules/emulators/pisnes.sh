@@ -27,7 +27,7 @@ function sources_pisnes() {
 
 function build_pisnes() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/snes9x"
 }
 

@@ -39,7 +39,7 @@ function _build_libcapsimage_hatari() {
     cd capsimg_source_linux_macosx/CAPSImg
     ./configure --prefix="$md_build"
     make clean
-    make -j2
+    make -j4
     make install
     mkdir -p "$md_build/src/includes/caps"
     cp -R "../LibIPF/"*.h "$md_build/src/includes/caps/"
@@ -64,7 +64,7 @@ function build_hatari() {
         -DENABLE_SDL2:BOOL=1 \
         -DSDL2_LIBRARY=/usr/local/lib/libSDL2.so
     make clean
-    make -j2
+    make -j4
     md_ret_require="$md_build/src/hatari"
 }
 

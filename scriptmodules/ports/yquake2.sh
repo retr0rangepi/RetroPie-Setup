@@ -30,7 +30,7 @@ function build_yquake2() {
     rm -rf release
     cmake .
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/release/quake2"
 }
 

@@ -27,7 +27,7 @@ function sources_pokemini() {
 
 function build_pokemini() {
     cd platform/sdl2
-    make
+    make -j4
     md_ret_require="$md_build/platform/sdl2/PokeMini"
 }
 

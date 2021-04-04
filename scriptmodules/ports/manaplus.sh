@@ -26,7 +26,7 @@ function sources_manaplus() {
 function build_manaplus() {
     autoreconf -i
     ./configure --prefix="$md_inst"
-    make
+    make -j4
 }
 
 function install_manaplus() {

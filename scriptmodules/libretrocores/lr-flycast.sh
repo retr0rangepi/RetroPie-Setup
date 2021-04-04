@@ -57,7 +57,7 @@ function build_lr-flycast() {
     isPlatform "arm" && params+=("WITH_DYNAREC=arm")
     ! isPlatform "x86" && params+=("HAVE_GENERIC_JIT=0" "HAVE_VULKAN=0")
     make "${params[@]}" clean
-    CFLAGS+=" ${add_flags[@]}" make "${params[@]}"
+    CFLAGS+=" ${add_flags[@]}" make -j4 "${params[@]}"
     md_ret_require="$md_build/flycast_libretro.so"
 }
 

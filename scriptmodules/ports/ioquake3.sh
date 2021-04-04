@@ -26,7 +26,7 @@ function sources_ioquake3() {
 
 function build_ioquake3() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/build/release-linux-$(_arch_ioquake3)/ioquake3.$(_arch_ioquake3)"
 }
 

@@ -89,10 +89,10 @@ function install_amiberry() {
     ./bootstrap.fs
     ./configure.fs
     make -f Makefile.fs clean
-    make -f Makefile.fs
+    make -j4 -f Makefile.fs
     cd "$md_build"
     make clean
-    make PLATFORM="$platform"
+    make -j4 PLATFORM="$platform"
     md_ret_require="$md_build/amiberry"
 }
 

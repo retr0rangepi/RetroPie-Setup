@@ -31,7 +31,7 @@ function build_corsixth() {
     sed -i "s/LUA_INCLUDE_DIRS include include\/lua include\/lua5.1 include\/lua51/LUA_INCLUDE_DIRS include include\/lua include\/lua5.1 include\/lua51 include\/lua5.2 include\/lua51/" $md_build/CMake/FindLua.cmake 
     cmake . -DWITH_LIBAV=ON -DCMAKE_INSTALL_PREFIX:PATH="$md_inst"
     cd ./CorsixTH
-    make
+    make -j4
     md_return_require="$md_build/CorsixTH/CorsixTH"
     cd "$md_build"
 }

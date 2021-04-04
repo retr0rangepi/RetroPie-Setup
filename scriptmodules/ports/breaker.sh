@@ -26,7 +26,7 @@ function sources_breaker() {
 function build_breaker() {
   cd "$md_build/source"
   sed -i "s/-lSDL/-lSDL -lm/" "$md_build/source/Makefile"
-  make
+  make -j4
   md_ret_require="$md_build/source/breaker"
 }
 

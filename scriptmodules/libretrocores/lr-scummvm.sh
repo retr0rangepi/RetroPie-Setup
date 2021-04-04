@@ -21,7 +21,7 @@ function sources_lr-scummvm() {
 }
 
 function build_lr-scummvm() {
-    make clean -C backends/platform/libretro/build
+    #make clean -C backends/platform/libretro/build
 
     local params=(HAVE_MT32EMU=1)
     local platform
@@ -29,7 +29,7 @@ function build_lr-scummvm() {
     isPlatform "neon" && platform+="neon"
     [[ -n "$platform" ]] && params+=(platform="$platform")
 
-    make "${params[@]}" -C backends/platform/libretro/build
+    make -j4 "${params[@]}" -C backends/platform/libretro/build
     md_ret_require="$md_build/backends/platform/libretro/build/scummvm_libretro.so"
 }
 

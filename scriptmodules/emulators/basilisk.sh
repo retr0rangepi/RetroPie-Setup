@@ -35,7 +35,7 @@ function build_basilisk() {
     isPlatform "aarch64" && params+=(--build=arm)
     ./autogen.sh --prefix="$md_inst" "${params[@]}"
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/BasiliskII/src/Unix/BasiliskII"
 }
 

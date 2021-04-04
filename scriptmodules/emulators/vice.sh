@@ -32,7 +32,7 @@ function build_vice() {
     ! isPlatform "x11" && params+=(--disable-catweasel --without-pulse)
     ./autogen.sh
     LDFLAGS="-L/usr/local/lib" ./configure --prefix="$md_inst" "${params[@]}"
-    make
+    make -j4
     md_ret_require="$md_build/src/x64"
 }
 

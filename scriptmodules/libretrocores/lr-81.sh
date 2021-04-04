@@ -22,7 +22,7 @@ function sources_lr-81() {
 
 function build_lr-81() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/81_libretro.so"
 }
 

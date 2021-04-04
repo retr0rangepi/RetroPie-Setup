@@ -17,8 +17,10 @@ function sources_openparsec() {
 
 function build_openparsec() {
     cd $md_build/client/platforms/premake-rpi
-    make client
-    md_ret_require="$md_build/client/openparsec/parsec_root/client/parsec"
+    sed -i 's|isnan(phi)|__isnan(phi)|' ../../src/libparsec/g_telep.cpp
+    sed -i 's|isnan(theta)|__isnan(theta)|' ../../src/libparsec/g_telep.cpp
+    make -j4 client
+    md_ret_require="$md_build/client/platforms/premake-rpi/build/client/parsec"
 }
 
 function install_openparsec() {
@@ -31,8 +33,8 @@ function install_openparsec() {
           'assets/README.md'
           'assets/init.con'
           'assets/openparsec.ico'
-          'client/openparsec/parsec_root/client/parsec'
-          'assets/planet.con'
+          'client/platforms/premake-rpi/build/client/parsec'
+          'client/parsec_root/client/planet.con'
           'assets/pscdata0.dat'
           'assets/pscdata1.dat'
           'assets/pscdata2.dat'

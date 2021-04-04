@@ -29,32 +29,26 @@ function sources_gearboy() {
 }
 
 function build_gearboy() {
-    if [[ "$__raspbian_ver" -lt "8" ]]; then
-        cd "$md_build/platforms/raspberrypi"
-    else
-        cd "$md_build/platforms/raspberrypi2"
-    fi
+    cd "$md_build/platforms/linux"
 
     make clean
-    make
+    make -j4
     strip "gearboy"
-    if [[ "$__raspbian_ver" -lt "8" ]]; then
-        md_ret_require="$md_build/platforms/raspberrypi/gearboy"
-    else
-        md_ret_require="$md_build/platforms/raspberrypi2/gearboy"
-    fi
+    md_ret_require="$md_build/platforms/linux/gearboy"
 }
 
 function install_gearboy() {
-    if [[ "$__raspbian_ver" -lt "8" ]]; then
-        cp "$md_build/platforms/raspberrypi/Gearboy/gearboy" "$md_inst/gearboy"
-    else
-        cp "$md_build/platforms/raspberrypi2/Gearboy/gearboy" "$md_inst/gearboy"
-    fi
+    cp "$md_build/platforms/linux/gearboy" "$md_inst/gearboy"
 }
 
 function configure_gearboy() {
-    mkRomDir "gameboy"
+    mkRomDir "gbc"
+    mkRomDir "gb"
+    ensureSystemretroconfig "gb"
+    ensureSystemretroconfig "gbc"
     moveConfigFile "$home/gearboy.cfg" "$md_conf_root/gearboy/gearboy.cfg"
-    addSystem 0 "$md_id" "gearboy" "$md_inst/gearboy %ROM%"
+    addEmulator 0 "$md_id" "gb" "$md_inst/gearboy %ROM%"
+    addEmulator 0 "$md_id" "gbc" "$md_inst/gearboy %ROM%"
+    addSystem "gb"
+    addSystem "gbc"
 }

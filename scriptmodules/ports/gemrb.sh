@@ -29,7 +29,7 @@ function build_gemrb() {
     cd build
     make clean
     cmake .. -DCMAKE_INSTALL_PREFIX="$md_inst" -DCMAKE_BUILD_TYPE=Release -DFREETYPE_INCLUDE_DIRS=/usr/include/freetype2/ -DSDL_BACKEND=SDL2 -DUSE_SDLMIXER=OFF
-    make
+    make -j4
     md_ret_require="$md_build/build/gemrb/gemrb"
 }
 

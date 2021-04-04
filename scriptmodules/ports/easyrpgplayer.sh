@@ -29,12 +29,12 @@ function build_easyrpgplayer() {
     cd liblcf
     autoreconf -i
     ./configure --prefix=/usr
-    make
+    make -j4
     make install
     cd ../player
     autoreconf -i
     ./configure --prefix "$md_inst"
-    make
+    make -j4
     cd ..
     # No longer needed.
     md_ret_require="$md_build/player/easyrpg-player"

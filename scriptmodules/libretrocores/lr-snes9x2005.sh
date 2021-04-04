@@ -27,7 +27,7 @@ function sources_lr-snes9x2005() {
 
 function build_lr-snes9x2005() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/snes9x2005_libretro.so"
 }
 

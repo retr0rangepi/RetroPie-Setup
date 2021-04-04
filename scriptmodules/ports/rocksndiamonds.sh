@@ -26,7 +26,7 @@ function sources_rocksndiamonds() {
 function build_rocksndiamonds() {
     make clean
 #   make sdl
-    make sdl2
+    make -j4 sdl2
     md_ret_require="$md_build"
 }
 

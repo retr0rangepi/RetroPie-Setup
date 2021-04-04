@@ -36,7 +36,7 @@ function sources_simcoupe() {
 function build_simcoupe() {
     cmake -DCMAKE_INSTALL_PREFIX="$md_inst" .
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/simcoupe"
 }
 

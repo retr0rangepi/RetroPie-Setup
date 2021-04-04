@@ -30,7 +30,7 @@ function build_lr-dolphin() {
     cd build
     cmake .. -DLIBRETRO=ON -DLIBRETRO_STATIC=1
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/build/dolphin_libretro.so"
 }
 

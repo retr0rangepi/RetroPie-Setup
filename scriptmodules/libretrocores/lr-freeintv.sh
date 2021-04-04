@@ -22,7 +22,7 @@ function sources_lr-freeintv() {
 
 function build_lr-freeintv() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/freeintv_libretro.so"
 }
 

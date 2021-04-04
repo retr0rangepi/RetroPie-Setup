@@ -29,7 +29,7 @@ function build_lr-mess() {
     rpSwap on 4096
     local params=($(_get_params_lr-mame) SUBTARGET=mess)
     make clean
-    make "${params[@]}"
+    make -j2 "${params[@]}"
     rpSwap off
     md_ret_require="$md_build/mess_libretro.so"
 }

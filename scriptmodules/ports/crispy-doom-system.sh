@@ -27,7 +27,7 @@ function sources_crispy-doom-system() {
 function build_crispy-doom-system() {
     ./autogen.sh
     ./configure --prefix="$md_inst"
-    make
+    make -j4
     md_ret_require="$md_build/src/crispy-doom"
 }
 

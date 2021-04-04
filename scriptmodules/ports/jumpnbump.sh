@@ -27,7 +27,7 @@ function sources_jumpnbump() {
 
 function build_jumpnbump() {
     make clean
-    CFLAGS="$CFLAGS -fsigned-char" make PREFIX="$md_inst"
+    CFLAGS="$CFLAGS -fsigned-char" make -j4 PREFIX="$md_inst"
     md_ret_require="$md_build/jumpnbump"
 }
 

@@ -28,7 +28,7 @@ function build_smw-netplay() {
     unzip data.zip
     mkdir Build && cd Build
     cmake .. -DUSE_SDL2_LIBS=1 -DSDL2_FORCE_GLES=1
-    make -j 4 smw && make -j 4 smw-server
+    make -j4 smw && make -j4 smw-server
     sed -i -e '$i \export LD_LIBRARY_PATH=/usr/local/lib' $home/.bashrc
 
     md_ret_require="$md_build/Build/Binaries/Release"

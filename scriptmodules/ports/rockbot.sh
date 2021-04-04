@@ -27,7 +27,7 @@ function build_rockbot() {
     sed -i 's/CONFIG += playstation2/#CONFIG += playstation2/g' "$md_build/Rockbot.pro"
     sed -i 's/#CONFIG += raspberry/CONFIG += raspberry/g' "$md_build/Rockbot.pro"
     qmake
-    make
+    make -j4
     md_ret_require="$md_build/rockbot"
 }
 

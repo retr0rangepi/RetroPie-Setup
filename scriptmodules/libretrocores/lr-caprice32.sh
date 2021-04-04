@@ -22,7 +22,7 @@ function sources_lr-caprice32() {
 
 function build_lr-caprice32() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/cap32_libretro.so"
 }
 

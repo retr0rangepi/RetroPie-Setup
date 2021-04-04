@@ -27,7 +27,7 @@ function sources_quasi88() {
 
 function build_quasi88() {
     make X11_VERSION= SDL_VERSION=1 clean
-    make X11_VERSION= SDL_VERSION=1 ARCH=linux SOUND_SDL=1 USE_OLD_MAME_SOUND=1 USE_FMGEN=1 ROMDIR="$biosdir/pc88" DISKDIR="$romdir/pc88" TAPEDIR="$romdir/pc88"
+    make -j4 X11_VERSION= SDL_VERSION=1 ARCH=linux SOUND_SDL=1 USE_OLD_MAME_SOUND=1 USE_FMGEN=1 ROMDIR="$biosdir/pc88" DISKDIR="$romdir/pc88" TAPEDIR="$romdir/pc88"
     md_ret_require="$md_build/quasi88.sdl"
 }
 

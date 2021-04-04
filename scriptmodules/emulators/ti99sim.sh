@@ -31,7 +31,7 @@ function sources_ti99sim() {
 
 function build_ti99sim() {
     make clean
-    make
+    make -j4
 }
 
 function install_ti99sim() {

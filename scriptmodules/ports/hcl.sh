@@ -26,7 +26,7 @@ function sources_hcl() {
 
 function build_hcl() {
     cmake . -DCMAKE_INSTALL_PREFIX:PATH="$md_inst"
-    make
+    make -j4
     md_ret_require="$md_build/hcl"
 }
 

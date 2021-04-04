@@ -26,7 +26,7 @@ function sources_nxengine() {
 
 function build_nxengine() {
     make clean
-    make
+    make -j4
 }
 
 function install_nxengine() {

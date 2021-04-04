@@ -42,7 +42,7 @@ function build_zesarux() {
     cd src
     ./configure --prefix "$md_inst" "${params[@]}" --enable-ssl
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/src/zesarux"
 }
 

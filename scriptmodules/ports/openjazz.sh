@@ -25,7 +25,7 @@ function sources_openjazz() {
 
 function build_openjazz() {
     cd "$md_build"
-    make
+    make -j4
     md_ret_require="$md_build/"
 }
 

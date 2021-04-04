@@ -22,6 +22,7 @@ function depends_retrobattle() {
 
 function sources_retrobattle() {
         wget -O- -q http://remar.se/andreas/retrobattle/files/retrobattle-src-1.0.0.tar.bz2 | tar -xvj --strip-components=1
+        sed -i 's/-Wall/-std=c++98 -Wall/' "$md_build/src/Makefile"
         sed -i 's/WIDTH = 800/WIDTH = 1280/' "$md_build/src/retro.cc"
         sed -i 's/HEIGHT = 600/HEIGHT = 720/' "$md_build/src/retro.cc"
         sed -i 's/FS = 0/FS = 1/' "$md_build/src/retro.cc"
@@ -29,7 +30,7 @@ function sources_retrobattle() {
 
 function build_retrobattle() {
 	cd "$md_build/src/"
-	make
+	make -j4
         md_ret_require="$md_build/retrobattle"
 }
 

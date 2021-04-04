@@ -27,7 +27,7 @@ function sources_freesynd() {
 function build_freesynd() {
     cd "$md_build/freesynd-code/freesynd/tags/release-0.7.5"
     cmake . -DCMAKE_INSTALL_PREFIX:PATH="$md_inst"
-    make
+    make -j4
     md_ret_require="$md_build/freesynd-code/freesynd/tags/release-0.7.5/src/freesynd"
 }
 

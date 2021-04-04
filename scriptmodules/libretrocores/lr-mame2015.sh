@@ -28,7 +28,7 @@ function sources_lr-mame2015() {
 function build_lr-mame2015() {
     rpSwap on 1200
     make clean
-    make
+    make -j4
     rpSwap off
     md_ret_require="$md_build/mame2015_libretro.so"
 }

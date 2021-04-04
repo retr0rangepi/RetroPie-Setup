@@ -28,7 +28,7 @@ function sources_extremetuxracer() {
 function build_extremetuxracer() {
     cd "$md_build/glshim"
     cmake . -DBCMHOST=1
-    make GL
+    make -j4 GL
 }
 
 function install_bin_extremetuxracer() {

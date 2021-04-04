@@ -33,7 +33,7 @@ function build_daphne() {
     make -f Makefile.rp
     cd ..
     ln -sf Makefile.vars.rp Makefile.vars
-    make STATIC_VLDP=1
+    make -j4 STATIC_VLDP=1
     md_ret_require="$md_build/daphne.bin"
 }
 

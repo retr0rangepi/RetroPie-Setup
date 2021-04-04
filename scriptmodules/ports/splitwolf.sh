@@ -61,7 +61,7 @@ function build_splitwolf() {
         local bin="${opt%% *}"
         local defs="${opt#* }"
         make clean
-        make "$defs" DATADIR="$romdir/ports/wolf3d/"
+        make -j4 "$defs" DATADIR="$romdir/ports/wolf3d/"
         mv "$bin" "bin/$bin"
         md_ret_require+=("bin/$bin")
     done < <(_get_opts_splitwolf)

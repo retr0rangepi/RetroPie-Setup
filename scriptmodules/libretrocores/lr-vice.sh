@@ -23,7 +23,7 @@ function sources_lr-vice() {
 
 function build_lr-vice() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/vice_x64_libretro.so"
 }
 

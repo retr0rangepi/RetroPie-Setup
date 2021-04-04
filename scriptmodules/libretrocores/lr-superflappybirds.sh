@@ -26,7 +26,7 @@ function sources_lr-superflappybirds() {
 
 function build_lr-superflappybirds() {
     cmake .
-    make
+    make -j4
     md_ret_require="$md_build/superflappybirds_libretro.so"
 }
 

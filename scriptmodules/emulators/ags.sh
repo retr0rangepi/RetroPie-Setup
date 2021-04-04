@@ -26,7 +26,7 @@ function sources_ags() {
 
 function build_ags() {
     make -C Engine clean
-    make -C Engine
+    make -j4 -C Engine
     md_ret_require="$md_build/Engine/ags"
 }
 

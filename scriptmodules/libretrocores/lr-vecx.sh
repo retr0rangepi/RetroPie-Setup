@@ -33,7 +33,7 @@ function build_lr-vecx() {
     isPlatform "gles" && params+=" HAS_GLES=1"
 
     make clean
-    make -f Makefile.libretro $params
+    make -j4 -f Makefile.libretro $params
     md_ret_require="$md_build/vecx_libretro.so"
 }
 

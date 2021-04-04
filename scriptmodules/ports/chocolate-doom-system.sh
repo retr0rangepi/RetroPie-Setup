@@ -27,7 +27,7 @@ function sources_chocolate-doom-system() {
 function build_chocolate-doom-system() {
     ./autogen.sh
     ./configure --prefix="$md_inst"
-    make
+    make -j4
     md_ret_require="$md_build/src/chocolate-doom"
     md_ret_require="$md_build/src/chocolate-hexen"
     md_ret_require="$md_build/src/chocolate-heretic"

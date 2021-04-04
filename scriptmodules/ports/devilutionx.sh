@@ -27,7 +27,7 @@ function sources_devilutionx() {
 function build_devilutionx() {
     cd build
     cmake -DBINARY_RELEASE=ON CMAKE_INSTALL_PREFIX="$md_inst" ..
-    make -j3
+    make -j4
 }
 
 function install_devilutionx() {

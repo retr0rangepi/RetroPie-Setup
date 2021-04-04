@@ -24,7 +24,7 @@ function sources_bermudasyndrome() {
 }
 
 function build_bermudasyndrome() {
-    make
+    make -j4
 }
 
 function install_bermudasyndrome() {

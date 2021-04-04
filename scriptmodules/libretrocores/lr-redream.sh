@@ -23,7 +23,7 @@ function sources_lr-redream() {
 function build_lr-redream() {
     cd deps/libretro
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/deps/libretro/redream_libretro.so"
 }
 

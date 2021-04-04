@@ -29,9 +29,9 @@ function build_mame4all() {
     make clean
     # drz80 contains obsoleted arm assembler that gcc/as will not like for arm8 cpu targets
     if isPlatform "armv8"; then
-        CFLAGS="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" make
+        CFLAGS="-O2 -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" make -j4
     else
-        make
+        make -j4
     fi
     md_ret_require="$md_build/mame"
 }

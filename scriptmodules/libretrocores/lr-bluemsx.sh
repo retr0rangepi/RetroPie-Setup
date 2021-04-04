@@ -22,7 +22,7 @@ function sources_lr-bluemsx() {
 
 function build_lr-bluemsx() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -j4 -f Makefile.libretro
     md_ret_require="$md_build/bluemsx_libretro.so"
 }
 

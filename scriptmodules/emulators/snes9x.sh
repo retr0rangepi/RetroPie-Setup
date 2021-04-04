@@ -27,7 +27,7 @@ function sources_snes9x() {
 
 function build_snes9x() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/snes9x"
 }
 

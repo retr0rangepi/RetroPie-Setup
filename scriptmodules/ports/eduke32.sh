@@ -53,7 +53,7 @@ function build_eduke32() {
     isPlatform "arm" && params+=(NETCODE=0)
 
     make veryclean
-    CFLAGS+=" -DSDL_USEFOLDER" make "${params[@]}"
+    CFLAGS+=" -DSDL_USEFOLDER" make -j4 "${params[@]}"
 
     if [[ "$md_id" == "ionfury" ]]; then
         md_ret_require="$md_build/fury"

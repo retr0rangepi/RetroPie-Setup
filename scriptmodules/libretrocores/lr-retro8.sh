@@ -21,7 +21,7 @@ function sources_lr-retro8() {
 
 function build_lr-retro8() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/retro8_libretro.so"
 }
 

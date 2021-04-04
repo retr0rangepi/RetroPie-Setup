@@ -24,9 +24,9 @@ function build_lr-mrboom() {
     rpSwap on 1000
     make clean
     if isPlatform "neon"; then
-        make HAVE_NEON=1
+        make -j4 HAVE_NEON=1
     else
-        make
+        make -j4
     fi
     md_ret_require="$md_build/mrboom_libretro.so"
 }

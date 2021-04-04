@@ -36,7 +36,7 @@ function build_kat5200() {
     # Author forgot to include the kat5200.html documentation in the latest version so we'll fake it.
     mkdir doc/kat5200.html/
     touch doc/kat5200.html/deleteme.html
-    make
+    make -j4
     md_ret_require="$md_build/src/kat5200"
 }
 

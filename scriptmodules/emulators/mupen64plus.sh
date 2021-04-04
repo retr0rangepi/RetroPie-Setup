@@ -156,9 +156,9 @@ function build_mupen64plus() {
             isPlatform "rpi1" && params+=("VFP=1" "VFP_HARD=1" "HOST_CPU=armv6")
             isPlatform "videocore" || [[ "$dir" == "mupen64plus-audio-omx" ]] && params+=("VC=1")
             isPlatform "mesa" && params+=("USE_GLES=1")
-            isPlatform "H3-mali" && params+=("VFP=1" "USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7" "NEON=1")
+            isPlatform "H3-mali" && params+=("USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7" "NEON=1")
             isPlatform "neon" && params+=("NEON=1")
-            isPlatform "gles" && params+=("VFP=1" "USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7")
+            isPlatform "gles" && params+=("USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7")
             isPlatform "x11" && params+=("OSD=1" "PIE=1")
             isPlatform "x86" && params+=("SSE=SSE2")
             isPlatform "armv6" && params+=("HOST_CPU=armv6")
@@ -166,7 +166,7 @@ function build_mupen64plus() {
             isPlatform "aarch64" && params+=("HOST_CPU=aarch64")
 
             [[ "$dir" == "mupen64plus-ui-console" ]] && params+=("COREDIR=$md_inst/lib/" "PLUGINDIR=$md_inst/lib/mupen64plus/")
-            make -C "$dir/projects/unix" "${params[@]}" clean
+            #make -C "$dir/projects/unix" "${params[@]}" clean
             # temporarily disable distcc due to segfaults with cross compiler and lto
             DISTCC_HOSTS="" make -C "$dir/projects/unix" all "${params[@]}" OPTFLAGS="$CFLAGS -O3 -flto"
         fi
@@ -185,7 +185,7 @@ function build_mupen64plus() {
     isPlatform "x86" && params+=("-DCRC_OPT=On")
 
     cmake "${params[@]}" ../../src/
-    make
+    make -j2
     popd
 
     rpSwap off
@@ -206,6 +206,8 @@ function build_mupen64plus() {
         if isPlatform "32bit"; then
             md_ret_require+=('mupen64plus-video-gles2rice/projects/unix/mupen64plus-video-rice.so')
             md_ret_require+=('mupen64plus-video-gles2n64/projects/unix/mupen64plus-video-n64.so')
+            md_ret_require+=('mupen64plus-video-glide64mk2/projects/unix/mupen64plus-video-glide64mk2.so')
+            md_ret_require+=('GLideN64/projects/cmake/plugin/Release/mupen64plus-video-GLideN64.so')
         fi
     fi
     if isPlatform "gl"; then
@@ -225,7 +227,7 @@ function install_mupen64plus() {
             isPlatform "mesa" && params+=("USE_GLES=1")
             isPlatform "neon" && params+=("NEON=1")
             isPlatform "gles" && params+=("VFP=1" "USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7")
-            isPlatform "H3-mali" && params+=("VFP=1" "USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7" "NEON=1")
+            isPlatform "H3-mali" && params+=("USE_GLES=1" "VFP_HARD=1" "HOST_CPU=armv7" "NEON=1")
             isPlatform "rpi" && params+=("VC=1")
             isPlatform "x11" && params+=("OSD=1" "PIE=1")
             isPlatform "x86" && params+=("SSE=SSE2")
@@ -235,6 +237,9 @@ function install_mupen64plus() {
             make -C "$source/projects/unix" PREFIX="$md_inst" OPTFLAGS="$CFLAGS -O3 -flto" "${params[@]}" install
         fi
     done
+    cp "$md_build/GLideN64/ini/GLideN64.custom.ini" "$md_inst/share/mupen64plus/"
+    cp "$md_build/GLideN64/projects/cmake/plugin/Release/mupen64plus-video-GLideN64.so" "$md_inst/lib/mupen64plus/"
+    cp "$md_build/GLideN64_config_version.ini" "$md_inst/share/mupen64plus/"
     # remove default InputAutoConfig.ini. inputconfigscript writes a clean file
     rm -f "$md_inst/share/mupen64plus/InputAutoCfg.ini"
 }
@@ -247,6 +252,7 @@ function configure_mupen64plus() {
     if isPlatform "rpi"; then
         # kms needs to run at full screen as it doesn't benefit from our SDL scaling hint
         if isPlatform "mesa"; then
+
             addEmulator 0 "${md_id}-GLideN64" "n64" "$md_inst/bin/mupen64plus.sh mupen64plus-video-GLideN64 %ROM% $res 0 --set Video-GLideN64[UseNativeResolutionFactor]\=1"
             addEmulator 0 "${md_id}-GLideN64-highres" "n64" "$md_inst/bin/mupen64plus.sh mupen64plus-video-GLideN64 %ROM% $res 0 --set Video-GLideN64[UseNativeResolutionFactor]\=2"
             addEmulator 0 "${md_id}-gles2n64" "n64" "$md_inst/bin/mupen64plus.sh mupen64plus-video-n64 %ROM%"

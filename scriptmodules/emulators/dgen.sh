@@ -15,7 +15,7 @@ rp_module_help="ROM Extensions: .32x .iso .cue .smd .bin .gen .md .sg .zip\n\nCo
 rp_module_licence="GPL2 https://sourceforge.net/p/dgen/dgen/ci/master/tree/COPYING"
 rp_module_repo="file $__archive_url/dgen-sdl-1.33.tar.gz"
 rp_module_section="opt"
-rp_module_flags="dispmanx !mali !kms"
+#rp_module_flags="dispmanx !mali !kms"
 
 function depends_dgen() {
     getDepends libsdl1.2-dev libarchive-dev
@@ -35,7 +35,7 @@ function build_dgen() {
         ./configure --prefix="$md_inst"
     fi
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/dgen"
 }
 

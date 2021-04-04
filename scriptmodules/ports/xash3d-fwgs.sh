@@ -33,11 +33,13 @@ function build_xash3d-fwgs() {
     ./waf configure -T release
     ./waf build
     md_ret_require=(
-        "$md_build/$md_id/build/game_launch/xash3d"
-        "$md_build/$md_id/build/engine/libxash.so"
-        "$md_build/$md_id/build/mainui/libmenu.so"
-        "$md_build/$md_id/build/ref_soft/libref_soft.so"
-        "$md_build/$md_id/build/ref_gl/libref_gl.so"
+        "$md_id/build/game_launch/xash3d"
+        "$md_id/build/engine/libxash.so"
+        "$md_id/build/mainui/libmenu.so"
+        "$md_id/build/ref_soft/libref_soft.so"
+        "$md_id/build/ref_gl/libref_gl.so"
+        "$md_build/hlsdk/build/cl_dll/client_armv7hf.so" 
+        "$md_build/hlsdk/build/dlls/hl_armv7hf.so" 
     )
 }
 
@@ -48,8 +50,8 @@ function install_xash3d-fwgs() {
         "$md_id/build/mainui/libmenu.so"
         "$md_id/build/ref_soft/libref_soft.so"
         "$md_id/build/ref_gl/libref_gl.so"
-        "hlsdk/build/cl_dll/client_armv8_32hf.so"
-        "hlsdk/build/dlls/hl_armv8_32hf.so"
+        "hlsdk/build/cl_dll/client_armv7hf.so" 
+        "hlsdk/build/dlls/hl_armv7hf.so" 
     )
 
 }
@@ -59,8 +61,8 @@ function configure_xash3d-fwgs() {
     ln -s "$romdir/ports/$md_id/valve" "$md_inst/valve"
     mkdir "$romdir/ports/$md_id/valve/cl_dlls"
     mkdir "$romdir/ports/$md_id/valve/dlls"
-    cp "$md_build/hlsdk/build/cl_dll/client_armv8_32hf.so" "$romdir/ports/$md_id/valve/cl_dlls/"
-    cp "$md_build/hlsdk/build/dlls/hl_armv8_32hf.so" "$romdir/ports/$md_id/valve/dlls/"
+    cp "$md_build/hlsdk/build/cl_dll/client_armv7hf.so" "$romdir/ports/$md_id/valve/cl_dlls/"
+    cp "$md_build/hlsdk/build/dlls/hl_armv7hf.so" "$romdir/ports/$md_id/valve/dlls/"
     chown -R $user:$user "$romdir/ports/$md_id/valve/"
 
     addPort "$md_id" "xash3d-fwgs" "xash3d-fwgs - Half-Life Engine" "pushd $romdir/ports/$md_id/; LD_LIBRARY_PATH=$md_inst $md_inst/xash3d -width 1280 -height 720 -fullscreen -console; popd" 

@@ -33,7 +33,7 @@ function build_uae4arm() {
         CXXFLAGS="" make PLATFORM=rpi1
     else
         # adding RetrOrangePi Mali/GLES support
-        CXXFLAGS="" make -j2 PLATFORM=gles
+        CXXFLAGS="" make -j4 PLATFORM=gles
     fi
     md_ret_require="$md_build/uae4arm"
 }

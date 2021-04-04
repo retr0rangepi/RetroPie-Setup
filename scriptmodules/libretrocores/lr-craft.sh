@@ -21,7 +21,7 @@ function sources_lr-craft() {
 
 function build_lr-craft() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro 
+    make -j4 -f Makefile.libretro 
     md_ret_require="$md_build/craft_libretro.so"
 }
 

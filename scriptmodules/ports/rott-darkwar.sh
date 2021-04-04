@@ -27,9 +27,9 @@ function sources_rott-darkwar() {
 function build_rott-darkwar() {
     sed -i 's/SUPERROTT   ?= 1/SUPERROTT   ?= 0/g' "$md_build/rott/Makefile"
     make clean
-    make rott-darkwar
-    make rott-darkwar
-    make rott-darkwar
+    make -j4 rott-darkwar
+#    make rott-darkwar
+#    make rott-darkwar
     md_ret_require=(
         "$md_build/rott-darkwar"
     )

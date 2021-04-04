@@ -22,7 +22,7 @@ function sources_lr-fmsx() {
 
 function build_lr-fmsx() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/fmsx_libretro.so"
 }
 

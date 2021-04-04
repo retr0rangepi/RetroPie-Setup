@@ -24,15 +24,15 @@ function depends_jzintv() {
 function sources_jzintv() {
     downloadAndExtract "$md_repo_url" "$md_build"
     cd jzintv/src
-    # aarch64 doesn't include sys/io.h - we can just remove it in this case
-    isPlatform "aarch64" && grep -rl "include.*sys/io.h" | xargs sed -i "/include.*sys\/io.h/d"
+    # aarch64 doesn't include sys/io.h - we can just remove it in this case #retrorangepi armhf also
+    grep -rl "include.*sys/io.h" | xargs sed -i "/include.*sys\/io.h/d"
 }
 
 function build_jzintv() {
     mkdir -p jzintv/bin
     cd jzintv/src
     make clean
-    make CC="gcc" CXX="g++" WARN="" WARNXX="" OPT_FLAGS="$CFLAGS"
+    make -j4 CC="gcc" CXX="g++" WARN="" WARNXX="" OPT_FLAGS="$CFLAGS"
     md_ret_require="$md_build/jzintv/bin/jzintv"
 }
 

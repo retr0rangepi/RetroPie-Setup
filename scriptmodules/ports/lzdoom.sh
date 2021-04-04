@@ -39,7 +39,7 @@ function build_lzdoom() {
     fi
     # Note: `-funsafe-math-optimizations` should be avoided, see: https://forum.zdoom.org/viewtopic.php?f=7&t=57781
     cmake "${params[@]}" ..
-    make
+    make -j4
     md_ret_require="$md_build/release/$md_id"
 }
 

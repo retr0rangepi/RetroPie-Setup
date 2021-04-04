@@ -33,7 +33,7 @@ function build_lr-mame2003() {
     #make clean
     local params=()
     isPlatform "arm" && params+=("ARM=1")
-    make -j2 ARCH="$CFLAGS" "${params[@]}"
+    make -j4 ARCH="$CFLAGS" "${params[@]}"
     rpSwap off
     md_ret_require="$md_build/$(_get_so_name_${md_id})_libretro.so"
 }

@@ -24,7 +24,7 @@ function sources_mysticmine() {
 }
 
 function build_mysticmine() {
-    make
+    make -j4
 }
 
 function install_mysticmine() {

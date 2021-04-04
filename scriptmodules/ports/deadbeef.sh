@@ -27,7 +27,7 @@ function build_deadbeef() {
 	cd "$md_build/deadbeef"
 	./autogen.sh
 	./configure --prefix="$md_inst"
-	make
+	make -j4
 }
 
 function install_deadbeef() {

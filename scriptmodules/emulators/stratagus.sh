@@ -29,7 +29,7 @@ function build_stratagus() {
     mkdir build
     cd build
     cmake -DENABLE_STRIP=ON ..
-    make
+    make -j4
     md_ret_require="$md_build/build/stratagus"
 }
 

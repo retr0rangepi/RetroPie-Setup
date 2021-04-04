@@ -30,7 +30,7 @@ function build_crack-attack() {
     if [ ! -f "/opt/retropie/supplementary/glshim/libGL.so.1" ]; then
         cd "$md_build/glshim"
         cmake . -DBCMHOST=1
-        make GL
+        make -j4 GL
     fi
 }
 

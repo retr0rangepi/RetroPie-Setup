@@ -1,0 +1,63 @@
+From 629d1080b9d6e67ebd42f3806d1d5f3e4666bc81 Mon Sep 17 00:00:00 2001
+From: retrorangepi <retrorangepi@outlook.com>
+Date: Sat, 3 Apr 2021 16:51:25 +0000
+Subject: [PATCH] adding ROPI target
+
+---
+ build/linux/Makefile    | 5 +++++
+ sources/F1SpiritApp.cpp | 2 ++
+ sources/main.cpp        | 2 ++
+ 3 files changed, 9 insertions(+)
+
+diff --git a/build/linux/Makefile b/build/linux/Makefile
+index 0364799..ef32495 100644
+--- a/build/linux/Makefile
++++ b/build/linux/Makefile
+@@ -4,6 +4,8 @@ ifeq ($(ODROID),1)
+  PREFIX = /usr/local
+ else ifeq ($(LINUX),1)
+  PREFIX = /usr/local
++else ifeq ($(ROPI),1)
++ PREFIX = /usr
+ else
+  PREFIX = /mnt/utmp/f1spirit
+ endif
+@@ -49,6 +51,9 @@ CC = gcc
+ ifeq ($(ODROID),1)
+  CFLAGS = -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -g3 -O3 -Wall `sdl-config --cflags` `curl-config --cflags` -I/usr/X11R6/include -Ithirdparty -DHAVE_GLES -D__USE_SDL_GLES__ -DODROID -fdiagnostics-color=auto
+  LDFLAGS = `sdl-config --libs` `curl-config --libs` -L/usr/X11R6/lib/ -lSDL_image -lSDL_mixer -lSDL_net -lm -lstdc++ -lGLESv1_CM -lEGL
++else ifeq ($(ROPI),1)
++ CFLAGS = -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -g3 -O3 -Wall `sdl-config --cflags` `curl-config --cflags` -I/usr/include -Ithirdparty -DHAVE_GLES -D__USE_SDL_GLES__ -fdiagnostics-color=auto
++ LDFLAGS = `sdl-config --libs` `curl-config --libs` -L/usr/X11R6/lib/ -lSDL_image -lSDL_mixer -lSDL_net -lm -lstdc++ -lGLESv1_CM -lEGL
+ else ifeq ($(LINUX),1)
+  CFLAGS = -g3 -O3 -Wno-write-strings `sdl-config --cflags` `curl-config --cflags` -I/usr/X11R6/include
+  LDFLAGS = `sdl-config --libs` `curl-config --libs` -L/usr/X11R6/lib/ -lSDL_image -lSDL_mixer -lSDL_net -lm -lstdc++ -lGL
+diff --git a/sources/F1SpiritApp.cpp b/sources/F1SpiritApp.cpp
+index 0f0cd73..39662fd 100644
+--- a/sources/F1SpiritApp.cpp
++++ b/sources/F1SpiritApp.cpp
+@@ -14,6 +14,8 @@
+ 
+ #include "3DStuff.h"
+ 
++#include "eglport.h"
++
+ #include <SDL.h>
+ #include <SDL_image.h>
+ #include <SDL_mixer.h>
+diff --git a/sources/main.cpp b/sources/main.cpp
+index ca7b9bb..cfd212d 100644
+--- a/sources/main.cpp
++++ b/sources/main.cpp
+@@ -9,6 +9,8 @@
+ 
+ #include "3DStuff.h"
+ 
++#include "eglport.h"
++
+ #include <SDL.h>
+ #include <SDL_mixer.h>
+ #include <SDL_image.h>
+-- 
+2.25.1
+

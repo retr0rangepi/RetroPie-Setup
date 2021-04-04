@@ -25,7 +25,7 @@ function sources_vgmplay() {
 
 function build_vgmplay() {
 	cd "$md_build/vgmplay/VGMPlay"
-	make
+	make -j4
         md_ret_require="$md_build/vgmplay/VGMPlay/vgmplay"
 }
 

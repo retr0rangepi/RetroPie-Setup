@@ -21,7 +21,7 @@ function sources_lr-fceumm-mod() {
 
 function build_lr-fceumm-mod() {
     make -f Makefile.libretro clean
-    make -f Makefile.libretro
+    make -j4 -f Makefile.libretro
     md_ret_require="$md_build/fceumm-mod_libretro.so"
 }
 

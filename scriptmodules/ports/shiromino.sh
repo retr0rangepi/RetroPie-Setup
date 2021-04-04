@@ -24,7 +24,7 @@ function sources_shiromino() {
 }
 
 function build_shiromino() {
-    make
+    make -j4
     md_ret_require="$md_build/bin/game"
 }
 

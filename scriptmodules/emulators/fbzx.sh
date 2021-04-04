@@ -35,7 +35,7 @@ function sources_fbzx() {
 
 function build_fbzx() {
     make clean
-    make
+    make -j4
     if ! isPlatform "x86"; then
         md_ret_require="$md_build/fbzx"
     else

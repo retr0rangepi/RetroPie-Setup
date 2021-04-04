@@ -51,7 +51,7 @@ function build_solarus() {
     mkdir build
     cd build
     cmake "${params[@]}" ..
-    make
+    make -j4
     md_ret_require=(
         "$md_build/build/solarus-run"
     )

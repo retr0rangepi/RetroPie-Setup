@@ -23,7 +23,7 @@ function sources_lr-beetle-saturn() {
 
 function build_lr-beetle-saturn() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/mednafen_saturn_libretro.so"
 }
 

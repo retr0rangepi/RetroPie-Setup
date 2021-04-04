@@ -27,7 +27,7 @@ function sources_xrick() {
 
 function build_xrick() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/xrick"
 }
 

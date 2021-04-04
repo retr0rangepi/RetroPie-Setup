@@ -26,7 +26,7 @@ function sources_minetest() {
 
 function build_minetest() {
     cmake . -DRUN_IN_PLACE=FALSE -DBUILD_SERVER=TRUE -DBUILD_CLIENT=TRUE -DCMAKE_BUILD_TYPE=Release -DENABLE_GLES=TRUE -DENABLE_CURL=TRUE -DCMAKE_INSTALL_PREFIX="$md_inst"
-    make
+    make -j4
 }
 
 function install_minetest() {

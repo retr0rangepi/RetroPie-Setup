@@ -28,7 +28,7 @@ function sources_linapple() {
 function build_linapple() {
     cd src
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/linapple"
 }
 

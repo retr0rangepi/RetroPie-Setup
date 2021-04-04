@@ -45,7 +45,7 @@ function build_alephone() {
     ./autogen.sh
     ./configure "${params[@]}"
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/Source_Files/alephone"
 }
 

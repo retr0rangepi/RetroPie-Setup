@@ -23,7 +23,7 @@ function sources_f2bgl() {
 }
 
 function build_f2bgl() {
-    make
+    make -j4
 }
 
 function install_f2bgl() {

@@ -24,7 +24,7 @@ function sources_heboris() {
 }
 
 function build_heboris() {
-    make
+    make -j4
     md_ret_require="$md_build/heboris"
 }
 

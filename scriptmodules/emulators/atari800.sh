@@ -36,7 +36,7 @@ function build_atari800() {
     isPlatform "videocore" && params+=(--target=rpi)
     ./configure --prefix="$md_inst" ${params[@]}
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/src/atari800"
 }
 

@@ -66,7 +66,7 @@ function build_wolf4sdl() {
         local bin="${opt%% *}"
         local defs="${opt#* }"
         make clean
-        CFLAGS+=" -DVERSIONALREADYCHOSEN $defs" make DATADIR="$romdir/ports/wolf3d/"
+        CFLAGS+=" -DVERSIONALREADYCHOSEN $defs" make -j4 DATADIR="$romdir/ports/wolf3d/"
         mv wolf3d "bin/$bin"
         md_ret_require+=("bin/$bin")
     done < <(_get_opts_wolf4sdl)

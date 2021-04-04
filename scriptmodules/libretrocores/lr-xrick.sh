@@ -22,7 +22,7 @@ function sources_lr-xrick() {
 
 function build_lr-xrick() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/xrick_libretro.so"
 }
 

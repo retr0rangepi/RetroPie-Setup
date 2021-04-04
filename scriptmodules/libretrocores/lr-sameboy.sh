@@ -21,7 +21,7 @@ function sources_lr-sameboy() {
 
 function build_lr-sameboy() {
     make clean
-    make libretro CFLAGS=-Wno-error
+    make -j4 libretro CFLAGS=-Wno-error
     md_ret_require="$md_build/libretro/sameboy_libretro.so"
 }
 

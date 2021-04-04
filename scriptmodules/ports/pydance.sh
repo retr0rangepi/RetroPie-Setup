@@ -30,7 +30,7 @@ function build_pydance() {
 }
 
 function install_pydance() {
-    su -c 'make PREFIX="/opt/retropie/ports/pydance" install'
+    su -c 'make -j4 PREFIX="/opt/retropie/ports/pydance" install'
 }
 
 function configure_pydance() {

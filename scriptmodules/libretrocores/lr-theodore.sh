@@ -23,7 +23,7 @@ function sources_lr-theodore() {
 
 function build_lr-theodore() {
     make clean
-    make
+    make -j4
     md_ret_require="theodore_libretro.so"
 }
 

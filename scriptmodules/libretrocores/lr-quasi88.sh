@@ -22,7 +22,7 @@ function sources_lr-quasi88() {
 
 function build_lr-quasi88() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/quasi88_libretro.so"
 }
 

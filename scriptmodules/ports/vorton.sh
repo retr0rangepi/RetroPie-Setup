@@ -25,7 +25,7 @@ function sources_vorton() {
 
 function build_vorton() {
     make clean
-    make -f Makefile.linux
+    make -j4 -f Makefile.linux
     md_ret_require="$md_build/vorton"
 }
 

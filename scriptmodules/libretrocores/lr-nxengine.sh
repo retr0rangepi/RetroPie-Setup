@@ -22,7 +22,7 @@ function sources_lr-nxengine() {
 
 function build_lr-nxengine() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/nxengine_libretro.so"
 }
 

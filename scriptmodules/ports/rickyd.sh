@@ -29,7 +29,7 @@ function build_rickyd() {
     mkdir build
     cd build
     .././configure --prefix=$md_inst
-    make
+    make -j4
     md_ret_require="$md_build/build/sources/ricky"
 }
 

@@ -23,7 +23,7 @@ function sources_lr-mesen() {
 
 function build_lr-mesen() {
     make -C Libretro clean
-    make -C Libretro
+    make -j4 -C Libretro
     md_ret_require="$md_build/Libretro/mesen_libretro.so"
 }
 

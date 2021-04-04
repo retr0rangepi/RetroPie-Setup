@@ -1,0 +1,72 @@
+From fef72b67e8df5e579656a6ebc07675496b3f15a1 Mon Sep 17 00:00:00 2001
+From: retrorangepi <retrorangepi@outlook.com>
+Date: Thu, 1 Apr 2021 12:22:47 +0000
+Subject: [PATCH] disabling version check
+
+---
+ Source/multi.cpp             |  6 +++---
+ SourceX/DiabloUI/selgame.cpp | 28 ++++++++++++++--------------
+ 2 files changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/Source/multi.cpp b/Source/multi.cpp
+index 5790b2a..3953f88 100644
+--- a/Source/multi.cpp
++++ b/Source/multi.cpp
+@@ -739,9 +739,9 @@ BOOL NetInit(BOOL bSinglePlayer, BOOL *pfExitProgram)
+ 		sgGameInitInfo.size = sizeof(sgGameInitInfo);
+ 		sgGameInitInfo.dwSeed = time(NULL);
+ 		sgGameInitInfo.programid = GAME_ID;
+-		sgGameInitInfo.versionMajor = PROJECT_VERSION_MAJOR;
+-		sgGameInitInfo.versionMinor = PROJECT_VERSION_MINOR;
+-		sgGameInitInfo.versionPatch = PROJECT_VERSION_PATCH;
++//		sgGameInitInfo.versionMajor = PROJECT_VERSION_MAJOR;
++//		sgGameInitInfo.versionMinor = PROJECT_VERSION_MINOR;
++//		sgGameInitInfo.versionPatch = PROJECT_VERSION_PATCH;
+ 		sgGameInitInfo.nDifficulty = gnDifficulty;
+ 		sgGameInitInfo.nTickRate = sgOptions.Gameplay.nTickRate;
+ 		sgGameInitInfo.bJogInTown = sgOptions.Gameplay.bJogInTown;
+diff --git a/SourceX/DiabloUI/selgame.cpp b/SourceX/DiabloUI/selgame.cpp
+index cbd32a7..de4c865 100644
+--- a/SourceX/DiabloUI/selgame.cpp
++++ b/SourceX/DiabloUI/selgame.cpp
+@@ -399,23 +399,23 @@ void selgame_Password_Init(int value)
+ 
+ static bool IsGameCompatible(GameData *data)
+ {
+-	if (data->versionMajor == PROJECT_VERSION_MAJOR
+-	    && data->versionMinor == PROJECT_VERSION_MINOR
+-	    && data->versionPatch == PROJECT_VERSION_PATCH
+-	    && data->programid == GAME_ID) {
+-		return IsDifficultyAllowed(data->nDifficulty);
+-	}
++//	if (data->versionMajor == PROJECT_VERSION_MAJOR
++//	    && data->versionMinor == PROJECT_VERSION_MINOR
++//	    && data->versionPatch == PROJECT_VERSION_PATCH
++//	    && data->programid == GAME_ID) {
++//		return IsDifficultyAllowed(data->nDifficulty);
++//	}
+ 
+ 	selgame_Free();
+ 
+-	if (data->programid != GAME_ID) {
+-		UiSelOkDialog(title, "The host is running a different game than you.", false);
+-	} else {
+-		char msg[64];
+-		sprintf(msg, "Your version %s does not match the host %d.%d.%d.", PROJECT_VERSION, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH);
+-
+-		UiSelOkDialog(title, msg, false);
+-	}
++//	if (data->programid != GAME_ID) {
++//		UiSelOkDialog(title, "The host is running a different game than you.", false);
++//	} else {
++//		char msg[64];
++//		sprintf(msg, "Your version %s does not match the host %d.%d.%d.", PROJECT_VERSION, PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_PATCH);
++//
++//		UiSelOkDialog(title, msg, false);
++//	}
+ 
+ 	LoadBackgroundArt("ui_art\\selgame.pcx");
+ 
+-- 
+2.25.1
+

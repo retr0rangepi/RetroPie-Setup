@@ -27,7 +27,7 @@ function sources_lr-freej2me() {
 function build_lr-freej2me() {
     ant
     cd "$md_build/src/libretro"
-    make
+    make -j4
     md_ret_require=("$md_build/src/libretro/freej2me_libretro.so")
 }
 

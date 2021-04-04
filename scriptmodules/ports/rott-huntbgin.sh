@@ -28,9 +28,9 @@ function build_rott-huntbgin() {
     sed -i 's/SHAREWARE   ?= 0/SHAREWARE   ?= 1/g' "$md_build/rott/Makefile"
     sed -i 's/SUPERROTT   ?= 1/SUPERROTT   ?= 0/g' "$md_build/rott/Makefile"
     make clean
-    make rott-huntbgin
-    make rott-huntbgin
-    make rott-huntbgin
+    make -j4 rott-huntbgin
+    make -j4 rott-huntbgin
+    make -j4 rott-huntbgin
     md_ret_require=(
         "$md_build/rott-huntbgin"
     )

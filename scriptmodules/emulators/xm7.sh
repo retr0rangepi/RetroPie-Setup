@@ -45,13 +45,13 @@ _EOF_
     chmod +x "bin/freetype-config"
 
     ./configure --disable-shared --prefix="$md_build/libagar" --enable-freetype="$md_build/agar"
-    make -j1 depend all install
+    make -j4 depend all install
 
     cd "$md_build"
     mkdir linux-sdl/build
     cd linux-sdl/build
     cmake -DCMAKE_CXX_FLAGS="-DSHAREDIR='\"${md_inst}/share/xm7\"'" -DCMAKE_INSTALL_PREFIX:PATH="$md_inst" -DCMAKE_BUILD_TYPE=Release -DUSE_OPENCL=No -DUSE_OPENGL=No -DWITH_LIBAGAR_PREFIX="$md_build/libagar" -DWITH_AGAR_STATIC=yes ..
-    make
+    make -j4
     md_ret_require="$md_build/linux-sdl/build/sdl/xm7"
 }
 

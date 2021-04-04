@@ -22,7 +22,7 @@ function sources_lr-prosystem() {
 
 function build_lr-prosystem() {
     make clean
-    CXXFLAGS="$CXXFLAGS -fsigned-char" make
+    CXXFLAGS="$CXXFLAGS -fsigned-char" make -j4
     md_ret_require="$md_build/prosystem_libretro.so"
 }
 

@@ -22,7 +22,7 @@ function sources_lr-freechaf() {
 
 function build_lr-freechaf() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/freechaf_libretro.so"
 }
 

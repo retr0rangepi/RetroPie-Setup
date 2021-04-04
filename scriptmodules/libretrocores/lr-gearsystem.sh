@@ -23,7 +23,7 @@ function sources_lr-gearsystem() {
 function build_lr-gearsystem() {
     cd platforms/libretro
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/platforms/libretro/gearsystem_libretro.so"
 }
 

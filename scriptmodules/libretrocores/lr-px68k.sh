@@ -22,7 +22,7 @@ function sources_lr-px68k() {
 
 function build_lr-px68k() {
     make clean
-    make
+    make -j4
     md_ret_require="$md_build/px68k_libretro.so"
 }
 

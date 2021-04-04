@@ -30,7 +30,7 @@ function sources_cgenius() {
 
 function build_cgenius() {
     cmake -DUSE_SDL2=yes -DCMAKE_INSTALL_PREFIX="$md_inst" -DNOTYPESAVE=on -DUSE_BOOST=no
-    make
+    make -j4
     md_ret_require="$md_build/src/CGeniusExe"
 }
 

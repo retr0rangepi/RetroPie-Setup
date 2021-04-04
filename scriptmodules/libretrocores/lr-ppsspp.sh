@@ -40,7 +40,7 @@ function build_lr-ppsspp() {
     elif isPlatform "kms"; then
         params+=("platform=armvglesneon")
     fi
-    make -C libretro "${params[@]}"
+    make -j4 -C libretro "${params[@]}"
     md_ret_require="$md_build/libretro/ppsspp_libretro.so"
 }
 
